@@ -34,28 +34,31 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
   行われます.
 
 * evernote-save-note (default bound to \C-x\C-s)
-  編集したノートをEvernoteサービス上で上書き保存します.
+  編集したノートをEvernoteサービス上で上書き保存します。
+
+* evernote-create-note
+  ノートを新規作成します。
 
 * evernote-write-note (default bound to \C-cee)
   emacsバッファを新規ノートとして保存します.保存時にはノートに付加する
-  タグを指定できます.
+  タグを指定できます。
 
 * evernote-edit-tags (default bound to \C-cet)
   ノートに付加するタグを変更します.このコマンド発行後に
   evernote-save-noteを実行することでEvernoteサービス上で変更が反映され
-  ます.
+  ます。
 
 * evernote-change-edit-mode (default bound to \C-cee)
   ノートの編集モードを変更します.詳細は "Evernote note editformat" を
   参照して下さい.このコマンド発行後にevernote-save-noteを実行すること
-  でEvernoteサービス上で変更が反映されます.
+  でEvernoteサービス上で変更が反映されます。
 
 * evernote-rename-note (default bound to \C-cer)
   ノートを名前を変更します.このコマンド発行後にevernote-save-noteを実
-  行することでEvernoteサービス上で変更が反映されます.
+  行することでEvernoteサービス上で変更が反映されます。
 
 * evernote-delete-note (default bound to \C-ced)
-  ノートを削除します.
+  ノートを削除します。
 
 
 evernote-open-note, evernote-write-noteを実行すると、ノートが読み込ま
@@ -191,6 +194,7 @@ cp evernote-mode.el <your load path>
 
 (add-to-list 'load-path "<your load path>")
 (require 'evernote-mode)
+(global-set-key "\C-cec" 'evernote-create-note)
 (global-set-key "\C-ceo" 'evernote-open-note)
 (global-set-key "\C-cew" 'evernote-write-note)
 

@@ -36,6 +36,9 @@ following commands.
 * evernote-save-note (default bound to \C-x\C-s)
   Save the modified note.
 
+* evernote-create-note
+  Create a note from scratch.
+
 * evernote-write-note (default bound to \C-cee)
   Create a new note from the current buffer.
   You can attach tags to the note when creating the note.
@@ -196,6 +199,7 @@ cp evernote-mode.el <your load path>
 
 (add-to-list 'load-path "<your load path>")
 (require 'evernote-mode)
+(global-set-key "\C-cec" 'evernote-create-note)
 (global-set-key "\C-ceo" 'evernote-open-note)
 (global-set-key "\C-cew" 'evernote-write-note)
 

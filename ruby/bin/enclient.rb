@@ -1,4 +1,4 @@
-#! ruby.exe -sWKu
+#! C:/Ruby192/bin/ruby.exe -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -676,6 +676,10 @@ module EnClient
 
       @opt.on "-t", "--tag tag_names", Array do |tag_list|
         @tags = Utils::unpack_utf8_string_list tag_list
+      end
+
+      @opt.on "--delete-all-tags" do
+        @tags = []
       end
 
       @opt.on "-x", "--xhtml" do

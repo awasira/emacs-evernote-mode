@@ -29,6 +29,7 @@
 ;;
 ;;      (add-to-list 'load-path "~/lisp")
 ;;      (require 'evernote-mode)
+;;      (global-set-key "\C-cec" 'evernote-create-note)
 ;;      (global-set-key "\C-ceo" 'evernote-open-note)
 ;;      (global-set-key "\C-cew" 'evernote-write-note)
 ;;
@@ -109,9 +110,9 @@
   (let ((open-note-func
          (lambda ()
            (let* ((note-info (evernote-command-get-note-info-from-tag-name
-                              (completing-read-multiple "Tags used for search (comma separated form. default search all tags):"
-                                                        (evernote-get-tag-cands (evernote-command-get-tag-info))
-                                                        nil t)))
+                              (evernote-completing-read-multiple "Tags used for search (comma separated form. default search all tags):"
+                                                                 (evernote-get-tag-cands (evernote-command-get-tag-info))
+                                                                 nil t)))
                   (note-cand (evernote-get-note-cands note-info))
                   (note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
                   (note-guid (cdr (assoc 'guid note-attr)))
@@ -142,13 +143,38 @@
     (message "(No changes need to be saved)")))
 
 
+(defun evernote-create-note ()
+  "Create a note"
+  (interactive)
+  (let ((create-note-func
+         (lambda ()
+           (let* ((tags (evernote-completing-read-multiple "Attached Tags (comma separated form):"
+                                                           (evernote-get-tag-cands (evernote-command-get-tag-info))))
+                  (name (read-string "Note name:"))
+                  (edit-mode "TEXT")
+                  (buf (generate-new-buffer name)))
+             (switch-to-buffer buf)
+             (evernote-command-create-note (current-buffer)
+                                           name
+                                           tags
+                                           edit-mode)
+             (setq evernote-note-guid (evernote-eval-command-result)
+                   evernote-note-name name
+                   evernote-note-tags tags
+                   evernote-note-edit-mode edit-mode)
+             (evernote-mode)
+             (evernote-update-mode-line)
+             (set-buffer-modified-p nil)))))
+    (evernote-command-with-auth create-note-func)))
+
+
 (defun evernote-write-note ()
   "Write buffer to a note"
   (interactive)
   (let ((write-note-func
          (lambda ()
-           (let* ((tags (completing-read-multiple "Attached Tags (comma separated form):"
-                                                  (evernote-get-tag-cands (evernote-command-get-tag-info))))
+           (let* ((tags (evernote-completing-read-multiple "Attached Tags (comma separated form):"
+                                                           (evernote-get-tag-cands (evernote-command-get-tag-info))))
                   (name (read-string "Note name:" (buffer-name)))
                   (edit-mode (completing-read "Edit Mode (type \"TEXT\" or \"XHTML\"):"
                                               '(("TEXT") ("XHTML"))
@@ -175,9 +201,9 @@
   (let ((edit-tags-func
          (lambda ()
            (if evernote-mode
-               (let ((tags (completing-read-multiple "Change attached Tags (comma separated form):"
-                                                     (evernote-get-tag-cands (evernote-command-get-tag-info))
-                                                     nil nil (mapconcat #'identity evernote-note-tags ","))))
+               (let ((tags (evernote-completing-read-multiple "Change attached Tags (comma separated form):"
+                                                              (evernote-get-tag-cands (evernote-command-get-tag-info))
+                                                              nil nil (mapconcat #'identity evernote-note-tags ","))))
                  (setq evernote-note-tags tags)
                  (evernote-update-mode-line)
                  (set-buffer-modified-p t))))))
@@ -212,7 +238,7 @@
                (if evernote-note-guid
                    (progn
                      (evernote-command-delete-note evernote-note-guid)
-                     (kill-buffer))))))
+                     (kill-buffer (current-buffer)))))))
         (evernote-command-with-auth delete-note-func))))
 
 
@@ -317,6 +343,11 @@
   (force-mode-line-update))
 
 
+(defun evernote-completing-read-multiple (prompt table &optional predicate require-match initial-input hist def inherit-input-method)
+  (let ((results (completing-read-multiple prompt table predicate require-match initial-input hist def inherit-input-method)))
+    (delete "" results)))
+
+
 ;;
 ;; Command interface.
 ;;
@@ -336,11 +367,11 @@
 
 (defun evernote-command-get-note-info-from-tag-name (tag-names)
   "Issue listnotes command from the tag name list."
-  (let ((oct-tag-names
-         (mapconcat #'identity (mapcar 'evernote-string-to-oct tag-names) ",")))
-    (if (string= oct-tag-names "\"\"")
-        (evernote-issue-command nil "listnotes")
-      (evernote-issue-command nil "listnotes" "-t" oct-tag-names)))
+  (if tag-names
+      (let ((oct-tag-names
+             (mapconcat #'identity (mapcar 'evernote-string-to-oct tag-names) ",")))
+        (evernote-issue-command nil "listnotes" "-t" oct-tag-names))
+    (evernote-issue-command nil "listnotes"))
   (evernote-eval-command-result))
 
 
@@ -395,7 +426,7 @@
                                 "-t" (mapconcat #'identity (mapcar 'evernote-string-to-oct tags) ",")
                                 guid (evernote-string-to-oct name) edit-mode-option)
       (evernote-issue-command inbuf
-                              "updatenote" "-c"
+                              "updatenote" "-c" "--delete-all-tags"
                               guid (evernote-string-to-oct name) edit-mode-option))))
 
 
