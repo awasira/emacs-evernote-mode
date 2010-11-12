@@ -18,7 +18,7 @@
 ;;
 ;; evernote-mode home page is at:
 ;; Author: Yusuke Kawakami
-;; Version: 0.01
+;; Version: 0.03
 ;; Keywords: tools
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -65,12 +65,17 @@
 (defvar evernote-mode-map (make-sparse-keymap)
   "Keymap used in evernote mode.")
 
-
 (define-key evernote-mode-map "\C-x\C-s" 'evernote-save-note)
 (define-key evernote-mode-map "\C-cet"   'evernote-edit-tags)
 (define-key evernote-mode-map "\C-cee"   'evernote-change-edit-mode)
 (define-key evernote-mode-map "\C-cer"   'evernote-rename-note)
 (define-key evernote-mode-map "\C-ced"   'evernote-delete-note)
+
+(defvar evernote-read-note-name-map
+	(copy-keymap minibuffer-local-completion-map))
+
+(define-key evernote-read-note-name-map [tab] 'evernote-note-completion)
+(define-key evernote-read-note-name-map "\C-i" 'evernote-note-completion)
 
 
 ;;(defvar evernote-browsing-mode-map (copy-keymap global-map)
@@ -146,9 +151,10 @@
 
 (defun evernote-open-note-common (note-list)
   "Common procedure of opening a note"
-  (let (note-cand note-attr note-guid note-name note-edit-mode note-tags opened-buf)
-    (setq note-cand (evernote-get-note-cands note-list))
-    (setq note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
+  (let (note-attr note-guid note-name note-edit-mode note-tags opened-buf)
+    ;;(setq note-cand (evernote-get-note-cands note-list))
+    ;;(setq note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
+		(setq note-attr (evernote-read-note-attr note-list))
     (setq note-guid (cdr (assoc 'guid note-attr)))
     (setq note-name (cdr (assoc 'name note-attr)))
     (setq note-edit-mode (cdr (assoc 'edit-mode note-attr)))
@@ -398,6 +404,60 @@
 (defun evernote-completing-read-multiple (prompt table &optional predicate require-match initial-input hist def inherit-input-method)
   (let ((results (completing-read-multiple prompt table predicate require-match initial-input hist def inherit-input-method)))
     (delete "" results)))
+
+
+(defun evernote-read-note-attr (note-list)
+	"Prompts a note name and returns a note attribute"
+	(let (evernote-note-cands evernote-note-display-map evernote-note-completion-prompt)
+		(setq evernote-note-cands
+					(mapcar (lambda (attr)
+										(cons (cdr (assoc 'name attr)) attr))
+									note-list))
+		(setq evernote-note-display-map
+					(mapcar (lambda (attr)
+										(cons (cdr (assoc 'name attr))
+													(format "%s    %s"
+																	(cdr (assoc 'updated attr))
+																	(cdr (assoc 'name attr)))))
+									note-list))
+		(setq evernote-note-completion-prompt "Note:")
+		(cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
+																			nil evernote-read-note-name-map)
+								evernote-note-cands))))
+
+
+(defun evernote-note-completion ()
+	"Complete note name and display completion list"
+	(interactive)
+	(let (word result start)
+		(setq start (+ (string-width evernote-note-completion-prompt) 1))
+		(setq word (buffer-substring start (point)))
+		;(evernote-tmp-message (concat "[" word "]"))
+		(setq result (try-completion word evernote-note-cands))
+		(cond
+		 ((eq result t) (evernote-tmp-message "[Sole Completion]"))
+		 ((eq result nil) (ding) (evernote-tmp-message "[No Match]"))
+		 ((string= result word)
+			(let (formatted-name-list)
+				(setq formatted-name-list
+							(mapcar (lambda (name)
+												(cdr (assoc name evernote-note-display-map)))
+											(all-completions word evernote-note-display-map)))
+				(with-output-to-temp-buffer "*Completions*"
+					(display-completion-list formatted-name-list))))
+		 (t (delete-region start (point))
+				(insert result)
+				(if (eq t (try-completion result evernote-note-cands))
+						nil
+					(evernote-tmp-message "[Complete, but not unique]"))))))
+
+
+(defun evernote-tmp-message (msg)
+	(save-excursion
+	 (goto-char (point-max))
+	 (save-excursion (insert " " msg))
+	 (sit-for 1)
+	 (delete-region (point) (point-max))))
 
 
 ;;
