@@ -275,6 +275,18 @@
         (evernote-command-with-auth delete-note-func))))
 
 
+(defun evernote-create-search ()
+  "Create a saved search"
+  (interactive)
+	(let ((create-search-func
+				 (lambda ()
+					 (let (name query)
+						 (setq name (read-string "Saved Search Name:"))
+						 (setq query (read-string "Query:"))
+						 (evernote-command-create-search name query)))))
+		(evernote-command-with-auth create-search-func)))
+
+
 ;;
 ;; Helper functions.
 ;;
@@ -484,7 +496,10 @@
 
 (defun evernote-command-create-search (name query)
   "Issue createsearch command"
-  (evernote-issue-command nil "createsearch" name query))
+  (evernote-issue-command nil
+													"createsearch"
+													(evernote-string-to-oct name)
+													(evernote-string-to-oct query)))
 
 
 (defun evernote-issue-command (inbuf &rest args)
