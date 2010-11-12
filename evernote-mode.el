@@ -72,7 +72,7 @@
 (define-key evernote-mode-map "\C-ced"   'evernote-delete-note)
 
 (defvar evernote-read-note-name-map
-	(copy-keymap minibuffer-local-completion-map))
+  (copy-keymap minibuffer-local-completion-map))
 
 (define-key evernote-read-note-name-map [tab] 'evernote-note-completion)
 (define-key evernote-read-note-name-map "\C-i" 'evernote-note-completion)
@@ -137,15 +137,15 @@
   (let ((search-note-func
          (lambda ()
            (evernote-open-note-common
-						(evernote-command-get-note-list-from-query
-						 (let ((search-cands
-										(evernote-get-search-cands (evernote-command-get-search-list))))
-							 (cdr (assoc 'query
-													 (cdr (assoc
-																 (completing-read "Saved search:"
-																									search-cands
-																									nil t)
-																 search-cands))))))))))
+            (evernote-command-get-note-list-from-query
+             (let ((search-cands
+                    (evernote-get-search-cands (evernote-command-get-search-list))))
+               (cdr (assoc 'query
+                           (cdr (assoc
+                                 (completing-read "Saved search:"
+                                                  search-cands
+                                                  nil t)
+                                 search-cands))))))))))
     (evernote-command-with-auth search-note-func)))
 
 
@@ -154,7 +154,7 @@
   (let (note-attr note-guid note-name note-edit-mode note-tags opened-buf)
     ;;(setq note-cand (evernote-get-note-cands note-list))
     ;;(setq note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
-		(setq note-attr (evernote-read-note-attr note-list))
+    (setq note-attr (evernote-read-note-attr note-list))
     (setq note-guid (cdr (assoc 'guid note-attr)))
     (setq note-name (cdr (assoc 'name note-attr)))
     (setq note-edit-mode (cdr (assoc 'edit-mode note-attr)))
@@ -284,13 +284,13 @@
 (defun evernote-create-search ()
   "Create a saved search"
   (interactive)
-	(let ((create-search-func
-				 (lambda ()
-					 (let (name query)
-						 (setq name (read-string "Saved Search Name:"))
-						 (setq query (read-string "Query:"))
-						 (evernote-command-create-search name query)))))
-		(evernote-command-with-auth create-search-func)))
+  (let ((create-search-func
+         (lambda ()
+           (let (name query)
+             (setq name (read-string "Saved Search Name:"))
+             (setq query (read-string "Query:"))
+             (evernote-command-create-search name query)))))
+    (evernote-command-with-auth create-search-func)))
 
 
 ;;
@@ -323,9 +323,9 @@
 
 (defun evernote-get-search-cands (search-list)
   "Get the completion table from search list output from command line"
-	(mapcar
-	 (lambda (elem) (cons (cdr (assoc 'name elem)) elem))
-	 search-list))
+  (mapcar
+   (lambda (elem) (cons (cdr (assoc 'name elem)) elem))
+   search-list))
 
 
 (defun evernote-find-opened-buffer (guid)
@@ -389,84 +389,87 @@
 
 
 (defun evernote-read-note-attr (note-list)
-	"Prompts a note name and returns a note attribute"
-	(let (name-set
-				evernote-note-cands
-				evernote-note-display-map
-				evernote-note-completion-prompt)
-		(mapc (lambda (attr)
-						(let* ((name (cdr (assoc 'name attr)))
-									 (displayed-name name)
-									 (index 1))
-							(while (member displayed-name name-set)
-								(setq displayed-name (format "%s(%d)" name index))
-								(setq index (+ index 1)))
-							(setq name-set (cons displayed-name name-set))
-							(setq evernote-note-cands
-										(cons (cons name attr) evernote-note-cands))
-							(setq evernote-note-display-map
-										(cons (cons name
-																(format "%s    %s"
-																				(cdr (assoc 'updated attr))
-																				displayed-name))
-													evernote-note-display-map))))
-					note-list)
-		(setq evernote-note-cands (nreverse evernote-note-cands)
-					evernote-note-completion-prompt (nreverse evernote-note-completion-prompt))
-		(setq evernote-note-completion-prompt "Note:")
-		(cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
-																			nil evernote-read-note-name-map)
-								evernote-note-cands))))
+  "Prompts a note name and returns a note attribute"
+  (let ((name-num-map (make-hash-table :test #'equal))
+        evernote-note-cands
+        evernote-note-display-map
+        evernote-note-completion-prompt)
+    (mapc (lambda (attr)
+            (let* ((name (cdr (assoc 'name attr)))
+                   displayed-name
+                   (num (gethash name name-num-map)))
+              (if num
+                  (progn
+                    (setq num (+ num 1))
+                    (setq displayed-name (format "%s(%d)" name num))
+                    (puthash name num name-num-map))
+                (setq displayed-name (substring name 0))
+                (puthash name 1 name-num-map))
+              (setq evernote-note-cands
+                    (cons (cons displayed-name attr) evernote-note-cands))
+              (setq evernote-note-display-map
+                    (cons (cons displayed-name
+                                (format "%s    %s"
+                                        (cdr (assoc 'updated attr))
+                                        displayed-name))
+                          evernote-note-display-map))))
+          note-list)
+    (setq evernote-note-cands (nreverse evernote-note-cands)
+          evernote-note-display-map (nreverse evernote-note-display-map))
+    (setq evernote-note-completion-prompt "Note:")
+    (cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
+                                      nil evernote-read-note-name-map)
+                evernote-note-cands))))
 
-;;		(setq evernote-note-cands
-;;					(mapcar (lambda (attr)
-;;										(cons (cdr (assoc 'name attr)) attr))
-;;									note-list))
-;;		(setq evernote-note-display-map
-;;					(mapcar (lambda (attr)
-;;										(cons (cdr (assoc 'name attr))
-;;													(format "%s    %s"
-;;																	(cdr (assoc 'updated attr))
-;;																	(cdr (assoc 'name attr)))))
-;;									note-list))
-;;		(setq evernote-note-completion-prompt "Note:")
-;;		(cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
-;;																			nil evernote-read-note-name-map)
-;;								evernote-note-cands))))
+;;    (setq evernote-note-cands
+;;          (mapcar (lambda (attr)
+;;                    (cons (cdr (assoc 'name attr)) attr))
+;;                  note-list))
+;;    (setq evernote-note-display-map
+;;          (mapcar (lambda (attr)
+;;                    (cons (cdr (assoc 'name attr))
+;;                          (format "%s    %s"
+;;                                  (cdr (assoc 'updated attr))
+;;                                  (cdr (assoc 'name attr)))))
+;;                  note-list))
+;;    (setq evernote-note-completion-prompt "Note:")
+;;    (cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
+;;                                      nil evernote-read-note-name-map)
+;;                evernote-note-cands))))
 
 
 (defun evernote-note-completion ()
-	"Complete note name and display completion list"
-	(interactive)
-	(let (word result start)
-		(setq start (+ (string-width evernote-note-completion-prompt) 1))
-		(setq word (buffer-substring start (point)))
-		;(evernote-tmp-message (concat "[" word "]"))
-		(setq result (try-completion word evernote-note-cands))
-		(cond
-		 ((eq result t) (evernote-tmp-message "[Sole Completion]"))
-		 ((eq result nil) (ding) (evernote-tmp-message "[No Match]"))
-		 ((string= result word)
-			(let (formatted-name-list)
-				(setq formatted-name-list
-							(mapcar (lambda (name)
-												(cdr (assoc name evernote-note-display-map)))
-											(all-completions word evernote-note-display-map)))
-				(with-output-to-temp-buffer "*Completions*"
-					(display-completion-list formatted-name-list))))
-		 (t (delete-region start (point))
-				(insert result)
-				(if (eq t (try-completion result evernote-note-cands))
-						nil
-					(evernote-tmp-message "[Complete, but not unique]"))))))
+  "Complete note name and display completion list"
+  (interactive)
+  (let (word result start)
+    (setq start (+ (string-width evernote-note-completion-prompt) 1))
+    (setq word (buffer-substring start (point)))
+                                        ;(evernote-tmp-message (concat "[" word "]"))
+    (setq result (try-completion word evernote-note-cands))
+    (cond
+     ((eq result t) (evernote-tmp-message "[Sole Completion]"))
+     ((eq result nil) (ding) (evernote-tmp-message "[No Match]"))
+     ((string= result word)
+      (let (formatted-name-list)
+        (setq formatted-name-list
+              (mapcar (lambda (name)
+                        (cdr (assoc name evernote-note-display-map)))
+                      (all-completions word evernote-note-display-map)))
+        (with-output-to-temp-buffer "*Completions*"
+          (display-completion-list formatted-name-list))))
+     (t (delete-region start (point))
+        (insert result)
+        (if (eq t (try-completion result evernote-note-cands))
+            nil
+          (evernote-tmp-message "[Complete, but not unique]"))))))
 
 
 (defun evernote-tmp-message (msg)
-	(save-excursion
-	 (goto-char (point-max))
-	 (save-excursion (insert " " msg))
-	 (sit-for 1)
-	 (delete-region (point) (point-max))))
+  (save-excursion
+    (goto-char (point-max))
+    (save-excursion (insert " " msg))
+    (sit-for 1)
+    (delete-region (point) (point-max))))
 
 
 ;;
@@ -566,9 +569,9 @@
 (defun evernote-command-create-search (name query)
   "Issue createsearch command"
   (evernote-issue-command nil
-													"createsearch"
-													(evernote-string-to-oct name)
-													(evernote-string-to-oct query)))
+                          "createsearch"
+                          (evernote-string-to-oct name)
+                          (evernote-string-to-oct query)))
 
 
 (defun evernote-issue-command (inbuf &rest args)
