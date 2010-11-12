@@ -109,22 +109,55 @@
   (interactive)
   (let ((open-note-func
          (lambda ()
-           (let* ((note-info (evernote-command-get-note-info-from-tag-name
-                              (evernote-completing-read-multiple "Tags used for search (comma separated form. default search all tags):"
-                                                                 (evernote-get-tag-cands (evernote-command-get-tag-info))
-                                                                 nil t)))
-                  (note-cand (evernote-get-note-cands note-info))
-                  (note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
-                  (note-guid (cdr (assoc 'guid note-attr)))
-                  (note-name (cdr (assoc 'name note-attr)))
-                  (note-edit-mode (cdr (assoc 'edit-mode note-attr)))
-                  (note-tags (cdr (assoc 'tags note-attr)))
-                  (opened-buf (evernote-find-opened-buffer note-guid)))
-             (if opened-buf
-                 (evernote-move-cursor-to-window opened-buf)
-               (let ((content (evernote-command-get-note-content note-guid note-edit-mode)))
-                 (evernote-create-note-buffer note-guid note-name note-edit-mode note-tags content)))))))
+           (evernote-open-note-common
+            (evernote-command-get-note-list-from-tags
+             (evernote-completing-read-multiple "Tags used for search (comma separated form. default search all tags):"
+                                                (evernote-get-tag-cands (evernote-command-get-tag-list))
+                                                nil t))))))
     (evernote-command-with-auth open-note-func)))
+
+
+(defun evernote-search-notes ()
+  "Search notes with query and open a note among them"
+  (interactive)
+  (let ((search-note-func
+         (lambda ()
+           (evernote-open-note-common (evernote-command-get-note-list-from-query (read-string "Query:"))))))
+    (evernote-command-with-auth search-note-func)))
+
+
+(defun evernote-do-saved-search ()
+  "Do a saved search and open a note"
+  (interactive)
+  (let ((search-note-func
+         (lambda ()
+           (evernote-open-note-common
+						(evernote-command-get-note-list-from-query
+						 (let ((search-cands
+										(evernote-get-search-cands (evernote-command-get-search-list))))
+							 (cdr (assoc 'query
+													 (cdr (assoc
+																 (completing-read "Saved search:"
+																									search-cands
+																									nil t)
+																 search-cands))))))))))
+    (evernote-command-with-auth search-note-func)))
+
+
+(defun evernote-open-note-common (note-list)
+  "Common procedure of opening a note"
+  (let (note-cand note-attr note-guid note-name note-edit-mode note-tags opened-buf)
+    (setq note-cand (evernote-get-note-cands note-list))
+    (setq note-attr (cdr (assoc (completing-read "Note:" note-cand nil t) note-cand)))
+    (setq note-guid (cdr (assoc 'guid note-attr)))
+    (setq note-name (cdr (assoc 'name note-attr)))
+    (setq note-edit-mode (cdr (assoc 'edit-mode note-attr)))
+    (setq note-tags (cdr (assoc 'tags note-attr)))
+    (setq opened-buf (evernote-find-opened-buffer note-guid))
+    (if opened-buf
+        (evernote-move-cursor-to-window opened-buf)
+      (let ((content (evernote-command-get-note-content note-guid note-edit-mode)))
+        (evernote-create-note-buffer note-guid note-name note-edit-mode note-tags content)))))
 
 
 (defun evernote-save-note ()
@@ -149,7 +182,7 @@
   (let ((create-note-func
          (lambda ()
            (let* ((tags (evernote-completing-read-multiple "Attached Tags (comma separated form):"
-                                                           (evernote-get-tag-cands (evernote-command-get-tag-info))))
+                                                           (evernote-get-tag-cands (evernote-command-get-tag-list))))
                   (name (read-string "Note name:"))
                   (edit-mode "TEXT")
                   (buf (generate-new-buffer name)))
@@ -174,7 +207,7 @@
   (let ((write-note-func
          (lambda ()
            (let* ((tags (evernote-completing-read-multiple "Attached Tags (comma separated form):"
-                                                           (evernote-get-tag-cands (evernote-command-get-tag-info))))
+                                                           (evernote-get-tag-cands (evernote-command-get-tag-list))))
                   (name (read-string "Note name:" (buffer-name)))
                   (edit-mode (completing-read "Edit Mode (type \"TEXT\" or \"XHTML\"):"
                                               '(("TEXT") ("XHTML"))
@@ -202,7 +235,7 @@
          (lambda ()
            (if evernote-mode
                (let ((tags (evernote-completing-read-multiple "Change attached Tags (comma separated form):"
-                                                              (evernote-get-tag-cands (evernote-command-get-tag-info))
+                                                              (evernote-get-tag-cands (evernote-command-get-tag-list))
                                                               nil nil (mapconcat #'identity evernote-note-tags ","))))
                  (setq evernote-note-tags tags)
                  (evernote-update-mode-line)
@@ -258,26 +291,33 @@
       (message (evernote-error-message error-code)))))
 
 
-(defun evernote-get-tag-cands (tag-info)
-  "Get the completion table from tag info output from command line"
+(defun evernote-get-tag-cands (tag-list)
+  "Get the completion table from tag list output from command line"
   (let (acc
         (collect-tagname (lambda (node)
                            (setq acc (cons (list (cdr (assoc 'name node))) acc))
                            (let ((children (cdr (assoc 'children node))))
                              (if children
                                  (mapc collect-tagname children))))))
-    (mapcar collect-tagname tag-info)
+    (mapcar collect-tagname tag-list)
     (nreverse acc)))
 
 
-(defun evernote-get-note-cands (note-info)
-  "Get completion table from note info output from command line"
+(defun evernote-get-search-cands (search-list)
+  "Get the completion table from search list output from command line"
+	(mapcar
+	 (lambda (elem) (cons (cdr (assoc 'name elem)) elem))
+	 search-list))
+
+
+(defun evernote-get-note-cands (note-list)
+  "Get completion table from note list output from command line"
   (let ((maxwidth 0))
     (mapc (lambda (node)
             (setq maxwidth
                   (max maxwidth
                        (string-width (cdr (assoc 'name node))))))
-          note-info)
+          note-list)
     (mapcar (lambda (node)
               (let* ((name (cdr (assoc 'name node)))
                      (indent (make-string (- maxwidth (string-width name)) ?\ )))
@@ -285,7 +325,7 @@
                               name indent
                               (cdr (assoc 'updated node)))
                       node)))
-            note-info)))
+            note-list)))
 
 
 (defun evernote-find-opened-buffer (guid)
@@ -359,13 +399,13 @@
     (evernote-issue-command nil "login" user passwd)))
 
 
-(defun evernote-command-get-tag-info ()
+(defun evernote-command-get-tag-list ()
   "Issue listtags command"
   (evernote-issue-command nil "listtags")
   (evernote-eval-command-result))
 
 
-(defun evernote-command-get-note-info-from-tag-name (tag-names)
+(defun evernote-command-get-note-list-from-tags (tag-names)
   "Issue listnotes command from the tag name list."
   (if tag-names
       (let ((oct-tag-names
@@ -375,10 +415,11 @@
   (evernote-eval-command-result))
 
 
-(defun evernote-command-get-note-info-from-tag-guid (tag-guids)
-  "Issue listnotes command from the tag guid list."
-  (if tag-guids
-      (evernote-issue-command nil "listnotes" "-g" (mapconcat #'identity tag-guids ","))
+(defun evernote-command-get-note-list-from-query (query)
+  "Issue listnotes command from the query."
+  (if query
+      (let ((oct-query (evernote-string-to-oct query)))
+        (evernote-issue-command nil "listnotes" "-q" oct-query))
     (evernote-issue-command nil "listnotes"))
   (evernote-eval-command-result))
 
@@ -433,6 +474,17 @@
 (defun evernote-command-delete-note (guid)
   "Issue deletenote command specified by the guid, tags and the edit mode."
   (evernote-issue-command nil "deletenote" guid))
+
+
+(defun evernote-command-get-search-list ()
+  "Issue listsearch command"
+  (evernote-issue-command nil "listsearch")
+  (evernote-eval-command-result))
+
+
+(defun evernote-command-create-search (name query)
+  "Issue createsearch command"
+  (evernote-issue-command nil "createsearch" name query))
 
 
 (defun evernote-issue-command (inbuf &rest args)

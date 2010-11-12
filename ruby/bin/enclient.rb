@@ -1,4 +1,4 @@
-#! C:/Ruby192/bin/ruby.exe -sWKu
+#! /usr/bin/ruby1.8 -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -495,22 +495,20 @@ module EnClient
         end
       end
 
-      @opt.on "-g", "--guid tag_guids", Array do |guid_list|
-        if @tag == nil
-          @tags = []
-        end
-        @tags += guid_list
+      @opt.on "-q", "--query query", String do |query|
+        @query = Utils::unpack_utf8_string query
       end
     end
 
     def exec_impl(args)
       @tag_info = create_tag_info
-      @tags = nil
+      @tags, @query = nil, nil
       parse_args args, 0
 
       filter = Evernote::EDAM::NoteStore::NoteFilter.new
       filter.order = Evernote::EDAM::Type::NoteSortOrder::UPDATED
       filter.tagGuids = @tags
+      filter.words = @query
       notelist = @note_store.findNotes(@auth_token,
                                        filter,
                                        0,
@@ -596,18 +594,6 @@ module EnClient
       super self.class.get_command_name
       @opt.banner = "#{@name} title"
 
-      #@opt.on "-t", "--tag tag_names", Array do |tag_list|
-      #  @tags = []
-      #  tag_list = Utils::unpack_utf8_string_list tag_list
-      #  tag_list.each do |tag_name|
-      #    tag_guid = @tag_info.get_tag_guid tag_name
-      #    if tag_guid == nil
-      #      raise IllegalArgumentException.new(%|tag "#{tag_name}" is not found|)
-      #    end
-      #    @tags << tag_guid
-      #  end
-      #end
-
       @opt.on "-t", "--tag tag_names", Array do |tag_list|
         @tags = Utils::unpack_utf8_string_list tag_list
       end
@@ -626,7 +612,6 @@ module EnClient
     end
 
     def exec_impl(args)
-      @tag_info = create_tag_info
       @tags, @save_as_xhtml, @has_content, content = nil, false, false, nil
       title, = parse_args args, 1
       if @has_content
@@ -662,18 +647,6 @@ module EnClient
       super self.class.get_command_name
       @opt.banner = "#{@name} guid title"
 
-      #@opt.on "-t", "--tag tag_names", Array do |tag_list|
-      #  @tags = []
-      #  tag_list = Utils::unpack_utf8_string_list tag_list
-      #  tag_list.each do |tag_name|
-      #    tag_guid = @tag_info.get_tag_guid tag_name
-      #    if tag_guid == nil
-      #      raise IllegalArgumentException.new(%|tag "#{tag_name}" is not found|)
-      #    end
-      #    @tags << tag_guid
-      #  end
-      #end
-
       @opt.on "-t", "--tag tag_names", Array do |tag_list|
         @tags = Utils::unpack_utf8_string_list tag_list
       end
@@ -696,7 +669,6 @@ module EnClient
     end
 
     def exec_impl(args)
-      @tag_info = create_tag_info
       @tags, @save_as_xhtml, @has_content, content = nil, false, false, nil
       guid, title = parse_args args, 2
       if @has_content
@@ -867,6 +839,55 @@ module EnClient
   end
 
   #
+  # ListSearch Command
+  #
+  class ListSearch < Command
+    def self.get_command_name
+      "listsearch"
+    end
+
+    def initialize
+      super self.class.get_command_name
+    end
+
+    def exec_impl(args)
+      parse_args args, 0
+      searches = @note_store.listSearches @auth_token
+      formatter = Formatter.new
+      searches.each do |s|
+        alist = Formatter.new
+        alist << Formatter::Pair.new("name", s.name)
+        alist << Formatter::Pair.new("guid", s.guid)
+        alist << Formatter::Pair.new("query", s.query)
+        formatter << alist
+      end
+      puts formatter.to_s
+    end
+  end
+
+  #
+  # CreateSearch Command
+  #
+  class CreateSearch < Command
+    def self.get_command_name
+      "createsearch"
+    end
+
+    def initialize
+      super self.class.get_command_name
+      @opt.banner = "#{@name} name query"
+    end
+
+    def exec_impl(args)
+      name, query = parse_args args, 2
+      search = Evernote::EDAM::Type::SavedSearch.new
+      search.name = name
+      search.query = query
+      @note_store.createSearch @auth_token, search
+    end
+  end
+
+  #
   # Utils
   #
   class Utils
@@ -920,6 +941,8 @@ module EnClient
       add_command CreateTag
       add_command UpdateTag
       add_command ExpungeTag
+      add_command ListSearch
+      add_command CreateSearch
 
       command_found = false
       command_name = ARGV[0]
