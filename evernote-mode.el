@@ -328,24 +328,6 @@
 	 search-list))
 
 
-(defun evernote-get-note-cands (note-list)
-  "Get completion table from note list output from command line"
-  (let ((maxwidth 0))
-    (mapc (lambda (node)
-            (setq maxwidth
-                  (max maxwidth
-                       (string-width (cdr (assoc 'name node))))))
-          note-list)
-    (mapcar (lambda (node)
-              (let* ((name (cdr (assoc 'name node)))
-                     (indent (make-string (- maxwidth (string-width name)) ?\ )))
-                (cons (format "%s%s (Last updated %s)"
-                              name indent
-                              (cdr (assoc 'updated node)))
-                      node)))
-            note-list)))
-
-
 (defun evernote-find-opened-buffer (guid)
   "Find a buffer associated with guid"
   (let ((found_buf nil))
@@ -408,22 +390,49 @@
 
 (defun evernote-read-note-attr (note-list)
 	"Prompts a note name and returns a note attribute"
-	(let (evernote-note-cands evernote-note-display-map evernote-note-completion-prompt)
-		(setq evernote-note-cands
-					(mapcar (lambda (attr)
-										(cons (cdr (assoc 'name attr)) attr))
-									note-list))
-		(setq evernote-note-display-map
-					(mapcar (lambda (attr)
-										(cons (cdr (assoc 'name attr))
-													(format "%s    %s"
-																	(cdr (assoc 'updated attr))
-																	(cdr (assoc 'name attr)))))
-									note-list))
+	(let (name-set
+				evernote-note-cands
+				evernote-note-display-map
+				evernote-note-completion-prompt)
+		(mapc (lambda (attr)
+						(let* ((name (cdr (assoc 'name attr)))
+									 (displayed-name name)
+									 (index 1))
+							(while (member displayed-name name-set)
+								(setq displayed-name (format "%s(%d)" name index))
+								(setq index (+ index 1)))
+							(setq name-set (cons displayed-name name-set))
+							(setq evernote-note-cands
+										(cons (cons name attr) evernote-note-cands))
+							(setq evernote-note-display-map
+										(cons (cons name
+																(format "%s    %s"
+																				(cdr (assoc 'updated attr))
+																				displayed-name))
+													evernote-note-display-map))))
+					note-list)
+		(setq evernote-note-cands (nreverse evernote-note-cands)
+					evernote-note-completion-prompt (nreverse evernote-note-completion-prompt))
 		(setq evernote-note-completion-prompt "Note:")
 		(cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
 																			nil evernote-read-note-name-map)
 								evernote-note-cands))))
+
+;;		(setq evernote-note-cands
+;;					(mapcar (lambda (attr)
+;;										(cons (cdr (assoc 'name attr)) attr))
+;;									note-list))
+;;		(setq evernote-note-display-map
+;;					(mapcar (lambda (attr)
+;;										(cons (cdr (assoc 'name attr))
+;;													(format "%s    %s"
+;;																	(cdr (assoc 'updated attr))
+;;																	(cdr (assoc 'name attr)))))
+;;									note-list))
+;;		(setq evernote-note-completion-prompt "Note:")
+;;		(cdr (assoc (read-from-minibuffer evernote-note-completion-prompt
+;;																			nil evernote-read-note-name-map)
+;;								evernote-note-cands))))
 
 
 (defun evernote-note-completion ()
