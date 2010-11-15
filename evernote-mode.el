@@ -531,7 +531,7 @@
 (defun evernote-read-edit-mode (default)
   (completing-read "Edit Mode (type \"TEXT\" or \"XHTML\"):"
                    '(("TEXT") ("XHTML"))
-                   nil nil default))
+                   nil t default))
 
 
 (defun evernote-string-to-oct (string)
