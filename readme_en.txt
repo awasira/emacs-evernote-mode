@@ -178,8 +178,7 @@ An example of TEXT mode editing:
 
 You can select the edit mode when you create a note or when you call
 evernote-change-edit-mode. The edit mode is recorded in the note when
-you save it, and the recorded edit mode is adapted when you reopen the
-note.
+you save it, and the recorded edit mode is applied to the note when you reopen it.
 Notes created by other Evernote applications are read as XHTML mode,
 but you can change the edit-mode by evernote-change-edit-mode.
 
@@ -203,7 +202,7 @@ The following examples are referred from
 
 * Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
 
-  tag:cooking -tag:mexican beef ?carrots
+  tag:cooking -tag:mexican beef -carrots
 
 
 * Find notes in my "Travel" notebook with San Francisco in the title:
@@ -214,18 +213,6 @@ The following examples are referred from
 * Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
 
   any: "San Francisco" tag:SFO
-
-
-* Find image notes from the Sunnyvale region:
-
-  resource:image/* latitude:37 -latitude:38
-  longitude:-123 -longitude:-122
-
-
-* Find untagged audio notes that I edited in the last week or two:
-
-  -tag:* resource:audio/* updated:week-1
-
 
 
 Installation & Settings

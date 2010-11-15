@@ -64,7 +64,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
   ミニバッファから入力されたクエリを使ってノートを検索します。
   クエリの例は "Search Query Examples" を参照して下さい。
 
-* evernote-create-saved-search
+* evernote-do-saved-search
   Evernoteの「保存された検索」を使ってノートを検索します。
 
 * evernote-create-saved-search
@@ -200,7 +200,7 @@ http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 
 * Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
 
-  tag:cooking -tag:mexican beef ?carrots
+  tag:cooking -tag:mexican beef -carrots
 
 
 * Find notes in my "Travel" notebook with San Francisco in the title:
@@ -211,17 +211,6 @@ http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 * Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
 
   any: "San Francisco" tag:SFO
-
-
-* Find image notes from the Sunnyvale region:
-
-  resource:image/* latitude:37 -latitude:38
-  longitude:-123 -longitude:-122
-
-
-* Find untagged audio notes that I edited in the last week or two:
-
-  -tag:* resource:audio/* updated:week-1
 
 
 Installation & Settings
