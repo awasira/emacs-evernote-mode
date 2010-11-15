@@ -364,8 +364,8 @@
                      evernote-note-displayed-name-attr-alist))
          (setq evenote-note-displayed-name-formatted-name-alist
                (cons (cons displayed-name
-                           (format "%s    %s"
-                                   (cdr (assoc 'updated attr))
+                           (format "%s   %s"
+                                   (evernote-assoc-cdr 'updated attr)
                                    displayed-name))
                      evenote-note-displayed-name-formatted-name-alist))))
      note-command-out)
@@ -520,6 +520,12 @@
       (evernote-update-mode-line)
       (set-buffer-modified-p nil)
       (pop-to-buffer buf))))
+
+
+(defun evernote-get-tag-list-string (tags maxlen)
+  (substring
+   (mapconcat #'identity tags ",")
+   0 maxlen))
 
 
 (defun evernote-read-edit-mode (default)
