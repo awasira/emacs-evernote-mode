@@ -1,5 +1,3 @@
-;;; evernote-mode.el ---
-
 ;;
 ;;  Copyright 2010 Yusuke Kawakami
 ;;
@@ -133,7 +131,8 @@
    (lambda ()
      (evernote-open-note-common
       (evernote-command-get-note-list-from-query
-       (read-string "Query:"))))))
+       (read-string "Query:"))
+      t))))
 
 
 (defun evernote-do-saved-search ()
@@ -152,13 +151,14 @@
             "Saved search:"
             search-alist
             nil t)
-           search-alist))))))))
+           search-alist))))
+      t))))
 
 
-(defun evernote-open-note-common (note-command-output)
+(defun evernote-open-note-common (note-command-output &optional display-completion)
   "Common procedure of opening a note"
   (let (note-attr note-guid note-name note-edit-mode note-tags opened-buf)
-    (setq note-attr (evernote-read-note-attr note-command-output))
+    (setq note-attr (evernote-read-note-attr note-command-output display-completion))
     (setq note-guid (evernote-assoc-cdr 'guid note-attr)
           note-name (evernote-assoc-cdr 'name note-attr)
           note-edit-mode (evernote-assoc-cdr 'edit-mode note-attr)
@@ -348,7 +348,7 @@
    search-command-out))
 
 
-(defun evernote-read-note-attr (note-command-out)
+(defun evernote-read-note-attr (note-command-out &optional display-completion)
   "Prompts a note name and returns a note attribute"
   (let ((name-num-hash (make-hash-table :test #'equal))
         evernote-note-displayed-name-attr-alist ; used in evernote-search-mode
@@ -373,6 +373,9 @@
           (nreverse evernote-note-displayed-name-attr-alist))
     (setq evenote-note-displayed-name-formatted-name-alist
           (nreverse evenote-note-displayed-name-formatted-name-alist))
+    (if display-completion
+        (evernote-display-note-completion-buf
+         evenote-note-displayed-name-formatted-name-alist))
     (evernote-assoc-cdr (read-from-minibuffer "Note:"
                                               nil evernote-read-note-map)
                         evernote-note-displayed-name-attr-alist)))
@@ -406,26 +409,8 @@
       (ding)
       (evernote-minibuffer-tmp-message "[No Match]"))
      ((string= result word)
-      (let (formatted-name-displayed-name-alist completion-buf)
-        (setq formatted-name-displayed-name-alist
-              (mapcar (lambda (displayed-name)
-                        (cons
-                         (evernote-assoc-cdr
-                          displayed-name
-                          evenote-note-displayed-name-formatted-name-alist)
-                         displayed-name))
-                      (all-completions
-                       word
-                       evenote-note-displayed-name-formatted-name-alist)))
-        (setq completion-buf (get-buffer-create "*Evernote-Completions*"))
-        (save-excursion
-          (set-buffer completion-buf)
-          (evernote-display-note-completion-list
-           formatted-name-displayed-name-alist)
-          (setq evernote-search-mode-formatted-name-displayed-name-alist
-                formatted-name-displayed-name-alist)
-          (evernote-search-mode))
-        (display-buffer completion-buf)))
+      (evernote-display-note-completion-buf
+       evenote-note-displayed-name-formatted-name-alist))
      (t (evernote-set-minibuffer-string result)
         (end-of-buffer)
         (if (eq t
@@ -441,8 +426,37 @@
   (if (assoc
        (evernote-get-minibuffer-string)
        evernote-note-displayed-name-attr-alist)
-      (exit-minibuffer)
+      (progn
+        (let ((completion-buf (get-buffer "*Evernote-Completions*")))
+          (if completion-buf
+              (kill-buffer completion-buf)))
+        (exit-minibuffer))
     (evernote-minibuffer-tmp-message "[No Match]")))
+
+
+(defun evernote-display-note-completion-buf (displayed-name-formatted-name-alist &optional word)
+  (let (formatted-name-displayed-name-alist completion-buf)
+    (setq formatted-name-displayed-name-alist
+          (mapcar (lambda (displayed-name)
+                    (cons
+                     (evernote-assoc-cdr
+                      displayed-name
+                      evenote-note-displayed-name-formatted-name-alist)
+                     displayed-name))
+                  (all-completions
+                   (if word
+                       word
+                     "")
+                   evenote-note-displayed-name-formatted-name-alist)))
+    (save-excursion
+      (setq completion-buf (get-buffer-create "*Evernote-Completions*"))
+      (set-buffer completion-buf)
+      (evernote-display-note-completion-list
+       formatted-name-displayed-name-alist)
+      (setq evernote-search-mode-formatted-name-displayed-name-alist
+            formatted-name-displayed-name-alist)
+      (evernote-search-mode))
+    (display-buffer completion-buf)))
 
 
 (defun evernote-display-note-completion-list (formatted-name-displayed-name-alist)
@@ -465,8 +479,10 @@
              (evernote-get-current-line-string)
              evernote-search-mode-formatted-name-displayed-name-alist))
       (kill-buffer (current-buffer))
-      (evernote-set-minibuffer-string displayed-name)
-      (exit-minibuffer))))
+      (if (active-minibuffer-window)
+          (progn
+            (evernote-set-minibuffer-string displayed-name)
+            (exit-minibuffer))))))
 
 
 (defun evernote-find-opened-buffer (guid)
