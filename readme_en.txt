@@ -59,6 +59,15 @@ following commands.
 * evernote-delete-note (default bound to \C-ced)
   Delete the note.
 
+* evernote-search-notes
+  Search notes by query in the minibuffer. (See "Search Query Examples" for details)
+
+* evernote-do-saved-search
+  Search notes by using a Saved Search.
+
+* evernote-create-saved-search
+  Save a query with a name for re-use at a later date.
+
 
 After calling evernote-open-note or evernote-write-note,
 they validate the minor-mode "evernote-mode" in the buffer.
@@ -181,8 +190,46 @@ The main usage of evernote-mode is to create and edit notes as TEXT
 mode.
 
 
-Installation
-============
+Search Query Examples
+=====================
+
+The following examples are referred from
+(http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479).
+
+* Find notes containing the word "chicken", tagged with "cooking", and created this year:
+
+  chicken tag:cooking created:year
+
+
+* Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
+
+  tag:cooking -tag:mexican beef ?carrots
+
+
+* Find notes in my "Travel" notebook with San Francisco in the title:
+
+  notebook:Travel intitle:"San Francisco"
+
+
+* Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
+
+  any: "San Francisco" tag:SFO
+
+
+* Find image notes from the Sunnyvale region:
+
+  resource:image/* latitude:37 -latitude:38
+  longitude:-123 -longitude:-122
+
+
+* Find untagged audio notes that I edited in the last week or two:
+
+  -tag:* resource:audio/* updated:week-1
+
+
+
+Installation & Settings
+=======================
 
 1. Install ruby scripts for using Evernote service.
 
@@ -201,6 +248,8 @@ cp evernote-mode.el <your load path>
 (require 'evernote-mode)
 (global-set-key "\C-cec" 'evernote-create-note)
 (global-set-key "\C-ceo" 'evernote-open-note)
+(global-set-key "\C-ces" 'evernote-search-notes)
+(global-set-key "\C-ceS" 'evernote-do-saved-search)
 (global-set-key "\C-cew" 'evernote-write-note)
 
 
@@ -210,8 +259,3 @@ If you want to use the proxy, set the value to the environment
 variable 'EN_PROXY' written as 'host:port' format.
 (ex. export EN_PROXY=proxy.hoge.com:8080)
 
-
-TODO
-====
-Support saved search
-Evernote browsing mode

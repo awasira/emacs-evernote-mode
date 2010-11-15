@@ -60,6 +60,16 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 * evernote-delete-note (default bound to \C-ced)
   ノートを削除します。
 
+* evernote-search-notes
+  ミニバッファから入力されたクエリを使ってノートを検索します。
+  クエリの例は "Search Query Examples" を参照して下さい。
+
+* evernote-create-saved-search
+  Evernoteの「保存された検索」を使ってノートを検索します。
+
+* evernote-create-saved-search
+  クエリに名前をつけて保存し、以後「保存された検索」として参照できるようにします。
+
 
 evernote-open-note, evernote-write-noteを実行すると、ノートが読み込ま
 れているバッファで evernote-modeマイナーモードが起動されます。
@@ -97,9 +107,9 @@ XHTMLモードでの編集の例:
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   ↓
-   ↓XHTMLモードで保存
-   ↓
+   |
+   |XHTMLモードで保存
+   V
    Evernoteサービス上のノート(Emacsバッファの内容と同じ)
    -----------------------------------
    <?xml version="1.0" encoding="UTF-8"?>
@@ -109,9 +119,9 @@ XHTMLモードでの編集の例:
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   ↓
-   ↓XHTMLモードで読み込み
-   ↓
+   |
+   |XHTMLモードで読み込み
+   V
    Emacs バッファ(ノートの内容と同じ)
    -----------------------------------
    <?xml version="1.0" encoding="UTF-8"?>
@@ -140,9 +150,9 @@ TEXTモードでの編集の例:
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-   ↓
-   ↓TEXTモードで保存
-   ↓
+   |
+   |TEXTモードで保存
+   V
    Evernoteサービス上のノート
    (Emacsバッファの内容がエスケープされ, XMLに変換される)
    -----------------------------------
@@ -153,9 +163,9 @@ TEXTモードでの編集の例:
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   ↓
-   ↓TEXTモードで読み込み
-   ↓
+   |
+   |TEXTモードで読み込み
+   V
    Emacs バッファ
    (ノートのルート要素以下の内容がアンエスケープされる)
    -----------------------------------
@@ -174,6 +184,44 @@ evernote-change-edit-modeで選択できます。ノートには編集モード�
 evernote-modeにはXML編集機能が備わっていないので、他のEvernoteアプリケー
 ションで作成されたノートの編集には適していません。evernote-modeでEmacs
 バッファをTEXTモードでそのまま保存、編集することが主な用途となります。
+
+
+Search Query Examples
+=====================
+
+以下の例は
+http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
+からの引用です。
+
+* Find notes containing the word "chicken", tagged with "cooking", and created this year:
+
+  chicken tag:cooking created:year
+
+
+* Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
+
+  tag:cooking -tag:mexican beef ?carrots
+
+
+* Find notes in my "Travel" notebook with San Francisco in the title:
+
+  notebook:Travel intitle:"San Francisco"
+
+
+* Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
+
+  any: "San Francisco" tag:SFO
+
+
+* Find image notes from the Sunnyvale region:
+
+  resource:image/* latitude:37 -latitude:38
+  longitude:-123 -longitude:-122
+
+
+* Find untagged audio notes that I edited in the last week or two:
+
+  -tag:* resource:audio/* updated:week-1
 
 
 Installation & Settings
@@ -196,6 +244,8 @@ cp evernote-mode.el <your load path>
 (require 'evernote-mode)
 (global-set-key "\C-cec" 'evernote-create-note)
 (global-set-key "\C-ceo" 'evernote-open-note)
+(global-set-key "\C-ces" 'evernote-search-notes)
+(global-set-key "\C-ceS" 'evernote-do-saved-search)
 (global-set-key "\C-cew" 'evernote-write-note)
 
 
@@ -203,10 +253,3 @@ cp evernote-mode.el <your load path>
 
 プロキシを使用する場合は環境変数EN_PROXYに 'プロキシホスト':'ポート'
 を指定して下さい。(ex. export EN_PROXY=proxy.hoge.com:8080)
-
-
-TODO
-====
-Support saved search
-Evernote browsing mode
-
