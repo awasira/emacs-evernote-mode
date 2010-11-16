@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-6
+Last Modified: 2010-11-16
 
 License
 =======
@@ -67,8 +67,11 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 * evernote-do-saved-search
   Evernoteの「保存された検索」を使ってノートを検索します。
 
-* evernote-create-saved-search
+* evernote-create-search
   クエリに名前をつけて保存し、以後「保存された検索」として参照できるようにします。
+
+* evernote-edit-search
+  既存の「保存された検索」の名前とクエリを変更します。
 
 
 evernote-open-note, evernote-write-noteを実行すると、ノートが読み込ま

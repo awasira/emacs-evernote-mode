@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-6
+Last Modified: 2010-11-16
 
 License
 =======
@@ -65,8 +65,11 @@ following commands.
 * evernote-do-saved-search
   Search notes by using a Saved Search.
 
-* evernote-create-saved-search
+* evernote-create-search
   Save a query with a name for re-use at a later date.
+
+* evernote-edit-search
+  Change the name and the query of an existing Saved Search.
 
 
 After calling evernote-open-note or evernote-write-note,
