@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at:
 ;; Author: Yusuke Kawakami
-;; Version: 0.03
+;; Version: 0.11
 ;; Keywords: tools
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -142,8 +142,10 @@
    (lambda ()
      (evernote-open-note-common
       (evernote-command-get-note-list-from-query
-       (let ((search-alist
-              (evernote-get-search-alist (evernote-command-get-search-list))))
+       (let (search-alist)
+         (setq search-alist
+               (evernote-get-search-alist
+                (evernote-command-get-search-list)))
          (evernote-assoc-cdr
           'query
           (evernote-assoc-cdr
@@ -308,6 +310,29 @@
       (read-string "Query:")))))
 
 
+(defun evernote-edit-search ()
+  "Create a saved search"
+  (interactive)
+  (evernote-command-with-auth
+   (lambda ()
+     (let (search-alist search-attr)
+       (setq search-alist
+               (evernote-get-search-alist
+                (evernote-command-get-search-list)))
+       (setq search-attr (evernote-assoc-cdr
+                          (completing-read
+                           "Saved search:"
+                           search-alist
+                           nil t)
+                          search-alist))
+       (evernote-command-update-search
+        (evernote-assoc-cdr 'guid search-attr)
+        (read-string "New Saved search name:"
+                     (evernote-assoc-cdr 'name search-attr))
+        (read-string "New Query:"
+                     (evernote-assoc-cdr 'query search-attr)))))))
+
+
 ;;
 ;; Helper functions.
 ;;
@@ -352,7 +377,7 @@
   "Prompts a note name and returns a note attribute"
   (let ((name-num-hash (make-hash-table :test #'equal))
         evernote-note-displayed-name-attr-alist ; used in evernote-search-mode
-        evenote-note-displayed-name-formatted-name-alist) ; used in evernote-search-mode
+        evernote-note-displayed-name-formatted-name-alist) ; used in evernote-search-mode
     (mapc
      (lambda (attr)
        (let (name displayed-name)
@@ -362,20 +387,23 @@
          (setq evernote-note-displayed-name-attr-alist
                (cons (cons displayed-name attr)
                      evernote-note-displayed-name-attr-alist))
-         (setq evenote-note-displayed-name-formatted-name-alist
+         (setq evernote-note-displayed-name-formatted-name-alist
                (cons (cons displayed-name
-                           (format "%s   %s"
+                           (format "%-30s   %-15s   %s"
                                    (evernote-assoc-cdr 'updated attr)
+                                   (evernote-get-tag-list-string
+                                    (evernote-assoc-cdr 'tags attr)
+                                    15)
                                    displayed-name))
-                     evenote-note-displayed-name-formatted-name-alist))))
+                     evernote-note-displayed-name-formatted-name-alist))))
      note-command-out)
     (setq evernote-note-displayed-name-attr-alist
           (nreverse evernote-note-displayed-name-attr-alist))
-    (setq evenote-note-displayed-name-formatted-name-alist
-          (nreverse evenote-note-displayed-name-formatted-name-alist))
+    (setq evernote-note-displayed-name-formatted-name-alist
+          (nreverse evernote-note-displayed-name-formatted-name-alist))
     (if display-completion
         (evernote-display-note-completion-buf
-         evenote-note-displayed-name-formatted-name-alist))
+         evernote-note-displayed-name-formatted-name-alist))
     (evernote-assoc-cdr (read-from-minibuffer "Note:"
                                               nil evernote-read-note-map)
                         evernote-note-displayed-name-attr-alist)))
@@ -410,7 +438,8 @@
       (evernote-minibuffer-tmp-message "[No Match]"))
      ((string= result word)
       (evernote-display-note-completion-buf
-       evenote-note-displayed-name-formatted-name-alist))
+       evernote-note-displayed-name-formatted-name-alist
+       word))
      (t (evernote-set-minibuffer-string result)
         (end-of-buffer)
         (if (eq t
@@ -441,13 +470,13 @@
                     (cons
                      (evernote-assoc-cdr
                       displayed-name
-                      evenote-note-displayed-name-formatted-name-alist)
+                      evernote-note-displayed-name-formatted-name-alist)
                      displayed-name))
                   (all-completions
                    (if word
                        word
                      "")
-                   evenote-note-displayed-name-formatted-name-alist)))
+                   evernote-note-displayed-name-formatted-name-alist)))
     (save-excursion
       (setq completion-buf (get-buffer-create "*Evernote-Completions*"))
       (set-buffer completion-buf)
@@ -463,6 +492,11 @@
   "Display formatted note names on this buffer"
   (setq buffer-read-only nil)
   (erase-buffer)
+  (insert (format "total %d\n%-30s   %-15s   %s\n\n"
+                  (length formatted-name-displayed-name-alist)
+                  "Last Modified"
+                  "Tags"
+                  "Title"))
   (mapc (lambda (elem)
           (insert (car elem) "\n"))
         formatted-name-displayed-name-alist)
@@ -472,17 +506,19 @@
 (defun evernote-select-note-in-search-mode ()
   "Select a note name on this buffer and input it into the mini buffer"
   (interactive)
-  (save-excursion
-    (let (displayed-name)
-      (setq displayed-name
-            (evernote-assoc-cdr
-             (evernote-get-current-line-string)
-             evernote-search-mode-formatted-name-displayed-name-alist))
-      (kill-buffer (current-buffer))
-      (if (active-minibuffer-window)
-          (progn
-            (evernote-set-minibuffer-string displayed-name)
-            (exit-minibuffer))))))
+  (if (active-minibuffer-window)
+      (save-excursion
+        (let (displayed-name)
+          (setq displayed-name
+                (evernote-assoc-cdr
+                 (evernote-get-current-line-string)
+                 evernote-search-mode-formatted-name-displayed-name-alist))
+          (if displayed-name
+              (progn
+                (kill-buffer (current-buffer))
+                (evernote-set-minibuffer-string displayed-name)
+                (exit-minibuffer)))))
+    (kill-buffer (current-buffer))))
 
 
 (defun evernote-find-opened-buffer (guid)
@@ -523,13 +559,11 @@
 
 
 (defun evernote-get-tag-list-string (tags maxlen)
-  (substring
-   (mapconcat #'identity tags ",")
-   0 maxlen))
+  (truncate-string-to-width (mapconcat #'identity tags ",") maxlen))
 
 
 (defun evernote-read-edit-mode (default)
-  (completing-read "Edit Mode (type \"TEXT\" or \"XHTML\"):"
+  (completing-read "Edit mode (type \"TEXT\" or \"XHTML\"):"
                    '(("TEXT") ("XHTML"))
                    nil t default))
 
@@ -545,7 +579,10 @@
 
 
 (defun evernote-assoc-cdr (key alist)
-  (cdr (assoc key alist)))
+  (let ((result-cons (assoc key alist)))
+    (if result-cons
+        (cdr result-cons)
+      nil)))
 
 
 (defun evernote-get-current-line-string ()
@@ -722,6 +759,15 @@
                           (evernote-string-to-oct query)))
 
 
+(defun evernote-command-update-search (guid name query)
+  "Issue updatesearch command"
+  (evernote-issue-command nil
+                          "updatesearch"
+                          guid
+                          (evernote-string-to-oct name)
+                          (evernote-string-to-oct query)))
+
+
 (defun evernote-issue-command (inbuf &rest args)
   "Invoke external process to issue an evernote command."
   (let ((outbuf (get-buffer-create evernote-command-output-buffer-name))
@@ -802,6 +848,16 @@
 ;; Evernote mode
 ;;
 
+(defun evernote-mode-after-save-hook ()
+  (setq evernote-mode nil
+        evernote-note-guid nil
+        evernote-note-name nil
+        evernote-note-tags nil
+        evernote-note-edit-mode nil
+        vc-mode nil)
+  (remove-hook 'after-save-hook 'evernote-mode-after-save-hook))
+
+
 (defun evernote-mode ()
   "Toggle Evernote mode, a minor mode for using evernote functions."
   (interactive)
@@ -814,7 +870,9 @@
   (setq evernote-mode (not evernote-mode))
   (setq vc-mode
         (concat "[Tag:" (mapconcat #'identity evernote-note-tags ",") "] "
-                "[Edit Mode:" evernote-note-edit-mode "]"))
+                "[Edit mode:" evernote-note-edit-mode "]"))
+  (make-local-variable 'after-save-hook)
+  (add-hook 'after-save-hook 'evernote-mode-after-save-hook)
   (run-hooks 'evernote-mode-hook))
 
 

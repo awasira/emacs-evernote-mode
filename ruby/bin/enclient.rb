@@ -40,8 +40,8 @@ require 'forwardable'
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.03, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.03, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.11, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.11, :editmode => "XHTML"}|
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
   USER_STORE_URL      = "https://#{EVERNOTE_HOST}/edam/user"
@@ -888,6 +888,29 @@ module EnClient
   end
 
   #
+  # UpdateSearch Command
+  #
+  class UpdateSearch < Command
+    def self.get_command_name
+      "updatesearch"
+    end
+
+    def initialize
+      super self.class.get_command_name
+      @opt.banner = "#{@name} guid name query"
+    end
+
+    def exec_impl(args)
+      guid, name, query = parse_args args, 3
+      search = Evernote::EDAM::Type::SavedSearch.new
+      search.guid = guid
+      search.name = name
+      search.query = query
+      @note_store.updateSearch @auth_token, search
+    end
+  end
+
+  #
   # Utils
   #
   class Utils
@@ -943,6 +966,7 @@ module EnClient
       add_command ExpungeTag
       add_command ListSearch
       add_command CreateSearch
+      add_command UpdateSearch
 
       command_found = false
       command_name = ARGV[0]
