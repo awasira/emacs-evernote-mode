@@ -926,12 +926,13 @@
 
 (defun evernote-mode-change-major-mode-hook ()
   "Change major mode hook for evernote mode. This records the note info to the global variable to restore them after changing the major mode"
-  (setq evernote-mode-info-for-changing-major-mode
-        (list
-         (cons 'guid  evernote-note-guid)
-         (cons 'name  evernote-note-name)
-         (cons 'tags  evernote-note-tags)
-         (cons 'edit-mode  evernote-note-edit-mode))))
+  (if evernote-mode
+      (setq evernote-mode-info-for-changing-major-mode
+            (list
+             (cons 'guid  evernote-note-guid)
+             (cons 'name  evernote-note-name)
+             (cons 'tags  evernote-note-tags)
+             (cons 'edit-mode  evernote-note-edit-mode)))))
 
 
 (defun evernote-mode-after-change-major-mode-hook ()
