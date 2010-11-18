@@ -711,20 +711,14 @@
              (if (and (stringp pattern)
                       (fboundp mode)
                       (string-match pattern note-name))
-                 (condition-case nil
-                     (progn
-                       (funcall mode)
-                       (throw 'mode mode))
-                   (error
-                    (throw 'mode nil)))))))
+                 (progn
+                   (funcall mode)
+                   (throw 'mode mode))))))
      auto-mode-alist)
     (if (fboundp default-major-mode)
-        (condition-case nil
-            (progn
-              (funcall default-major-mode)
-              (throw 'mode default-major-mode))
-          (error
-           (throw 'mode nil))))))
+        (progn
+          (funcall default-major-mode)
+          (throw 'mode default-major-mode)))))
 
 
 (defun evernote-get-first-line (str)
