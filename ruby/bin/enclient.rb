@@ -40,8 +40,8 @@ require 'forwardable'
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.12, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.12, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.13, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.13, :editmode => "XHTML"}|
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
   USER_STORE_URL      = "https://#{EVERNOTE_HOST}/edam/user"
