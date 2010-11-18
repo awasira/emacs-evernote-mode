@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at:
 ;; Author: Yusuke Kawakami
-;; Version: 0.11
+;; Version: 0.12
 ;; Keywords: tools
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -61,6 +61,9 @@
 (defvar evernote-note-edit-mode nil
   "Edit mode of the buffer")
 (make-variable-buffer-local 'evernote-note-edit-mode)
+
+(defvar evernote-mode-info-for-changing-major-mode nil
+  "Temporal values used when changing the major mode")
 
 (defvar evernote-mode-map (make-sparse-keymap)
   "Keymap used in evernote mode.")
@@ -121,7 +124,8 @@
         "Tags used for search (comma separated form. default search all tags):"
         (evernote-get-tag-alist
          (evernote-command-get-tag-list))
-        nil t))))))
+        nil t)))
+     t)))
 
 
 (defun evernote-search-notes ()
@@ -132,7 +136,8 @@
      (evernote-open-note-common
       (evernote-command-get-note-list-from-query
        (read-string "Query:"))
-      t))))
+      t)
+     t)))
 
 
 (defun evernote-do-saved-search ()
@@ -154,7 +159,8 @@
             search-alist
             nil t)
            search-alist))))
-      t))))
+      t)
+     t)))
 
 
 (defun evernote-open-note-common (note-command-output &optional display-completion)
@@ -172,8 +178,8 @@
         (evernote-create-note-buffer
          note-guid
          note-name
-         note-edit-mode
          note-tags
+         note-edit-mode
          (evernote-command-get-note-content note-guid note-edit-mode))))))
 
 
@@ -183,14 +189,14 @@
   (if (and evernote-note-guid (buffer-modified-p))
       (evernote-command-with-auth
        (lambda ()
-         (progn
-           (evernote-command-update-note
-            (current-buffer)
-            evernote-note-guid
-            evernote-note-name
-            evernote-note-tags
-            evernote-note-edit-mode)
-           (set-buffer-modified-p nil))))
+         (evernote-command-update-note
+          (current-buffer)
+          evernote-note-guid
+          evernote-note-name
+          evernote-note-tags
+          evernote-note-edit-mode)
+         (set-buffer-modified-p nil)
+         t))
     (message "(No changes need to be saved)")))
 
 
@@ -212,13 +218,13 @@
                                      name
                                      tags
                                      edit-mode)
-       (setq evernote-note-guid (evernote-eval-command-result)
-             evernote-note-name name
-             evernote-note-tags tags
-             evernote-note-edit-mode edit-mode)
-       (evernote-mode)
-       (evernote-update-mode-line)
-       (set-buffer-modified-p nil)))))
+       (evernote-change-major-mode-from-note-name name)
+       (evernote-mode (evernote-eval-command-result)
+                      name
+                      tags
+                      edit-mode)
+       (set-buffer-modified-p nil))
+     t)))
 
 
 (defun evernote-write-note ()
@@ -238,6 +244,7 @@
                                      name
                                      tags
                                      edit-mode)
+       (evernote-change-major-mode-from-note-name name)
        (setq evernote-note-guid (evernote-eval-command-result)
              evernote-note-name name
              evernote-note-tags tags
@@ -246,7 +253,8 @@
            (evernote-mode))
        (rename-buffer name t)
        (evernote-update-mode-line)
-       (set-buffer-modified-p nil)))))
+       (set-buffer-modified-p nil))
+     t)))
 
 
 (defun evernote-edit-tags ()
@@ -262,7 +270,8 @@
                   (evernote-get-tag-alist (evernote-command-get-tag-list))
                   nil nil (mapconcat #'identity evernote-note-tags ",")))
            (evernote-update-mode-line)
-           (set-buffer-modified-p t))))))
+           (set-buffer-modified-p t)))
+     t)))
 
 
 (defun evernote-change-edit-mode ()
@@ -275,7 +284,8 @@
            (setq evernote-note-edit-mode
                  (evernote-read-edit-mode evernote-note-edit-mode))
            (evernote-update-mode-line)
-           (set-buffer-modified-p t))))))
+           (set-buffer-modified-p t)))
+     t)))
 
 
 (defun evernote-rename-note ()
@@ -286,6 +296,7 @@
         (setq evernote-note-name
               (read-string "New note name:" evernote-note-name))
         (rename-buffer evernote-note-name t)
+        (evernote-change-major-mode-from-note-name evernote-note-name)
         (set-buffer-modified-p t))))
 
 
@@ -297,7 +308,8 @@
       (evernote-command-with-auth
        (lambda ()
          (evernote-command-delete-note evernote-note-guid)
-         (kill-buffer (current-buffer))))))
+         (kill-buffer (current-buffer))
+         t))))
 
 
 (defun evernote-create-search ()
@@ -307,7 +319,8 @@
    (lambda ()
      (evernote-command-create-search
       (read-string "Saved Search Name:")
-      (read-string "Query:")))))
+      (read-string "Query:"))
+     t)))
 
 
 (defun evernote-edit-search ()
@@ -330,23 +343,56 @@
         (read-string "New Saved search name:"
                      (evernote-assoc-cdr 'name search-attr))
         (read-string "New Query:"
-                     (evernote-assoc-cdr 'query search-attr)))))))
+                     (evernote-assoc-cdr 'query search-attr))))
+     t)))
 
 
 ;;
 ;; Helper functions.
 ;;
 
+;;(defun evernote-command-with-auth (func &rest args)
+;;  "Add or remove tags from/to the note"
+;;  (let ((error-code (catch 'error (apply func args))))
+;;    (if (or (eq error-code evernote-error-invalid-auth)
+;;            (eq error-code evernote-error-auth-expired))
+;;        (let ((error-code (catch 'error (evernote-command-login))))
+;;          (if (eq error-code t)
+;;              (apply func args)
+;;            (message "%s (%s)"
+;;                     (evernote-error-message error-code)
+;;                     (evernote-get-first-line
+;;                      (evernote-get-command-result)))))
+;;      (message "%s (%s)"
+;;               (evernote-error-message error-code)
+;;               (evernote-get-first-line
+;;                (evernote-get-command-result))))))
+
+
 (defun evernote-command-with-auth (func &rest args)
   "Add or remove tags from/to the note"
   (let ((error-code (catch 'error (apply func args))))
-    (if (or (eq error-code evernote-error-invalid-auth)
-            (eq error-code evernote-error-auth-expired))
-        (let ((error-code (catch 'error (evernote-command-login))))
-          (if (eq error-code t)
-              (apply func args)
-            (message (evernote-error-message error-code))))
-      (message (evernote-error-message error-code)))))
+    (cond
+     ((eq error-code t)
+      t)
+     ((or (eq error-code evernote-error-invalid-auth)
+          (eq error-code evernote-error-auth-expired))
+      (let ((error-code (catch 'error (evernote-command-login))))
+        (if (eq error-code t)
+            (progn
+              (let ((error-code (catch 'error (apply func args))))
+                (if (not (eq error-code t))
+                    (evernote-output-error-message error-code))))
+          (evernote-output-error-message error-code))))
+     (t
+      (evernote-output-error-message error-code)))))
+
+
+(defun evernote-output-error-message (error-code)
+  (message "%s (%s)"
+           (evernote-error-message error-code)
+           (evernote-get-first-line
+            (evernote-get-command-result))))
 
 
 (defun evernote-get-tag-alist (tag-command-out)
@@ -541,19 +587,15 @@
       (pop-to-buffer buf))))
 
 
-(defun evernote-create-note-buffer (guid name edit-mode tags content)
+(defun evernote-create-note-buffer (guid name tags edit-mode content)
   "Create new buffer for the note"
   (save-excursion
     (let ((buf (generate-new-buffer name)))
       (set-buffer buf)
       (insert content)
-      (setq evernote-note-guid guid
-            evernote-note-name name
-            evernote-note-edit-mode edit-mode
-            evernote-note-tags tags)
-      (evernote-mode)
+      (evernote-change-major-mode-from-note-name name)
+      (evernote-mode guid name tags edit-mode)
       (goto-char (point-min))
-      (evernote-update-mode-line)
       (set-buffer-modified-p nil)
       (pop-to-buffer buf))))
 
@@ -655,6 +697,40 @@
                                     def
                                     inherit-input-method))
     (delete "" results)))
+
+
+(defun evernote-change-major-mode-from-note-name (note-name)
+  (catch 'mode
+    (mapc
+     (lambda (pattern-mode-pair)
+       (if (consp pattern-mode-pair)
+           (let ((pattern (car pattern-mode-pair))
+                 (mode (cdr pattern-mode-pair)))
+             (if (consp mode)
+                 (setq mode (car mode)))
+             (if (and (stringp pattern)
+                      (fboundp mode)
+                      (string-match pattern note-name))
+                 (condition-case nil
+                     (progn
+                       (funcall mode)
+                       (throw 'mode mode))
+                   (error
+                    (throw 'mode nil)))))))
+     auto-mode-alist)
+    (if (fboundp default-major-mode)
+        (condition-case nil
+            (progn
+              (funcall default-major-mode)
+              (throw 'mode default-major-mode))
+          (error
+           (throw 'mode nil))))))
+
+
+(defun evernote-get-first-line (str)
+  "Get first line of the string"
+  (let ((begin (string-match "^.*$" str)))
+    (substring str begin (match-end 0))))
 
 
 ;;
@@ -825,7 +901,7 @@
    ((eq error-code evernote-error-quota-reached)      "Quota reached")
    ((eq error-code evernote-error-invalid-auth)       "Invalid auth")
    ((eq error-code evernote-error-auth-expired)       "Auth expired")
-   ((eq error-code evernote-error-data-conflict)      "Data conflict")
+   ((eq error-code evernote-error-data-conflict)      "Data conflict. The data already exists.")
    ((eq error-code evernote-error-enml-validation)    "Enml validation. Tried to save a note of invalid format.")
    ((eq error-code evernote-error-shared-unavailable) "Shared unavailable")))
 
@@ -849,16 +925,38 @@
 ;;
 
 (defun evernote-mode-after-save-hook ()
-  (setq evernote-mode nil
-        evernote-note-guid nil
-        evernote-note-name nil
-        evernote-note-tags nil
-        evernote-note-edit-mode nil
-        vc-mode nil)
-  (remove-hook 'after-save-hook 'evernote-mode-after-save-hook))
+  "After save hook for evernote mode. This invalid evernote-mode"
+  (if evernote-mode
+      (evernote-mode)))
 
 
-(defun evernote-mode ()
+(defun evernote-mode-change-major-mode-hook ()
+  "Change major mode hook for evernote mode. This records the note info to the global variable to restore them after changing the major mode"
+  (setq evernote-mode-info-for-changing-major-mode
+        (list
+         (cons 'guid  evernote-note-guid)
+         (cons 'name  evernote-note-name)
+         (cons 'tags  evernote-note-tags)
+         (cons 'edit-mode  evernote-note-edit-mode))))
+
+
+(defun evernote-mode-after-change-major-mode-hook ()
+  "After change major mode hook for evernote mode. This restore the note info after changing the major mode"
+  (if evernote-mode-info-for-changing-major-mode
+      (progn
+        (evernote-mode
+         (evernote-assoc-cdr 'guid evernote-mode-info-for-changing-major-mode)
+         (evernote-assoc-cdr 'name evernote-mode-info-for-changing-major-mode)
+         (evernote-assoc-cdr 'tags evernote-mode-info-for-changing-major-mode)
+         (evernote-assoc-cdr 'edit-mode evernote-mode-info-for-changing-major-mode))
+        (setq evernote-mode-info-for-changing-major-mode nil))))
+
+
+(add-hook 'after-change-major-mode-hook
+          'evernote-mode-after-change-major-mode-hook)
+
+
+(defun evernote-mode (&optional guid name tags edit-mode)
   "Toggle Evernote mode, a minor mode for using evernote functions."
   (interactive)
   (or (assq 'evernote-mode minor-mode-alist)
@@ -866,14 +964,38 @@
   (or (assq 'evernote-mode minor-mode-map-alist)
       (setq minor-mode-map-alist
             (cons (cons 'evernote-mode evernote-mode-map) minor-mode-map-alist)))
-  (set-buffer-file-coding-system 'utf-8)
+  (let ((modified (buffer-modified-p)))
+    (set-buffer-file-coding-system 'utf-8)
+    (set-buffer-modified-p modified))
   (setq evernote-mode (not evernote-mode))
-  (setq vc-mode
-        (concat "[Tag:" (mapconcat #'identity evernote-note-tags ",") "] "
-                "[Edit mode:" evernote-note-edit-mode "]"))
-  (make-local-variable 'after-save-hook)
-  (add-hook 'after-save-hook 'evernote-mode-after-save-hook)
-  (run-hooks 'evernote-mode-hook))
+  (if evernote-mode
+      (progn
+        (if guid (setq evernote-note-guid guid))
+        (if name (setq evernote-note-name name))
+        (if tags (setq evernote-note-tags tags))
+        (if edit-mode (setq evernote-note-edit-mode edit-mode))
+        (setq vc-mode
+              (concat "[Tag:" (mapconcat #'identity evernote-note-tags ",") "] "
+                      "[Edit mode:" evernote-note-edit-mode "]"))
+        (make-local-hook 'after-save-hook)
+        (make-local-hook 'change-major-mode-hook)
+        (add-hook 'after-save-hook
+                  'evernote-mode-after-save-hook
+                  nil t)
+        (add-hook 'change-major-mode-hook
+                  'evernote-mode-change-major-mode-hook
+                  nil t)
+        (run-hooks 'evernote-mode-hook))
+    (progn
+      (setq evernote-note-guid nil
+            evernote-note-name nil
+            evernote-note-tags nil
+            evernote-note-edit-mode nil)
+      (setq vc-mode nil)
+      (remove-hook 'after-save-hook
+                   'evernote-mode-after-save-hook)
+      (remove-hook 'change-major-mode-hook
+                   'evernote-mode-change-major-mode-hook))))
 
 
 (provide 'evernote-mode)
