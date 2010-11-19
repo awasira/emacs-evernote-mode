@@ -32,6 +32,7 @@
 ;;      (global-set-key "\C-ces" 'evernote-search-notes)
 ;;      (global-set-key "\C-ceS" 'evernote-do-saved-search)
 ;;      (global-set-key "\C-cew" 'evernote-write-note)
+;;      (global-set-key "\C-cep" 'evernote-post-region)
 ;;
 ;; There is one hooks, evernotes-mode-hook.
 ;; The usage of the hook is shown as follows.
@@ -244,6 +245,7 @@
                                      name
                                      tags
                                      edit-mode)
+       (set-visited-file-name nil)
        (evernote-change-major-mode-from-note-name name)
        (setq evernote-note-guid (evernote-eval-command-result)
              evernote-note-name name
@@ -254,6 +256,36 @@
        (rename-buffer name t)
        (evernote-update-mode-line)
        (set-buffer-modified-p nil))
+     t)))
+
+
+(defun evernote-post-region (begin end arg)
+  "Post the region as a note"
+  (interactive "r\np")
+  (evernote-command-with-auth
+   (lambda ()
+     (let (tags name edit-mode)
+       (setq tags
+             (evernote-completing-read-multiple
+              "Attached Tags (comma separated form):"
+              (evernote-get-tag-alist
+               (evernote-command-get-tag-list))))
+       (setq name (read-string "Note name:" (buffer-name)))
+       (setq edit-mode (evernote-read-edit-mode "TEXT"))
+       (save-excursion
+         (save-restriction
+           (narrow-to-region begin end)
+           (evernote-command-create-note (current-buffer)
+                                         name
+                                         tags
+                                         edit-mode)))
+       (if (and (not (eq arg nil)) (not (eq arg 1)))
+           (evernote-create-note-buffer
+            (evernote-eval-command-result)
+            name
+            tags
+            edit-mode
+            (buffer-substring begin end))))
      t)))
 
 
