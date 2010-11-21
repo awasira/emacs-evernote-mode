@@ -47,9 +47,9 @@ following commands.
   Create a new note containing the selected region. If you call this
   command without argument, no buffer associated with the new note is
   generated, which is different from evernote-open-note and
-  evernote-create-note. If you call this command with an argument(not
-  default argument), it creates a new buffer associated with the new
-  note and you can edit the note in the buffer.
+  evernote-create-note. If you call this command with an argument by
+  \C-u etc.(not default argument), it creates a new buffer associated
+  with the new note and you can edit the note in the buffer.
 
 * evernote-edit-tags (default bound to \C-cet)
   Change tags attached to the note. The change on Evernote service
