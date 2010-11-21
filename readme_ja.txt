@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-16
+Last Modified: 2010-11-21
 
 License
 =======
@@ -42,6 +42,13 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 * evernote-write-note (default bound to \C-cee)
   emacsバッファを新規ノートとして保存します.保存時にはノートに付加する
   タグを指定できます。
+
+* evernote-post-region
+  選択されたリージョンを新規ノートとしてポストします。引数なしで実行し
+  た場合、evernote-open-noteやevernote-create-noteと異なり、新規ノート
+  に対応するバッファは作成しませんが、\C-u等で引数を与えた場合（デフォ
+  ルト引数以外を与えた場合）は、新規ノートに対応するバッファを作成し、
+  引き続きバッファ上での編集作業を行うことができます。
 
 * evernote-edit-tags (default bound to \C-cet)
   ノートに付加するタグを変更します.このコマンド発行後に
@@ -239,6 +246,7 @@ cp evernote-mode.el <your load path>
 (global-set-key "\C-ces" 'evernote-search-notes)
 (global-set-key "\C-ceS" 'evernote-do-saved-search)
 (global-set-key "\C-cew" 'evernote-write-note)
+(global-set-key "\C-cep" 'evernote-post-region)
 
 
 4. proxy の設定

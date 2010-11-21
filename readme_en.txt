@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-16
+Last Modified: 2010-11-21
 
 License
 =======
@@ -42,6 +42,14 @@ following commands.
 * evernote-write-note (default bound to \C-cee)
   Create a new note from the current buffer.
   You can attach tags to the note when creating the note.
+
+* evernote-post-region
+  Create a new note containing the selected region. If you call this
+  command without argument, no buffer associated with the new note is
+  generated, which is different from evernote-open-note and
+  evernote-create-note. If you call this command with an argument(not
+  default argument), it creates a new buffer associated with the new
+  note and you can edit the note in the buffer.
 
 * evernote-edit-tags (default bound to \C-cet)
   Change tags attached to the note. The change on Evernote service
@@ -241,6 +249,7 @@ cp evernote-mode.el <your load path>
 (global-set-key "\C-ces" 'evernote-search-notes)
 (global-set-key "\C-ceS" 'evernote-do-saved-search)
 (global-set-key "\C-cew" 'evernote-write-note)
+(global-set-key "\C-cep" 'evernote-post-region)
 
 
 4. Proxy settings
