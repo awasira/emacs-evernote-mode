@@ -1,4 +1,4 @@
-#! C:/Ruby192/bin/ruby.exe -sWKu
+#! /usr/bin/ruby -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -40,8 +40,8 @@ require 'forwardable'
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.14, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.14, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.20, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.20, :editmode => "XHTML"}|
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
   USER_STORE_URL      = "https://#{EVERNOTE_HOST}/edam/user"
@@ -464,9 +464,23 @@ module EnClient
     end
 
     def exec_impl(args)
-      tag_info = create_tag_info
+      #tag_info = create_tag_info
       parse_args args, 0
-      tag_info.print_tree
+      tags = @note_store.listTags @auth_token
+      tags.sort! do |a, b|
+        a.name <=> b.name
+      end
+
+      formatter = Formatter.new
+      tags.each do |s|
+        alist = Formatter.new
+        alist << Formatter::Pair.new("name", s.name)
+        alist << Formatter::Pair.new("guid", s.guid)
+        formatter << alist
+      end
+
+      #tag_info.print_tree
+      puts formatter.to_s
     end
   end
 
@@ -481,18 +495,8 @@ module EnClient
     def initialize
       super self.class.get_command_name
 
-      @opt.on "-t", "--tag tag_names", Array do |tag_list|
-        if @tag == nil
-          @tags = []
-        end
-        tag_list = Utils::unpack_utf8_string_list tag_list
-        tag_list.each do |tag_name|
-          tag_guid = @tag_info.get_tag_guid tag_name
-          if tag_guid == nil
-            raise IllegalArgumentException.new(%|tag "#{tag_name}" is not found|)
-          end
-          @tags << tag_guid
-        end
+      @opt.on "-t", "--tag tag_guids", Array do |tag_list|
+        @tags = tag_list
       end
 
       @opt.on "-q", "--query query", String do |query|
@@ -501,7 +505,6 @@ module EnClient
     end
 
     def exec_impl(args)
-      @tag_info = create_tag_info
       @tags, @query = nil, nil
       parse_args args, 0
 
@@ -515,35 +518,9 @@ module EnClient
                                        Evernote::EDAM::Limits::EDAM_USER_NOTES_MAX)
       formatter = Formatter.new
       notelist.notes.each do |n|
-        alist = Formatter.new
-        alist << Formatter::Pair.new("name", n.title)
-        alist << Formatter::Pair.new("guid", n.guid)
-        alist << Formatter::Pair.new("created", Time.at(n.created/1000))
-        alist << Formatter::Pair.new("updated", Time.at(n.updated/1000))
-
-        if n.tagGuids
-          tag_list = Formatter.new
-          n.tagGuids.each do |tag_guid|
-            tag_name = @tag_info.get_tag_name tag_guid
-            tag_list << tag_name if tag_name
-          end
-          alist << Formatter::Pair.new("tags", tag_list)
-        end
-
-        alist << Formatter::Pair.new("edit-mode", get_edit_mode(n.attributes.sourceApplication))
-
-        formatter << alist
+        formatter << Utils::get_note_formatter(n)
       end
       puts formatter.to_s
-    end
-
-    def get_edit_mode(src_app)
-      if src_app =~ /\Aemacs-enclient (\{.*\})\z/
-        attr = eval $1
-        attr[:editmode]
-      else
-        "XHTML"
-      end
     end
   end
 
@@ -631,7 +608,9 @@ module EnClient
         note.attributes.sourceApplication = APPLICATION_NAME_TEXT
       end
       note = @note_store.createNote @auth_token, note
-      puts %|"#{note.guid}"|
+
+      formatter = Util::get_note_formatter(note)
+      puts formatter.to_s
     end
   end
 
@@ -689,6 +668,9 @@ module EnClient
         note.attributes.sourceApplication = APPLICATION_NAME_TEXT
       end
       note = @note_store.updateNote @auth_token, note
+
+      formatter = Utils::get_note_formatter(note)
+      puts formatter.to_s
     end
   end
 
@@ -935,6 +917,34 @@ module EnClient
     def self.unpack_utf8_string_list(str_list)
       str_list.map do |elem|
         unpack_utf8_string elem
+      end
+    end
+
+    def self.get_note_formatter(note)
+      formatter = Formatter.new
+      formatter << Formatter::Pair.new("name", note.title)
+      formatter << Formatter::Pair.new("guid", note.guid)
+      formatter << Formatter::Pair.new("created", Time.at(note.created/1000))
+      formatter << Formatter::Pair.new("updated", Time.at(note.updated/1000))
+
+      if note.tagGuids
+        tag_list = Formatter.new
+        note.tagGuids.each do |tag_guid|
+          tag_list << tag_guid
+        end
+        formatter << Formatter::Pair.new("tags", tag_list)
+      end
+
+      formatter << Formatter::Pair.new("edit-mode", get_edit_mode(note.attributes.sourceApplication))
+      formatter
+    end
+
+    def self.get_edit_mode(src_app)
+      if src_app =~ /\Aemacs-enclient (\{.*\})\z/
+        attr = eval $1
+        attr[:editmode]
+      else
+        "XHTML"
       end
     end
   end
