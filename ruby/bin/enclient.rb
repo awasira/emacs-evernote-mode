@@ -609,7 +609,7 @@ module EnClient
       end
       note = @note_store.createNote @auth_token, note
 
-      formatter = Util::get_note_formatter(note)
+      formatter = Utils::get_note_formatter(note)
       puts formatter.to_s
     end
   end
