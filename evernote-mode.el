@@ -44,6 +44,8 @@
 
 ;;; Code
 
+(require 'tree-widget)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Macros
@@ -110,7 +112,7 @@
 
 (defvar evernote-browsing-mode-map (copy-keymap global-map)
   "Keymap used in evernote browsing mode.")
-(define-key evernote-browsing-mode-map "\C-m" 'evernote-browsing-open)
+(define-key evernote-browsing-mode-map "\C-m" 'widget-button-press)
 (define-key evernote-browsing-mode-map "t"    'evernote-browsing-list-tags)
 (define-key evernote-browsing-mode-map "S"    'evernote-browsing-list-searches)
 (define-key evernote-browsing-mode-map "s"    'evernote-browsing-search-notes)
@@ -129,8 +131,7 @@
   (setq buffer-read-only t
         truncate-lines t
         major-mode 'evernote-browsing-mode
-        mode-name "Evernote-Browsing"
-        evernote-line-guid-map (make-hash-table :test #'equal))
+        mode-name "Evernote-Browsing")
   (goto-char (point-min)))
 
 
@@ -143,23 +144,6 @@
       (switch-to-buffer (generate-new-buffer evernote-browsing-mode-buffer-name))
       (evernote-browsing-mode)
       (evernote-browsing-list-tags))))
-
-
-(defun evernote-browsing-open ()
-  "Open a note"
-  (interactive)
-  (when (eq major-mode 'evernote-browsing-mode)
-    (let ((type (enh-browsing-get-current-page-type))
-          (guid (enutil-get-line-guid)))
-      (when guid
-        (enh-command-with-auth
-         (cond
-          ((eq type 'tag-list)
-           (enh-browsing-open-tag guid))
-          ((eq type 'search-list)
-           (enh-browsing-open-search guid))
-          ((eq type 'note-list)
-           (enh-browsing-open-note guid))))))))
 
 
 (defun evernote-browsing-list-tags ()
@@ -850,11 +834,14 @@
 (make-variable-buffer-local 'enh-browsing-current-page)
 
 
-(defun enh-browsing-open-tag (guid)
+(defun enh-browsing-open-tag (widget &rest ignored)
   "Open a tag in browsing mode"
-  (let ((note-attrs
-         (enh-command-get-note-attrs-from-tag-guids
-          (list guid))))
+  (let* ((guid (widget-value widget))
+         (note-attrs
+          (enh-command-get-note-attrs-from-tag-guids
+           (if guid
+               (list guid)
+             nil))))
     (enh-set-note-attrs note-attrs)
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
@@ -864,12 +851,13 @@
                                note-attrs))))
 
 
-(defun enh-browsing-open-search (guid)
+(defun enh-browsing-open-search (widget &rest ignored)
   "Open a saved search in browsing mode"
-  (let ((note-attrs
-         (enh-command-get-note-attrs-from-query
-          (enutil-aget 'query
-                       (enh-get-search-attr guid)))))
+  (let* ((guid (widget-value widget))
+         (note-attrs
+          (enh-command-get-note-attrs-from-query
+           (enutil-aget 'query
+                        (enh-get-search-attr guid)))))
     (enh-set-note-attrs note-attrs)
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
@@ -879,10 +867,11 @@
                                note-attrs))))
 
 
-(defun enh-browsing-open-note (guid)
+(defun enh-browsing-open-note (widget &rest ignored)
   "Open a note in browsing mode"
-  (enh-base-open-note-common
-   (enh-get-note-attr guid)))
+  (let ((guid (widget-value widget)))
+    (enh-base-open-note-common
+     (enh-get-note-attr guid))))
 
 
 (defun enh-browsing-create-page (type description &optional attr-list)
@@ -925,53 +914,99 @@
 
 (defun enh-browsing-draw-tag-list-page ()
   "Create a page structure of the attr-list"
-  (enutil-insert-line-guid
-   enh-tag-info
-   (lambda (tag-attr)
-     (enutil-aget 'name tag-attr))
-   (format "%s\n\ntotal %d\n\n"
-           (enutil-aget 'description enh-browsing-current-page)
-           (hash-table-count enh-tag-info))))
+  (erase-buffer)
+  (widget-insert (format "Tag List\n\ntotal %d\n" (hash-table-count enh-tag-info)))
+  (let ((guid-children-hash (make-hash-table :test #'equal)))
+    (maphash
+     (lambda (guid attr)
+       (let* ((parent (enutil-aget 'parent attr))
+              (children (gethash parent guid-children-hash)))
+       (if children
+           (puthash parent (cons guid children) guid-children-hash)
+         (puthash parent (list guid) guid-children-hash))))
+     enh-tag-info)
+    (message "test")
+    (apply 'widget-create
+           (enh-browsing-get-tag-tree nil)))
+  (widget-setup))
+
+
+(defun enh-browsing-get-tag-tree (guid) ; root (eq guid nil)
+  (let* ((children (gethash guid guid-children-hash))
+         (attr (enh-get-tag-attr guid))
+         (name (if attr (enutil-aget 'name attr) "All tags")))
+    (if children
+        `(tree-widget :node (push-button :tag ,name
+                                         :format "%[%t%]\n"
+                                         :notify enh-browsing-open-tag
+                                         ,guid)
+                      :args ,(mapcar
+                              'enh-browsing-get-tag-tree
+                              (nreverse children))
+                      :open ,(if attr nil t))
+      `(push-button :tag ,name
+                    :format "%[%t%]\n"
+                    :notify enh-browsing-open-tag
+                    ,guid))))
+
+
+(defun enh-browsing-test-open-tag (widget &rest ignored)
+  (message (widget-value widget)))
 
 
 (defun enh-browsing-draw-search-list-page ()
   "Insert saved search list into the browsing buffer"
-  (enutil-insert-line-guid
-   enh-search-info
-   (lambda (search-attr)
-     (format "%-30s   %s"
-             (enutil-aget 'name search-attr)
-             (enutil-aget 'query search-attr)))
+  (erase-buffer)
+  (widget-insert
    (format "%s\n\ntotal %d\n%-30s   %s\n\n"
            (enutil-aget 'description enh-browsing-current-page)
            (hash-table-count enh-search-info)
            "Name"
-           "Query")))
+           "Query"))
+  (maphash
+   (lambda (guid attr)
+     (let ((attr (enh-get-search-attr guid)))
+       (widget-create 'push-button
+                      :tag (format "%-30s   %s"
+                                   (enutil-aget 'name attr)
+                                   (enutil-aget 'query attr))
+                      :format "%[%t%]\n"
+                      :notify enh-browsing-open-search
+                      guid)))
+   enh-search-info)
+  (widget-setup))
 
 
 (defun enh-browsing-draw-note-list-page ()
   "Insert note list into the browsing buffer"
+  (erase-buffer)
   (let ((guid-list (enutil-aget 'guid-list enh-browsing-current-page))
         (note-attrs (make-hash-table :test #'equal)))
     (mapc
      (lambda (guid)
        (puthash guid (gethash guid enh-note-info) note-attrs))
      guid-list)
-    (enutil-insert-line-guid
-     note-attrs
-     (lambda (note-attr)
-       (format "%-30s   %-15s   %s"
-               (enutil-aget 'updated note-attr)
-               (enh-tag-guids-to-comma-separated-names
-                (enutil-aget 'tags note-attr)
-                15)
-               (enutil-aget 'name note-attr)))
+    (widget-insert
      (format "%s\n\ntotal %d\n%-30s   %-15s   %s\n\n"
              (enutil-aget 'description enh-browsing-current-page)
              (hash-table-count note-attrs)
              "Last Modified"
              "Tags"
-             "Name"))))
+             "Name"))
+    (maphash
+     (lambda (guid attr)
+       (widget-create 'push-button
+                      :tag (format "%-30s   %-15s   %s"
+                                   (enutil-aget 'updated attr)
+                                   (enh-tag-guids-to-comma-separated-names
+                                    (enutil-aget 'tags attr)
+                                    15)
+                                   (enutil-aget 'name attr))
+                      :format "%[%t%]\n"
+                      :notify enh-browsing-open-note
+                      guid))
+     note-attrs))
+  (widget-setup))
 
 
 (defun enh-browsing-push-page (page)
@@ -1575,36 +1610,6 @@
                             (format "\\%03o" string))
                           (mapcar 'identity (encode-coding-string string 'utf-8))))
    "\""))
-
-
-;; Line data utility
-
-(defvar enutil-line-guid-map nil
-  "Local variable for associating each line with the specific data")
-(make-variable-buffer-local 'enutil-line-guid-map)
-
-
-(defun enutil-insert-line-guid (data-hash formatter &optional header)
-  (save-excursion
-    (let ((buffer-read-only nil))
-      (erase-buffer)
-      (if header (insert header))
-      (if enutil-line-guid-map
-          (clrhash enutil-line-guid-map)
-        (setq enutil-line-guid-map (make-hash-table :test #'equal)))
-      (maphash
-       (lambda (guid attr)
-         (let ((line (funcall formatter attr)))
-           (puthash line guid enutil-line-guid-map)
-           (insert line "\n")))
-       data-hash))))
-
-
-(defun enutil-get-line-guid ()
-  (save-excursion
-    (gethash
-     (enutil-get-current-line-string)
-     enutil-line-guid-map)))
 
 
 (provide 'evernote-mode)

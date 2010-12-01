@@ -125,6 +125,7 @@ module EnClient
     def self.to_lisp_expr(obj, indent_level=0)
       str = ""
       indent = " " * indent_level
+
       case obj
       when String
         str << %|#{indent}"#{escape obj}"\n|
@@ -141,7 +142,11 @@ module EnClient
         end
         str << %|#{indent})\n|
       else
-        str << %|#{indent} #{obj}\n|
+        if obj == nil
+          str << %|#{indent} nil\n|
+        else
+          str << %|#{indent} #{obj}\n|
+        end
       end
     end
 
@@ -476,6 +481,7 @@ module EnClient
         alist = Formatter.new
         alist << Formatter::Pair.new("name", s.name)
         alist << Formatter::Pair.new("guid", s.guid)
+        alist << Formatter::Pair.new("parent", s.parentGuid)
         formatter << alist
       end
 
