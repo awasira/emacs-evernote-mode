@@ -108,17 +108,23 @@
 ;; Interface for evernote-browsing-mode.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defconst evernote-browsing-mode-buffer-name "*Evernote-Browser*")
 
-(defvar evernote-browsing-mode-map (copy-keymap global-map)
+(defvar evernote-browsing-page-list nil
+  "Buffer list of evernote browsing mode.")
+
+(defvar evernote-browsing-current-page nil
+  "Current buffer of evernote browsing mode.")
+
+
+(defvar evernote-browsing-mode-map (copy-keymap widget-keymap)
   "Keymap used in evernote browsing mode.")
-(define-key evernote-browsing-mode-map "\C-m" 'widget-button-press)
 (define-key evernote-browsing-mode-map "t"    'evernote-browsing-list-tags)
 (define-key evernote-browsing-mode-map "S"    'evernote-browsing-list-searches)
 (define-key evernote-browsing-mode-map "s"    'evernote-browsing-search-notes)
 (define-key evernote-browsing-mode-map "b"    'evernote-browsing-prev-page)
 (define-key evernote-browsing-mode-map "f"    'evernote-browsing-next-page)
 (define-key evernote-browsing-mode-map "d"    'evernote-browsing-delete-page)
+(define-key evernote-browsing-mode-map "l"    'evernote-browsing-reflesh)
 ;(define-key evernote-browsing-mode-map "e"    'evernote-browsing-change-edit-mode)
 ;(define-key evernote-browsing-mode-map "r"    'evernote-browsing-rename-note)
 ;(define-key evernote-browsing-mode-map "d"    'evernote-browsing-delete-note)
@@ -128,8 +134,7 @@
   "Major mode for browsing notes."
   (interactive)
   (use-local-map evernote-browsing-mode-map)
-  (setq buffer-read-only t
-        truncate-lines t
+  (setq truncate-lines t
         major-mode 'evernote-browsing-mode
         mode-name "Evernote-Browsing")
   (goto-char (point-min)))
@@ -138,58 +143,65 @@
 (defun evernote-browser ()
   "Open an evernote browser"
   (interactive)
-  (let ((buf (get-buffer evernote-browsing-mode-buffer-name)))
-    (if buf
-        (enutil-move-cursor-to-window buf)
-      (switch-to-buffer (generate-new-buffer evernote-browsing-mode-buffer-name))
-      (evernote-browsing-mode)
-      (evernote-browsing-list-tags))))
+  (enh-browsing-update-page-list)
+  (if evernote-browsing-current-page
+      (enutil-move-cursor-to-window evernote-browsing-current-page)
+    (evernote-browsing-list-tags)))
 
 
 (defun evernote-browsing-list-tags ()
   "List tags"
   (interactive)
-  (when (eq major-mode 'evernote-browsing-mode)
-    (enh-command-with-auth
-     (enh-init-tag-info)
-     (enh-browsing-push-page
-      (enh-browsing-create-page 'tag-list "All Tags")))))
+  (enh-command-with-auth (enh-init-tag-info))
+  (enh-browsing-update-page-list)
+  (let ((page (enh-browsing-get-page-of-type 'tag-list)))
+    (if page
+        (progn
+          (setq evernote-browsing-current-page page)
+          (switch-to-buffer page))
+      (enh-browsing-push-page
+       (enh-browsing-create-page 'tag-list "All Tags")))))
 
 
 (defun evernote-browsing-list-searches ()
   "List saved searches"
   (interactive)
-  (when (eq major-mode 'evernote-browsing-mode)
-    (enh-command-with-auth
-     (enh-init-search-info)
-     (enh-browsing-push-page
-      (enh-browsing-create-page 'search-list "All Saved Searches")))))
+  (enh-command-with-auth (enh-init-search-info))
+  (enh-browsing-update-page-list)
+  (let ((page (enh-browsing-get-page-of-type 'search-list)))
+    (if page
+        (progn
+          (setq evernote-browsing-current-page page)
+          (switch-to-buffer page))
+      (enh-browsing-push-page
+       (enh-browsing-create-page 'search-list "All Saved Searches")))))
 
 
 (defun evernote-browsing-search-notes ()
   "Search notes"
   (interactive)
-  (when (eq major-mode 'evernote-browsing-mode)
-    (let (note-attrs (query (read-string "Query:")))
-      (enh-command-with-auth
-       (setq note-attrs
-             (enh-command-get-note-attrs-from-query query))
-       (enh-set-note-attrs note-attrs)
-       (enh-browsing-push-page
-        (enh-browsing-create-page 'note-list
-                                  (format "Query Result of: %s" query)
-                                  note-attrs))))))
+  (let (note-attrs (query (read-string "Query:")))
+    (enh-command-with-auth
+     (setq note-attrs
+           (enh-command-get-note-attrs-from-query query)))
+    (enh-browsing-update-page-list)
+    (enh-set-note-attrs note-attrs)
+    (enh-browsing-push-page
+     (enh-browsing-create-page 'note-list
+                               (format "Query Result of: %s" query)
+                               note-attrs))))
 
 
 (defun evernote-browsing-prev-page ()
   "Move to the prev page"
   (interactive)
   (when (eq major-mode 'evernote-browsing-mode)
+    (enh-browsing-update-page-list)
     (let ((prev-page (enh-browsing-get-prev-page)))
       (if prev-page
           (progn
-            (setq enh-browsing-current-page prev-page)
-            (enh-browsing-redraw-current-page))
+            (setq evernote-browsing-current-page prev-page)
+            (switch-to-buffer prev-page))
         (message "[No more previous page]")))))
 
 
@@ -197,28 +209,29 @@
   "Move to the next page"
   (interactive)
   (when (eq major-mode 'evernote-browsing-mode)
+    (enh-browsing-update-page-list)
     (let ((next-page (enh-browsing-get-next-page)))
       (if next-page
           (progn
-            (setq enh-browsing-current-page next-page)
-            (enh-browsing-redraw-current-page))
+            (setq evernote-browsing-current-page next-page)
+            (switch-to-buffer next-page))
         (message "[No more next page]")))))
 
 
-(defun evernote-browsing-delete-page (&optional page)
+(defun evernote-browsing-delete-page ()
   "Delete current page"
   (interactive)
   (when (eq major-mode 'evernote-browsing-mode)
-    (unless page
-      (setq page enh-browsing-current-page))
-    (if (eq page enh-browsing-current-page)
-        (let ((next-page (enh-browsing-get-next-page)))
-          (setq enh-browsing-page-list (delq page enh-browsing-page-list))
-          (if next-page
-              (setq enh-browsing-current-page next-page)
-            (setq enh-browsing-current-page (car enh-browsing-page-list)))
-          (enh-browsing-redraw-current-page))
-      (setq enh-browsing-page-list (delq page enh-browsing-page-list)))))
+    (kill-buffer (current-buffer))
+    (enh-browsing-update-page-list)
+    (switch-to-buffer evernote-browsing-current-page)))
+
+
+(defun evernote-browsing-reflesh ()
+  "Reflesh current page"
+  (interactive)
+  (when (eq major-mode 'evernote-browsing-mode)
+    (funcall enh-browsing-page-setup-func)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -284,7 +297,7 @@
           (enh-command-get-note-attrs-from-tag-guids
            (enh-read-tag-guids
             "Tags used for search (comma separated form. default search all tags):"))))
-     (enh-update-note-attrs-external note-attrs)
+     (enh-set-note-attrs note-attrs)
      (enh-base-open-note-common (enh-base-read-note-attr note-attrs)))))
 
 
@@ -296,7 +309,7 @@
      (let ((note-attrs
             (enh-command-get-note-attrs-from-query
              query)))
-       (enh-update-note-attrs-external note-attrs)
+       (enh-set-note-attrs note-attrs)
        (enh-base-open-note-common (enh-base-read-note-attr note-attrs))))))
 
 
@@ -307,7 +320,7 @@
    (let ((note-attrs
           (enh-command-get-note-attrs-from-query
            (enh-read-saved-search-query))))
-     (enh-update-note-attrs-external note-attrs)
+     (enh-set-note-attrs note-attrs)
      (enh-base-open-note-common (enh-base-read-note-attr note-attrs)))))
 
 
@@ -590,8 +603,7 @@
         (evernote-mode note-guid)
         (goto-char (point-min))
         (set-buffer-modified-p nil)
-        (pop-to-buffer buf)
-        (enh-browsing-reflesh)))))
+        (pop-to-buffer buf)))))
 
 
 (defun enh-base-create-note-common (default-note-name
@@ -629,7 +641,7 @@
                                          tag-names
                                          edit-mode))
           (setq content (buffer-substring (point-min) (point-max))))))
-    (enh-update-note-attr note-attr)
+    (enh-update-note-and-new-tag-attrs note-attr)
     (let ((buf nil))
       (save-excursion
         (if create-new-buffer
@@ -658,7 +670,7 @@
           (setq edit-mode (enutil-aget 'edit-mode attr))))
     (setq attr
           (enh-command-update-note inbuf guid name tag-names edit-mode))
-    (enh-update-note-attr attr)))
+    (enh-update-note-and-new-tag-attrs attr)))
 
 
 (defun enh-base-read-note-attr (note-attrs &optional display-completion)
@@ -773,28 +785,6 @@
           (throw 'mode default-major-mode)))))
 
 
-;;(defun enh-base-all-reflesh ()
-;;  (mapc
-;;   (lambda (buf)
-;;     (save-excursion
-;;       (set-buffer buf)
-;;       (if evernote-mode
-;;           (enh-base-reflesh))))
-;;   (buffer-list)))
-
-
-;;(defun enh-base-reflesh ()
-;;  (if evernote-mode
-;;      (let (note-attr name tag-names edit-mode)
-;;        (setq note-attr (enh-get-note-attr evernote-note-guid))
-;;        (setq name (enutil-aget 'name note-attr))
-;;        (setq tag-names (evernote-tag-guids-to-comma-separated-names
-;;                         (enutil-aget 'tag-list note-attr)))
-;;        (setq edit-mode (enutil-aget 'edit-mode note-attr))
-;;        (rename-buffer name t)
-;;        (enh-base-update-mode-line name tag-names edit-mode))))
-
-
 (defun enh-base-find-opened-buffer (guid)
   "Find a buffer associated with guid"
   (let ((found_buf nil))
@@ -825,24 +815,36 @@
 ;; Helper functions for evernote-browsing-mode (enh-browsing-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar enh-browsing-page-list nil
-  "Page data list of evernote browsing mode.")
-(make-variable-buffer-local 'enh-browsing-page-list)
+(defvar enh-browsing-page-type nil)
+(make-variable-buffer-local 'enh-browsing-page-type)
 
-(defvar enh-browsing-current-page nil
-  "Current page data of evernote browsing mode.")
-(make-variable-buffer-local 'enh-browsing-current-page)
+(defvar enh-browsing-page-description nil)
+(make-variable-buffer-local 'enh-browsing-page-description)
+
+(defvar enh-browsing-page-data nil)
+(make-variable-buffer-local 'enh-browsing-page-data)
+
+(defvar enh-browsing-page-widget-title nil)
+(make-variable-buffer-local 'enh-browsing-page-widget-title)
+
+(defvar enh-browsing-page-widget-root nil)
+(make-variable-buffer-local 'enh-browsing-page-widget-root)
+
+(defvar enh-browsing-page-setup-func nil)
+(make-variable-buffer-local 'enh-browsing-page-setup-func)
 
 
 (defun enh-browsing-open-tag (widget &rest ignored)
   "Open a tag in browsing mode"
-  (let* ((guid (widget-value widget))
-         (note-attrs
-          (enh-command-get-note-attrs-from-tag-guids
-           (if guid
-               (list guid)
-             nil))))
+  (let ((guid (widget-value widget)) note-attrs)
+    (enh-command-with-auth
+     (setq note-attrs
+           (enh-command-get-note-attrs-from-tag-guids
+            (if guid
+                (list guid)
+              nil))))
     (enh-set-note-attrs note-attrs)
+    (enh-browsing-update-page-list)
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
                                (format "Notes with tag %s"
@@ -853,12 +855,14 @@
 
 (defun enh-browsing-open-search (widget &rest ignored)
   "Open a saved search in browsing mode"
-  (let* ((guid (widget-value widget))
-         (note-attrs
-          (enh-command-get-note-attrs-from-query
-           (enutil-aget 'query
-                        (enh-get-search-attr guid)))))
+  (let* ((guid (widget-value widget)) note-attrs)
+    (enh-command-with-auth
+     (setq note-attrs
+           (enh-command-get-note-attrs-from-query
+            (enutil-aget 'query
+                         (enh-get-search-attr guid)))))
     (enh-set-note-attrs note-attrs)
+    (enh-browsing-update-page-list)
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
                                (format "Query Result of Saved Search: %s"
@@ -869,65 +873,67 @@
 
 (defun enh-browsing-open-note (widget &rest ignored)
   "Open a note in browsing mode"
-  (let ((guid (widget-value widget)))
-    (enh-base-open-note-common
-     (enh-get-note-attr guid))))
+  (enh-command-with-auth
+   (let ((guid (widget-value widget)))
+     (enh-base-open-note-common
+      (enh-get-note-attr guid)))))
 
 
-(defun enh-browsing-create-page (type description &optional attr-list)
+(defun enh-browsing-push-page (page)
+  "Push a new page to the browsing mode"
+  (enutil-push page evernote-browsing-page-list)
+  (setq evernote-browsing-current-page page)
+  (switch-to-buffer page)
+  (funcall enh-browsing-page-setup-func))
+
+
+(defun enh-browsing-create-page (type description &optional note-attrs)
   "Create a page structure of the attr-list"
-  (list
-   (cons 'type type)
-   (cons 'description description)
-   (cons 'guid-list
-         (mapcar
-          (lambda (attr)
-            (enutil-aget 'guid attr))
-          attr-list))))
-
-
-(defun enh-browsing-reflesh ()
-  "Refresh browsing buffer"
-  (let ((buf (get-buffer evernote-browsing-mode-buffer-name)))
-    (when buf
-      (save-excursion
-        (set-buffer buf)
-        (enh-browsing-redraw-current-page)))))
-
-
-(defun enh-browsing-redraw-current-page ()
-  "Draw browsing buffer"
-  (let (current-page type)
+  (let ((buf (generate-new-buffer (format "*ENB %s* " description))))
     (save-excursion
-      (if enh-browsing-current-page
-          (progn
-            (setq type (enutil-aget 'type enh-browsing-current-page))
-            (cond
-             ((eq type 'tag-list)
-              (enh-browsing-draw-tag-list-page))
-             ((eq type 'search-list)
-              (enh-browsing-draw-search-list-page))
-             ((eq type 'note-list)
-              (enh-browsing-draw-note-list-page))))
-        (enutil-erase-buffer-forcibly)))))
+      (set-buffer buf)
+      (setq enh-browsing-page-type type
+            enh-browsing-page-description description
+            enh-browsing-page-data
+            (mapcar
+             (lambda (attr)
+               (enutil-aget 'guid attr))
+             note-attrs))
+      (cond
+       ((eq type 'tag-list)
+        (setq enh-browsing-page-setup-func
+              'enh-browsing-setup-tag-list-page))
+       ((eq type 'search-list)
+        (setq enh-browsing-page-setup-func
+              'enh-browsing-setup-search-list-page))
+       ((eq type 'note-list)
+        (setq enh-browsing-page-setup-func
+              'enh-browsing-setup-note-list-page)))
+      (evernote-browsing-mode))
+    buf))
 
 
-(defun enh-browsing-draw-tag-list-page ()
+(defun enh-browsing-setup-tag-list-page ()
   "Create a page structure of the attr-list"
-  (erase-buffer)
-  (widget-insert (format "Tag List\n\ntotal %d\n" (hash-table-count enh-tag-info)))
+  (when enh-browsing-page-widget-root
+    (widget-delete enh-browsing-page-widget-title)
+    (widget-delete enh-browsing-page-widget-root)
+    (setq enh-browsing-page-widget-title nil)
+    (setq enh-browsing-page-widget-root nil))
   (let ((guid-children-hash (make-hash-table :test #'equal)))
     (maphash
      (lambda (guid attr)
        (let* ((parent (enutil-aget 'parent attr))
               (children (gethash parent guid-children-hash)))
-       (if children
-           (puthash parent (cons guid children) guid-children-hash)
-         (puthash parent (list guid) guid-children-hash))))
+         (if children
+             (puthash parent (cons guid children) guid-children-hash)
+           (puthash parent (list guid) guid-children-hash))))
      enh-tag-info)
-    (message "test")
-    (apply 'widget-create
-           (enh-browsing-get-tag-tree nil)))
+    (setq enh-browsing-page-widget-title
+          (widget-create 'item (format "Tag List\n\ntotal %d\n" (hash-table-count enh-tag-info))))
+    (setq enh-browsing-page-widget-root
+          (apply 'widget-create
+                 (enh-browsing-get-tag-tree nil))))
   (widget-setup))
 
 
@@ -950,118 +956,113 @@
                     ,guid))))
 
 
-(defun enh-browsing-test-open-tag (widget &rest ignored)
-  (message (widget-value widget)))
-
-
-(defun enh-browsing-draw-search-list-page ()
+(defun enh-browsing-setup-search-list-page ()
   "Insert saved search list into the browsing buffer"
-  (erase-buffer)
-  (widget-insert
-   (format "%s\n\ntotal %d\n%-30s   %s\n\n"
-           (enutil-aget 'description enh-browsing-current-page)
-           (hash-table-count enh-search-info)
-           "Name"
-           "Query"))
-  (maphash
-   (lambda (guid attr)
-     (let ((attr (enh-get-search-attr guid)))
-       (widget-create 'push-button
-                      :tag (format "%-30s   %s"
-                                   (enutil-aget 'name attr)
-                                   (enutil-aget 'query attr))
-                      :format "%[%t%]\n"
-                      :notify enh-browsing-open-search
-                      guid)))
-   enh-search-info)
+  (when enh-browsing-page-widget-root
+    (widget-delete enh-browsing-page-widget-root)
+    (setq enh-browsing-page-widget-root nil))
+  (let ((search-list nil))
+    (maphash
+     (lambda (guid attr)
+       (let ((attr (enh-get-search-attr guid)))
+         (enutil-push `(push-button
+                        :tag ,(format "%-30s   %s"
+                                      (enutil-aget 'name attr)
+                                      (enutil-aget 'query attr))
+                        :format "%[%t%]\n"
+                        :notify enh-browsing-open-search
+                        ,guid)
+                      search-list)))
+     enh-search-info)
+    (setq enh-browsing-page-widget-root
+          (apply 'widget-create
+                 `(group
+                   (item ,(format "%s\n\ntotal %d\n%-30s   %s\n\n"
+                                  enh-browsing-page-description
+                                  (hash-table-count enh-search-info)
+                                  "Name"
+                                  "Query"))
+                   ,@(nreverse search-list)))))
   (widget-setup))
 
 
-(defun enh-browsing-draw-note-list-page ()
+(defun enh-browsing-setup-note-list-page ()
   "Insert note list into the browsing buffer"
-  (erase-buffer)
-  (let ((guid-list (enutil-aget 'guid-list enh-browsing-current-page))
-        (note-attrs (make-hash-table :test #'equal)))
+  (when enh-browsing-page-widget-root
+    (widget-delete enh-browsing-page-widget-root)
+    (setq enh-browsing-page-widget-root nil))
+  (let ((guid-list enh-browsing-page-data)
+        (note-attrs (make-hash-table :test #'equal))
+        (note-list nil))
     (mapc
      (lambda (guid)
        (puthash guid (gethash guid enh-note-info) note-attrs))
      guid-list)
-    (widget-insert
-     (format "%s\n\ntotal %d\n%-30s   %-15s   %s\n\n"
-             (enutil-aget 'description enh-browsing-current-page)
-             (hash-table-count note-attrs)
-             "Last Modified"
-             "Tags"
-             "Name"))
     (maphash
      (lambda (guid attr)
-       (widget-create 'push-button
-                      :tag (format "%-30s   %-15s   %s"
-                                   (enutil-aget 'updated attr)
-                                   (enh-tag-guids-to-comma-separated-names
-                                    (enutil-aget 'tags attr)
-                                    15)
-                                   (enutil-aget 'name attr))
+       (enutil-push `(push-button
+                      :tag ,(format "%-30s   %-15s   %s"
+                                    (enutil-aget 'updated attr)
+                                    (enh-tag-guids-to-comma-separated-names
+                                     (enutil-aget 'tags attr)
+                                     15)
+                                    (enutil-aget 'name attr))
                       :format "%[%t%]\n"
                       :notify enh-browsing-open-note
-                      guid))
-     note-attrs))
+                      ,guid)
+                    note-list))
+     note-attrs)
+    (setq enh-browsing-page-widget-root
+          (apply 'widget-create
+                 `(group
+                   (item ,(format "%s\n\ntotal %d\n%-30s   %-15s   %s\n\n"
+                                  enh-browsing-page-description
+                                  (hash-table-count note-attrs)
+                                  "Last Modified"
+                                  "Tags"
+                                  "Name"))
+                   ,@(nreverse note-list)))))
   (widget-setup))
 
 
-(defun enh-browsing-push-page (page)
-  "Push a new page to the browsing mode"
-  (let ((type (enutil-aget 'type page)))
-    (if (or (eq type 'tag-list) (eq type 'search-list))
-        (let (same-type-page)
-          (setq same-type-page
-                (enh-browsing-get-page-of-type type))
-          (if same-type-page
-              (evernote-browsing-delete-page same-type-page)))))
-  (enutil-push page enh-browsing-page-list)
-  (setq enh-browsing-current-page page)
-  (enh-browsing-redraw-current-page))
-
-
-(defun enh-browsing-get-page-of-type(type)
-  "Get a page of the type in the browsing mode"
-  (catch 'result
-    (mapc
-     (lambda (page)
-       (if (eq (enutil-aget 'type page) type)
-           (throw 'result page)))
-     enh-browsing-page-list)
-    nil))
-
-
-(defun enh-browsing-get-current-page-type ()
-  (enutil-aget
-   'type
-   enh-browsing-current-page))
-
-
-(defun enh-browsing-get-current-page-guids ()
-  (enutil-aget
-   'guids
-   enh-browsing-current-page))
-
-
-(defun enh-browsing-get-next-page ()
-  (if (enutil-neq enh-browsing-current-page (car enh-browsing-page-list))
-      (catch 'next-page
-        (let (next-page)
-          (mapc
-           (lambda (page)
-             (when (eq page enh-browsing-current-page)
-               (throw 'next-page next-page))
-             (setq next-page page))
-           enh-browsing-page-list)))))
+(defun enh-browsing-update-page-list ()
+  (setq evernote-browsing-page-list
+        (delete nil
+                (mapcar (lambda (page)
+                          (if (buffer-live-p page) page nil))
+                        evernote-browsing-page-list)))
+  (unless (memq evernote-browsing-current-page evernote-browsing-page-list)
+    (setq evernote-browsing-current-page (car evernote-browsing-page-list))))
 
 
 (defun enh-browsing-get-prev-page ()
   (cadr
-   (memq enh-browsing-current-page
-         enh-browsing-page-list)))
+   (memq evernote-browsing-current-page
+         evernote-browsing-page-list)))
+
+
+(defun enh-browsing-get-next-page ()
+  (catch 'next-page
+    (let (next-page)
+      (mapc
+       (lambda (page)
+         (when (eq page evernote-browsing-current-page)
+           (throw 'next-page next-page))
+         (setq next-page page))
+       evernote-browsing-page-list))))
+
+
+(defun enh-browsing-get-page-of-type (type)
+  "Get a page of the type in the browsing mode"
+  (let ((result nil))
+    (save-excursion
+      (mapc
+       (lambda (page)
+         (set-buffer page)
+         (when (eq enh-browsing-page-type type)
+           (setq result page)))
+       evernote-browsing-page-list))
+    result))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1431,11 +1432,7 @@
        (enh-command-get-search-attrs))))
 
 
-(defun enh-update-note-attrs-external (note-attrs)
-  (enh-set-note-attrs note-attrs))
-
-
-(defun enh-update-note-attr (note-attr)
+(defun enh-update-note-and-new-tag-attrs (note-attr)
   (enh-set-note-attr note-attr)
   (let* ((tag-guids (enutil-aget 'guid note-attr)))
     (if (catch 'result
@@ -1444,25 +1441,8 @@
                (unless (gethash guid enh-tag-info)
                  (throw 'result t)))
              tag-guids))
-        (progn
           (enh-set-tag-attrs
-           (enh-command-get-tag-attrs))
-          (enh-browsing-reflesh)))))
-
-
-(defun enh-update-tag-attrs-external (tag-attrs)
-  (enh-set-tag-attrs tag-attrs)
-  (enh-browsing-reflesh))
-
-
-(defun enh-update-search-attrs-external (search-attrs)
-  (enh-set-search-attrs search-attrs)
-  (enh-browsing-reflesh))
-
-
-(defun enh-update-search-attr (search-attr)
-  (enh-set-search-attr search-attr)
-  (enh-browsing-reflesh))
+           (enh-command-get-tag-attrs)))))
 
 
 (defun enh-tag-guids-to-comma-separated-names (tag-guids &optional maxlen)
