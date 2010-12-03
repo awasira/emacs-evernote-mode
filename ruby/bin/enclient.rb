@@ -615,7 +615,7 @@ module EnClient
       end
       note = @note_store.createNote @auth_token, note
 
-      formatter = Utils::get_note_formatter(note)
+      formatter = Utils::get_note_formatter note
       puts formatter.to_s
     end
   end
@@ -675,7 +675,7 @@ module EnClient
       end
       note = @note_store.updateNote @auth_token, note
 
-      formatter = Utils::get_note_formatter(note)
+      formatter = Utils::get_note_formatter note
       puts formatter.to_s
     end
   end
@@ -843,11 +843,7 @@ module EnClient
       searches = @note_store.listSearches @auth_token
       formatter = Formatter.new
       searches.each do |s|
-        alist = Formatter.new
-        alist << Formatter::Pair.new("name", s.name)
-        alist << Formatter::Pair.new("guid", s.guid)
-        alist << Formatter::Pair.new("query", s.query)
-        formatter << alist
+        formatter << Utils::get_search_formatter(s)
       end
       puts formatter.to_s
     end
@@ -871,7 +867,10 @@ module EnClient
       search = Evernote::EDAM::Type::SavedSearch.new
       search.name = name
       search.query = query
-      @note_store.createSearch @auth_token, search
+      search = @note_store.createSearch @auth_token, search
+
+      formatter = Utils::get_search_formatter search
+      puts formatter.to_s
     end
   end
 
@@ -895,6 +894,9 @@ module EnClient
       search.name = name
       search.query = query
       @note_store.updateSearch @auth_token, search
+
+      formatter = Utils::get_search_formatter search
+      puts formatter.to_s
     end
   end
 
@@ -942,6 +944,14 @@ module EnClient
       end
 
       formatter << Formatter::Pair.new("edit-mode", get_edit_mode(note.attributes.sourceApplication))
+      formatter
+    end
+
+    def self.get_search_formatter(search)
+      formatter = Formatter.new
+      formatter << Formatter::Pair.new("name", search.name)
+      formatter << Formatter::Pair.new("guid", search.guid)
+      formatter << Formatter::Pair.new("query", search.query)
       formatter
     end
 
