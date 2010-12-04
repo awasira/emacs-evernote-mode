@@ -70,10 +70,11 @@
          (if (eq error-code t)
              (progn
                (let (error-code)
-                 (catch 'error
-                   (progn
-                     (funcall try-func)
-                     t))
+                 (setq error-code
+                       (catch 'error
+                         (progn
+                           (funcall try-func)
+                           t)))
                  (if (enutil-neq error-code t)
                      (enh-command-output-error error-code))))
            (enh-command-output-error error-code))))

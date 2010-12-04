@@ -1,4 +1,4 @@
-#! /usr/bin/ruby -sWKu
+#! C:/Ruby192/bin/ruby.exe -sWKu
 # -*- coding: utf-8 -*-
 
 #
