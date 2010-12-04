@@ -247,6 +247,24 @@
   "Note guid of the buffer")
 (make-variable-buffer-local 'evernote-note-guid)
 
+(defvar evernote-note-modified-name nil
+  "Modified name of the note before saving")
+(make-variable-buffer-local 'evernote-note-modified-name)
+
+(defvar evernote-note-modified-edit-mode nil
+  "Modified edit-mode of the note before saving")
+(make-variable-buffer-local 'evernote-note-modified-edit-mode)
+
+(defvar evernote-note-is-modified-tag-names nil
+  "Modified tag-names of the note before saving")
+(make-variable-buffer-local 'evernote-note-is-modified-tag-names)
+
+(defvar evernote-note-modified-tag-names nil
+  "Modified tag-names of the note before saving")
+(make-variable-buffer-local 'evernote-note-modified-tag-names)
+
+
+
 (defvar evernote-mode-map (make-sparse-keymap)
   "Keymap used in evernote mode.")
 (define-key evernote-mode-map "\C-x\C-s" 'evernote-save-note)
@@ -271,7 +289,10 @@
   (if evernote-mode
       (progn
         (when guid (setq evernote-note-guid guid))
-        (enh-base-update-mode-line)
+        (enh-base-update-mode-line
+         evernote-note-is-modified-tag-names
+         evernote-note-modified-tag-names
+         evernote-note-modified-edit-mode)
         (make-local-hook 'after-save-hook)
         (make-local-hook 'change-major-mode-hook)
         (add-hook 'after-save-hook
@@ -380,8 +401,22 @@
        (enh-base-update-note-common
         (current-buffer)   ; contents
         evernote-note-guid ; guid
-        nil                ; name
-        t)                 ; tags
+        (if evernote-note-modified-name ; name
+            evernote-note-modified-name
+          nil)
+        (if evernote-note-is-modified-tag-names ; tags
+            evernote-note-modified-tag-names
+          t)
+        (if evernote-note-modified-edit-mode ; edit-mode
+            evernote-note-modified-edit-mode
+          nil))
+       (if (or evernote-note-modified-name
+               evernote-note-is-modified-tag-names)
+           (enh-browsing-reflesh-page 'note-list))
+       (setq evernote-note-modified-name nil
+             evernote-note-is-modified-tag-names nil
+             evernote-note-modified-tag-names nil
+             evernote-note-modified-edit-mode nil)
        (set-buffer-modified-p nil))
     (message "(No changes need to be saved)")))
 
@@ -389,51 +424,42 @@
 (defun evernote-edit-tags ()
   "Add or remove tags from/to the note"
   (interactive)
-  (if evernote-mode
-      (enh-command-with-auth
-         (let ((tag-names (enh-read-tag-names
-                           "Change attached Tags (comma separated form):"
-                           evernote-note-guid)))
-           (enh-base-update-note-common
-            nil                ; contents
-            evernote-note-guid ; guid
-            nil                ; name
-            tag-names))))      ; tags
-  (enh-base-update-mode-line)
-  (enh-browsing-reflesh-page 'note-list))
+  (when evernote-mode
+    (setq evernote-note-modified-tag-names
+          (enh-read-tag-names
+           "Change attached Tags (comma separated form):"
+           evernote-note-guid))
+    (setq evernote-note-is-modified-tag-names t) ; this must be after enh-read-tag-names
+    (enh-base-update-mode-line evernote-note-is-modified-tag-names
+                               evernote-note-modified-tag-names
+                               evernote-note-modified-edit-mode)
+    (set-buffer-modified-p t)))
 
 
 (defun evernote-change-edit-mode ()
   "Change edit mode of the note"
   (interactive)
-  (if evernote-mode
-      (let ((edit-mode (enh-read-edit-mode (enutil-aget 'edit-mode (enh-get-note-attr evernote-note-guid)))))
-        (enh-command-with-auth
-         (enh-base-update-note-common
-          (current-buffer)   ; contents
-          evernote-note-guid ; guid
-          nil                ; name
-          t                  ; tags
-          edit-mode))))      ; edit-mode
-  (enh-base-update-mode-line))
+  (when evernote-mode
+    (setq evernote-note-modified-edit-mode
+          (enh-read-edit-mode
+           (enutil-aget 'edit-mode (enh-get-note-attr evernote-note-guid))))
+    (enh-base-update-mode-line
+     evernote-note-is-modified-tag-names
+     evernote-note-modified-tag-names
+     evernote-note-modified-edit-mode)
+    (set-buffer-modified-p t)))
 
 
 (defun evernote-rename-note ()
   "Rename a note"
   (interactive)
-  (if evernote-mode
-      (let ((name (read-string "New note name:"
-                               (enutil-aget 'name (enh-get-note-attr evernote-note-guid)))))
-        (enh-command-with-auth
-         (enh-base-update-note-common
-          nil                ; contents
-          evernote-note-guid ; guid
-          name               ; name
-          t                  ; tags
-          nil))              ; edit-mode
-        (rename-buffer name t)
-        (enh-base-change-major-mode-from-note-name name)
-        (enh-browsing-reflesh-page 'note-list))))
+  (when evernote-mode
+      (setq evernote-note-modified-name
+            (read-string "New note name:"
+                         (enutil-aget 'name (enh-get-note-attr evernote-note-guid))))
+      (rename-buffer evernote-note-modified-name t)
+      (enh-base-change-major-mode-from-note-name evernote-note-modified-name)
+      (set-buffer-modified-p t)))
 
 
 (defun evernote-delete-note ()
@@ -497,15 +523,27 @@
   (if evernote-mode
       (setq evernote-mode-info-for-changing-major-mode
             (list
-             (cons 'guid  evernote-note-guid)))))
+             (cons 'guid  evernote-note-guid)
+             (cons 'modified-name evernote-note-modified-name)
+             (cons 'is-modified-tag-names evernote-note-is-modified-tag-names)
+             (cons 'modified-tag-names evernote-note-modified-tag-names)
+             (cons 'modified-edit-mode evernote-note-modified-edit-mode)))))
 
 
 (defun evernote-mode-after-change-major-mode-hook ()
   "After change major mode hook for evernote mode. This restore the note info after changing the major mode"
   (if evernote-mode-info-for-changing-major-mode
       (progn
-        (evernote-mode
-         (enutil-aget 'guid evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-modified-name
+              (enutil-aget 'modified-name evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-is-modified-tag-names
+              (enutil-aget 'is-modified-tag-names evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-modified-tag-names
+              (enutil-aget 'modified-tag-names evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-modified-edit-mode
+              (enutil-aget 'modified-edit-mode evernote-mode-info-for-changing-major-mode))
+        (evernote-mode ; this must be after setting evernote-note-modified-xxx
+              (enutil-aget 'guid evernote-mode-info-for-changing-major-mode))
         (setq evernote-mode-info-for-changing-major-mode nil))))
 
 
@@ -625,7 +663,7 @@
          (note-edit-mode (enutil-aget 'edit-mode note-attr))
          (opened-buf (enh-base-find-opened-buffer note-guid)))
     (if opened-buf
-        (enutil-move-cursor-to-window opened-buf)
+        (enutil-move-cursor-to-window opened-buf t)
       (let ((buf (generate-new-buffer note-name)))
         (set-buffer buf)
         (insert (enh-command-get-note-content note-guid note-edit-mode))
@@ -828,16 +866,20 @@
     found_buf))
 
 
-(defun enh-base-update-mode-line ()
+(defun enh-base-update-mode-line (&optional is-set-tag-names tag-names edit-mode)
   "Update mode line"
   (let ((note-attr (enh-get-note-attr evernote-note-guid)))
     (setq vc-mode
           (concat "[Tag:"
-                  (enh-tag-guids-to-comma-separated-names
-                   (enutil-aget 'tags note-attr))
+                  (if is-set-tag-names
+                      (mapconcat #'identity tag-names ",")
+                    (enh-tag-guids-to-comma-separated-names
+                     (enutil-aget 'tags note-attr)))
                   "] "
                   "[Edit mode:"
-                  (enutil-aget 'edit-mode note-attr)
+                  (if edit-mode
+                      edit-mode
+                    (enutil-aget 'edit-mode note-attr))
                   "]"))
     (force-mode-line-update)))
 
@@ -910,7 +952,7 @@
           (cur-buf (current-buffer)))
      (enh-base-open-note-common note-attr)
      (if (string= "o" (this-command-keys))
-         (enutil-move-cursor-to-window cur-buf)))))
+         (enutil-move-cursor-to-window cur-buf t)))))
 
 
 (defun enh-browsing-push-page (page &optional noswitch)
@@ -1629,12 +1671,14 @@
     (delete-region (point) (point-max))))
 
 
-(defun enutil-move-cursor-to-window (buf)
+(defun enutil-move-cursor-to-window (buf &optional pop)
   "Move cursor to the window associated with the bufer"
   (let ((buf-window (get-buffer-window buf)))
     (if buf-window
         (select-window buf-window)
-      (pop-to-buffer buf))))
+      (if pop
+          (pop-to-buffer buf)
+        (switch-to-buffer buf)))))
 
 
 (defun enutil-string-to-oct (string)
