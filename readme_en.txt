@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-21
+Last Modified: 2010-12-05
 
 License
 =======
@@ -78,6 +78,11 @@ following commands.
 
 * evernote-edit-search
   Change the name and the query of an existing Saved Search.
+
+* evernote-browser
+  Open Evernote Browser. Evernote Browser offers the features to
+  open notes from the tag hierarchical list, the saved search list
+  and the note list used before. See "Evernote Browser" for details.
 
 
 After calling evernote-open-note or evernote-write-note,
@@ -224,6 +229,59 @@ The following examples are referred from
 * Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
 
   any: "San Francisco" tag:SFO
+
+
+Evernote Browser
+=========================
+
+Evernote Browser offers the features to open notes from the tag
+hierarchical list, the saved search list, and the note lists used
+before. These lists are always kept in Emacs buffers after they are
+created, and they make the procedure to open notes easy.
+
+Evernote Browser is composed of multiple Evernote Browser pages(emacs
+bufferes). An Evernote Browser page is created when searching notes
+first or when executing the evernote-browser command at the state that
+no search has been executed. The multiple pages are managed as the
+page list and each page has the next/previous page.
+There is one valid current page. Execute the evernote-browser command
+to move the cursor to the current Evernote Browser page. Also, use the
+key for moving to the next/previous page key (described later) to move
+to another page.
+
+
+There are three type of Evernote Browser page
+
+- tag list page
+- saved search list page
+- note list page
+
+A tag list page shows the hierarchical tag list created on Evernote
+service. Pressing [Enter](\C-m) on the tag name opens a note list page
+of the tag.
+
+A saved search list shows the search list created on Evernote
+service. Pressing [Enter](\C-m) on the search name opens a note list
+page from the search result.
+
+A note list shows the note list from a note search result. The note
+list page is newly created by the evenote-open-note command, the
+evernote-search-notes command and by searches on Evernote Browser.
+Pressing [Enter](\C-m) on the note name opens a note.
+
+
+The followings are other key assignments on Evernote Browser pages
+
+b: show the previous page
+f: show the next page
+t: create a tag list page and show it. If a tag list page already
+   exists, move the cursor to the page
+S: create a search list page and show it. If a tag list page already
+   exists, move the cursor to the page
+s: create a note list from the search query input and show it.
+o: same as [Enter](\C-m), but it does not move the cursor to the
+   opened note.
+d: delete the current from Evernote Browser
 
 
 Installation & Settings

@@ -1,6 +1,6 @@
 Emacs evernote mode
 
-Last Modified: 2010-11-21
+Last Modified: 2010-12-05
 
 License
 =======
@@ -80,6 +80,10 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 * evernote-edit-search
   既存の「保存された検索」の名前とクエリを変更します。
 
+* evernote-browser
+  Evernote Browser を開きます。Evernote Browser はタグ一覧や、保存され
+  た検索の一覧、過去に検索したノートの一覧からノートを開くための機能を
+  提供します。詳細は "Evernote Browser" を参照して下さい。
 
 evernote-open-note, evernote-write-noteを実行すると、ノートが読み込ま
 れているバッファで evernote-modeマイナーモードが起動されます。
@@ -223,6 +227,60 @@ http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
   any: "San Francisco" tag:SFO
 
 
+Evernote Browser
+=========================
+
+Evernote Browser はタグ一覧や、保存された検索の一覧、過去に検索したノー
+トの一覧からノートを開くための機能を提供します。こららの一覧は
+evernote-open-note コマンドや evernote-search-notes コマンドと異なり
+作成後常にバッファ上に保持されるので、ノートを開く手順を簡略化すること
+ができます。
+
+Evernote Browser は複数の Evernote Browser ページ(バッファ)から構成さ
+れます。Evernote Browserページは、最初にノートの検索を行った際、もしく
+は検索を一度も行っていない状態で evernote-browser コマンドを実行した際
+に作られます。複数のページはリストとして管理され、ページ間の前後関係と
+現在有効なカレントページが存在します。Evernote Browser のカレントペー
+ジに移動するにはevernote-browser コマンドを実行して下さい。また、ペー
+ジの移動には後述するページ移動キーを使用して下さい。
+
+
+各 Evernote Browser ページはは以下の種類があります。
+
+- タグ一覧ページ
+- 保存された検索一覧ページ
+- ノート一覧ページ
+
+タグ一覧ページにはユーザがEvernoteサービス上で作成したタグ一覧が階層的
+に表示されます。タグ名上で Enter(\C-m) を押すことで、そのタグが付加さ
+れたノート一覧ページが開きます。
+
+保存された検索一覧ページにはユーザがEvernoteサービス上で作成した「保存
+された検索」の一覧が表示されます。保存された検索の名前上で Enter(\C-m)
+を押すことで保存された検索を実行し、結果をノート一覧ページとして開きま
+す。
+
+ノート一覧ページは検索により取得したノートの一覧を表示します。
+ノート一覧ページは evernote-open-note コマンド、 evernote-search-notes
+コマンドや、Evernote Browser での検索が行われる度に新たに作成されます。
+ノート名上でEnter(\C-m)を押すことでノートを開きます。
+
+
+Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
+
+b: 前のページに移動します
+f: 次のページに移動します
+t: タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合は
+   そのページに移動します
+S: 保存された検索一覧ページを作成し、表示します。既に保存された検索一
+   覧ページがある場合はそのページに移動します
+s: 入力された検索クエリから結果を新規ノート一覧ページとして作成し、そ
+   のページを表示します。
+o: Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートに
+   カーソルを移動しません
+d: 現在のページを Evernote Browser から削除します
+
+
 Installation & Settings
 =======================
 
@@ -247,6 +305,7 @@ cp evernote-mode.el <your load path>
 (global-set-key "\C-ceS" 'evernote-do-saved-search)
 (global-set-key "\C-cew" 'evernote-write-note)
 (global-set-key "\C-cep" 'evernote-post-region)
+(global-set-key "\C-ceb" 'evernote-browser)
 
 
 4. proxy の設定
