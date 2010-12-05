@@ -717,7 +717,8 @@
               (setq buf (generate-new-buffer name))
               (set-buffer buf)
               (when content (insert content)))
-          (rename-buffer name t)) ;; BUG
+          (when change-to-evernote-mode
+            (rename-buffer name t)))
         (when change-to-evernote-mode
           (set-visited-file-name nil) ; set-visited-file-name must be before (evernote-mode) because it changes the mode line.
           (enh-base-change-major-mode-from-note-name name)
@@ -951,8 +952,10 @@
           (note-attr (enh-get-note-attr guid))
           (cur-buf (current-buffer)))
      (enh-base-open-note-common note-attr)
-     (if (string= "o" (this-command-keys))
-         (enutil-move-cursor-to-window cur-buf t)))))
+     (let ((command-keys (this-command-keys)))
+       (if (and (stringp command-keys)
+                (string= "o" command-keys))
+           (enutil-move-cursor-to-window cur-buf t))))))
 
 
 (defun enh-browsing-push-page (page &optional noswitch)
