@@ -237,12 +237,12 @@ evernote-open-note コマンドや evernote-search-notes コマンドと異な�
 ができます。
 
 Evernote Browser は複数の Evernote Browser ページ(バッファ)から構成さ
-れます。Evernote Browserページは、最初にノートの検索を行った際、もしく
-は検索を一度も行っていない状態で evernote-browser コマンドを実行した際
-に作られます。複数のページはリストとして管理され、ページ間の前後関係と
-現在有効なカレントページが存在します。Evernote Browser のカレントペー
-ジに移動するにはevernote-browser コマンドを実行して下さい。また、ペー
-ジの移動には後述するページ移動キーを使用して下さい。
+れます。Evernote Browserページは、ノートの検索を行った際、もしくは検索
+を一度も行っていない状態で evernote-browser コマンドを実行した際に作ら
+れます。複数のページはリストとして管理され、現在有効なカレントページと
+各ページ間の前後関係が存在します。Evernote Browser のカレントページに
+移動するにはevernote-browser コマンドを実行して下さい。また、ページの
+移動には後述するページ移動キーを使用して下さい。
 
 
 各 Evernote Browser ページはは以下の種類があります。

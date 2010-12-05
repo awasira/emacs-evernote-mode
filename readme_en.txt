@@ -241,12 +241,13 @@ created, and they make the procedure to open notes easy.
 
 Evernote Browser is composed of multiple Evernote Browser pages(emacs
 bufferes). An Evernote Browser page is created when searching notes
-first or when executing the evernote-browser command at the state that
-no search has been executed. The multiple pages are managed as the
-page list and each page has the next/previous page.
+or when executing the evernote-browser command at the state that
+no search has been executed.
+The multiple pages are managed as the page list. There is one valid
+current page and each page has the next/previous page.
 There is one valid current page. Execute the evernote-browser command
 to move the cursor to the current Evernote Browser page. Also, use the
-key for moving to the next/previous page key (described later) to move
+keys for moving to the next/previous page key (described later) to move
 to another page.
 
 
@@ -272,8 +273,8 @@ Pressing [Enter](\C-m) on the note name opens a note.
 
 The followings are other key assignments on Evernote Browser pages
 
-b: show the previous page
-f: show the next page
+b: move to the previous page
+f: move to the next page
 t: create a tag list page and show it. If a tag list page already
    exists, move the cursor to the page
 S: create a search list page and show it. If a tag list page already
