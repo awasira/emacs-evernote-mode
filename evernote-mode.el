@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
 ;; Author: Yusuke Kawakami
-;; Version: 0.20
+;; Version: 0.21
 ;; Keywords: tools
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -27,6 +27,7 @@
 ;;
 ;;      (add-to-list 'load-path "~/lisp")
 ;;      (require 'evernote-mode)
+;;      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))
 ;;      (global-set-key "\C-cec" 'evernote-create-note)
 ;;      (global-set-key "\C-ceo" 'evernote-open-note)
 ;;      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -263,6 +264,10 @@
   "Modified tag-names of the note before saving")
 (make-variable-buffer-local 'evernote-note-modified-tag-names)
 
+(defvar evernote-note-xhtml-mode-content nil
+  "Note contents as a string of XHTML")
+(make-variable-buffer-local 'evernote-note-xhtml-mode-content)
+
 
 
 (defvar evernote-mode-map (make-sparse-keymap)
@@ -272,6 +277,7 @@
 (define-key evernote-mode-map "\C-cee"   'evernote-change-edit-mode)
 (define-key evernote-mode-map "\C-cer"   'evernote-rename-note)
 (define-key evernote-mode-map "\C-ced"   'evernote-delete-note)
+(define-key evernote-mode-map "\C-x\C-q" 'evernote-toggle-read-only)
 
 
 (defun evernote-mode (&optional guid)
@@ -396,29 +402,37 @@
 (defun evernote-save-note ()
   "Save a note"
   (interactive)
-  (if (and evernote-mode (buffer-modified-p))
-      (enh-command-with-auth
-       (enh-base-update-note-common
-        (current-buffer)   ; contents
-        evernote-note-guid ; guid
-        (if evernote-note-modified-name ; name
-            evernote-note-modified-name
-          nil)
-        (if evernote-note-is-modified-tag-names ; tags
-            evernote-note-modified-tag-names
-          t)
-        (if evernote-note-modified-edit-mode ; edit-mode
-            evernote-note-modified-edit-mode
-          nil))
-       (if (or evernote-note-modified-name
-               evernote-note-is-modified-tag-names)
-           (enh-browsing-reflesh-page 'note-list))
-       (setq evernote-note-modified-name nil
-             evernote-note-is-modified-tag-names nil
-             evernote-note-modified-tag-names nil
-             evernote-note-modified-edit-mode nil)
-       (set-buffer-modified-p nil))
-    (message "(No changes need to be saved)")))
+  (cond
+   ((not evernote-mode)
+    nil) ; do nothing
+   ((not (buffer-modified-p))
+    (message "(No changes need to be saved)"))
+   (buffer-read-only
+    (ding)
+    (message "Unset read-only before you save"))
+   (t
+    (enh-command-with-auth
+     (enh-base-update-note-common
+      (current-buffer)   ; contents
+      evernote-note-guid ; guid
+      (if evernote-note-modified-name ; name
+          evernote-note-modified-name
+        nil)
+      (if evernote-note-is-modified-tag-names ; tags
+          evernote-note-modified-tag-names
+        t)
+      (if evernote-note-modified-edit-mode ; edit-mode
+          evernote-note-modified-edit-mode
+        nil))
+     (if (or evernote-note-modified-name
+             evernote-note-is-modified-tag-names
+             evernote-note-modified-edit-mode)
+         (enh-browsing-reflesh-page 'note-list))
+     (setq evernote-note-modified-name nil
+           evernote-note-is-modified-tag-names nil
+           evernote-note-modified-tag-names nil
+           evernote-note-modified-edit-mode nil)
+     (set-buffer-modified-p nil)))))
 
 
 (defun evernote-edit-tags ()
@@ -440,14 +454,41 @@
   "Change edit mode of the note"
   (interactive)
   (when evernote-mode
-    (setq evernote-note-modified-edit-mode
-          (enh-read-edit-mode
-           (enutil-aget 'edit-mode (enh-get-note-attr evernote-note-guid))))
-    (enh-base-update-mode-line
-     evernote-note-is-modified-tag-names
-     evernote-note-modified-tag-names
-     evernote-note-modified-edit-mode)
-    (set-buffer-modified-p t)))
+    (let* ((current-edit-mode
+            (or evernote-note-modified-edit-mode
+                (enutil-aget 'edit-mode (enh-get-note-attr evernote-note-guid))))
+           (next-edit-mode (enh-read-edit-mode current-edit-mode))
+           (need-change nil))
+      (when (not (string= current-edit-mode next-edit-mode))
+        (cond
+         ;; XHTML mode, Confirm the buffer is saved.
+         ((and (string= current-edit-mode "XHTML")
+               (buffer-modified-p))
+          (ding)
+          (message "Save the buffer before you change edit mode"))
+         ;; XHTML mode, Formatted xml.
+         ((and (string= current-edit-mode "XHTML")
+               buffer-read-only)
+          (when (y-or-n-p "Changing text mode will remove all format information. Continue? ")
+            (setq evernote-note-xhtml-mode-content nil)
+            (setq buffer-read-only nil)
+            (setq need-change t)))
+         ;; XHTML mode, raw xml.
+         ((and (string= current-edit-mode "XHTML")
+               (not buffer-read-only))
+          (setq evernote-note-xhtml-mode-content nil)
+          (setq need-change t))
+         ;; HTML mode.
+         ((string= current-edit-mode "TEXT")
+          (setq buffer-read-only nil)
+          (setq need-change t))))
+      (when need-change
+        (setq evernote-note-modified-edit-mode next-edit-mode)
+        (enh-base-update-mode-line
+         evernote-note-is-modified-tag-names
+         evernote-note-modified-tag-names
+         evernote-note-modified-edit-mode)
+        (set-buffer-modified-p t)))))
 
 
 (defun evernote-rename-note ()
@@ -508,6 +549,35 @@
   (enh-browsing-reflesh-page 'search-list))
 
 
+(defun evernote-toggle-read-only ()
+  (interactive)
+  (when evernote-mode
+    (if (string= (or evernote-note-modified-edit-mode
+                     (enutil-aget 'edit-mode (enh-get-note-attr evernote-note-guid)))
+                 "XHTML")
+        (if buffer-read-only
+            (progn
+              (setq buffer-read-only nil)
+              (let ((orig-buffer-modified-p (buffer-modified-p)))
+                (erase-buffer)
+                (insert evernote-note-xhtml-mode-content)
+                (goto-char (point-min))
+                (set-buffer-modified-p orig-buffer-modified-p)))
+          (if (buffer-modified-p)
+              (progn
+                (ding)
+                (message "Save the buffer before you toggle read only"))
+            (setq evernote-note-xhtml-mode-content
+                  (buffer-substring (point-min) (point-max)))
+            (erase-buffer)
+            (enh-format-enml evernote-note-xhtml-mode-content (current-buffer))
+            (goto-char (point-min))
+            (set-buffer-modified-p nil)
+            (setq buffer-read-only t)))
+      (setq buffer-read-only (not buffer-read-only)))
+    (force-mode-line-update)))
+
+
 (defvar evernote-mode-info-for-changing-major-mode nil
   "Temporal values used when changing the major mode")
 
@@ -527,7 +597,8 @@
              (cons 'modified-name evernote-note-modified-name)
              (cons 'is-modified-tag-names evernote-note-is-modified-tag-names)
              (cons 'modified-tag-names evernote-note-modified-tag-names)
-             (cons 'modified-edit-mode evernote-note-modified-edit-mode)))))
+             (cons 'modified-edit-mode evernote-note-modified-edit-mode)
+             (cons 'note-xhtml-mode-content evernote-note-xhtml-mode-content)))))
 
 
 (defun evernote-mode-after-change-major-mode-hook ()
@@ -544,6 +615,8 @@
               (enutil-aget 'modified-edit-mode evernote-mode-info-for-changing-major-mode))
         (evernote-mode ; this must be after setting evernote-note-modified-xxx
               (enutil-aget 'guid evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-xhtml-mode-content
+              (enutil-aget 'note-xhtml-mode-content evernote-mode-info-for-changing-major-mode))
         (setq evernote-mode-info-for-changing-major-mode nil))))
 
 
@@ -666,9 +739,16 @@
         (enutil-move-cursor-to-window opened-buf t)
       (let ((buf (generate-new-buffer note-name)))
         (set-buffer buf)
-        (insert (enh-command-get-note-content note-guid note-edit-mode))
-        (enh-base-change-major-mode-from-note-name note-name)
+        (let ((content (enh-command-get-note-content note-guid note-edit-mode)))
+          (if (string= note-edit-mode "XHTML")
+              (progn
+                (setq evernote-note-xhtml-mode-content content)
+                (enh-format-enml content (current-buffer))
+                (setq buffer-read-only t))
+            (insert content)))
         (evernote-mode note-guid)
+        ; this must be after (evernote-mode) that setup the change major mode hooks.
+        (enh-base-change-major-mode-from-note-name note-name)
         (goto-char (point-min))
         (set-buffer-modified-p nil)
         (pop-to-buffer buf)))))
@@ -1086,11 +1166,12 @@
     (maphash
      (lambda (guid attr)
        (enutil-push `(push-button
-                      :tag ,(format "%-30s   %-15s   %s"
+                      :tag ,(format "%-30s   %-15s   %4s   %s"
                                     (enutil-aget 'updated attr)
                                     (enh-tag-guids-to-comma-separated-names
                                      (enutil-aget 'tags attr)
                                      15)
+                                    (enutil-aget 'edit-mode attr)
                                     (enutil-aget 'name attr))
                       :format "%[%t%]\n"
                       :notify enh-browsing-open-note
@@ -1100,11 +1181,12 @@
     (setq enh-browsing-page-widget-root
           (apply 'widget-create
                  `(group
-                   (item ,(format "%s\n\ntotal %d\n%-30s   %-15s   %s\n"
+                   (item ,(format "%s\n\ntotal %d\n%-30s   %-15s   %4s   %s\n"
                                   enh-browsing-page-description
                                   (hash-table-count note-attrs)
                                   "Last Modified"
                                   "Tags"
+                                  "Mode"
                                   "Name"))
                    ,@(nreverse note-list)))))
   (widget-setup)
@@ -1468,6 +1550,29 @@
         (enutil-aget 'tags
                      (enh-get-note-attr note-guid)))
      nil)))
+
+
+(defun enh-format-enml (content outbuf)
+  (if (boundp 'evernote-enml-formatter-command)
+      (let ((infile (concat (make-temp-file "evernote-enml") ".html"))
+            (command (car evernote-enml-formatter-command))
+            (args (cdr evernote-enml-formatter-command)))
+        (setq args (append args (list infile)))
+        (with-temp-buffer
+          (insert content)
+          (write-region (point-min) (point-max) infile)
+          (message "") ; remove the message notifying writing to tmp file.
+          (let ((coding-system-for-read 'utf-8)
+                (coding-system-for-write 'utf-8))
+            (apply 'call-process
+                   command
+                   infile
+                   outbuf
+                   nil
+                   args))))
+    (save-excursion ; insert the content as is.
+      (set-buffer outbuf)
+      (insert content))))
 
 
 (defun enh-reset-local-cache ()
