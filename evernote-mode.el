@@ -118,7 +118,10 @@
   "Current buffer of evernote browsing mode.")
 
 
-(defvar evernote-browsing-mode-map (copy-keymap widget-keymap)
+(defvar evernote-browsing-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map widget-keymap)
+    map)
   "Keymap used in evernote browsing mode.")
 (define-key evernote-browsing-mode-map "o"    'widget-button-press)
 (define-key evernote-browsing-mode-map "t"    'evernote-browsing-list-tags)
@@ -629,7 +632,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defvar evernote-read-note-map
-  (copy-keymap minibuffer-local-completion-map))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map minibuffer-local-completion-map)
+    map))
 (define-key evernote-read-note-map [tab] 'evernote-read-note-completion)
 (define-key evernote-read-note-map "\C-i" 'evernote-read-note-completion)
 (define-key evernote-read-note-map "\C-m" 'evernote-read-note-finish)
@@ -679,7 +684,10 @@
 ;; Interface for evernote-search-mode.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar evernote-search-mode-map (copy-keymap global-map)
+(defvar evernote-search-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map global-map)
+    map)
   "Keymap used in evernote search mode.")
 (define-key evernote-search-mode-map "\C-m" 'evernote-select-note-in-search-mode)
 
