@@ -3,11 +3,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 lang="en" xml:lang="en">
 <head>
-<title>Emacs evernote mode</title>
+<title>readme<sub>en</sub></title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2010/12/09 21:15:59"/>
-<meta name="author" content="Yusuke Kawakami"/>
+<meta name="generated" content="2011/02/22 21:52:12"/>
+<meta name="author" content=""/>
 <style type="text/css">
   html {
 	font-family: Times, serif;
@@ -33,61 +33,67 @@ lang="en" xml:lang="en">
   }
 </style>
 </head><body>
-<h1 class="title">Emacs evernote mode</h1>
-<div id="table-of-contents">
+<h1 class="title">readme<sub>en</sub></h1>
 <h2>Table of Contents</h2>
 <ul>
-<li><a href="#sec-1">1  License</a></li>
-<li><a href="#sec-2">2 Introduction</a></li>
-<li><a href="#sec-3">3 Evernote note edit mode</a>
-<ul>
-<li><a href="#sec-4">3.1 XHTML mode</a>
-<ul>
-<li><a href="#sec-5">3.1.1  An example of XHTML mode editing:</a></li>
 </ul>
-</li>
-<li><a href="#sec-6">3.2 TEXT mode</a>
-<ul>
-<li><a href="#sec-7">3.2.1  An example of TEXT mode editing:</a></li>
-</ul>
-</li>
-<li><a href="#sec-8">3.3 Select edit mode</a></li>
-<li><a href="#sec-9">3.4 Change edit mode</a></li>
-</ul>
-</li>
-<li><a href="#sec-10">4 Search Query Examples</a></li>
-<li><a href="#sec-11">5 Evernote Browser</a></li>
-<li><a href="#sec-12">6 Install and Settings</a></li>
-</ul>
-</div>
+Emacs evernote mode
+===================
 
-<div class="outline-2">
-<h2 id="sec-1">1  License</h2>
+<p>
+Author: Yusuke Kawakami &lt;Yusuke Kawakami&gt;
+Date: 2011/02/22 21:52:07
+</p>
 
-<p><pre>
-Copyright 2010 Yusuke Kawakami
-
+<p>
+Table of Contents
+=================
+1  License
+2 Introduction
+3 Evernote note edit mode
+3.1 XHTML mode
+3.1.1  An example of XHTML mode editing:
+3.2 TEXT mode
+3.2.1  An example of TEXT mode editing:
+3.3 Select edit mode
+3.4 Change edit mode
+4 Search Query Examples
+5 Evernote Browser
+6 Install and Settings
+7 Troubleshooting
+7.1 `require': no such file to load -- gdbm
+7.2 `require': no such file to load -- net/https
+</p>
+<p>
+1 QUOTE License
+~~~~~~~~~~~~~~~
+</p>
+<p>
+Copyright 2011 Yusuke Kawakami
+</p>
+<p>
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
+</p>
+<p>
+     [[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
+</p>
+<p>
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+</p>
 
-
-&lt;&lt;Introduction&gt;&gt;(INVISIBLE)
-</pre>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-2">2 Introduction</h2>
-
-
+<p>
+(INVISIBLE)
+</p>
+<p>
+2 Introduction
+~~~~~~~~~~~~~~
+</p>
 <p>
 Emacs evernote mode offers functions to refer and edit Evernote notes directly from Emacs. Currently this package offers the following interfaces.
 </p>
@@ -138,7 +144,7 @@ Change tags attached to the note. The change on Evernote service will be made af
 <b>Command: evernote-change-edit-mode (default bound to \C-cee)</b>
 
 <p>
-Change the edit mode of the note. (See <a href="#Evernote--note--edit--mode">Evernote note edit mode</a> for details) The change on Evernote service will be made after exec of evernote-save-note.
+Change the edit mode of the note. (See [Evernote note edit mode] for details) The change on Evernote service will be made after exec of evernote-save-note.
 </p>
 </li>
 <li>
@@ -159,7 +165,7 @@ Delete the note.
 <b>Command: evernote-search-notes</b>
 
 <p>
-Search notes by query in the minibuffer. (See <a href="#Search--Query--Examples">Search Query Examples</a> for details)
+Search notes by query in the minibuffer. (See [Search Query Examples] for details)
 </p>
 </li>
 <li>
@@ -187,7 +193,7 @@ Change the name and the query of an existing Saved Search.
 <b>Command: evernote-toggle-read-only (default bound to \C-x\C-q)</b>
 
 <p>
-Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See <a href="#Evernote--note--edit--mode">Evernote note edit mode</a> for details.
+Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See [Evernote note edit mode] for details.
 </p>
 </li>
 <li>
@@ -201,13 +207,12 @@ The command to format XHTML. When a note of XHTML mode is read-only, the command
 <b>Command: evernote-browser</b>
 
 <p>
-Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See <a href="#Evernote--Browser">Evernote Browser</a> for details.
+Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See [Evernote Browser] for details.
 </p>
 </li>
-</ul>
-<p>When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
+</ul>When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.
-</p>
+
 
 <p>
 The minor-mode "evernote-mode" is applied to the buffers opening the evernote note. The following commands are available only when "evernote-mode" is valid.
@@ -230,55 +235,53 @@ evernote-delete-note
 
 
 </li>
-</ul>
-<p><a name="Evernote&ndash;note&ndash;edit&ndash;mode">&nbsp;</a>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-3">3 Evernote note edit mode</h2>
-
+</ul>(INVISIBLE)
 
 <p>
-Evernote notes are XML complying with ENML DTD(<a href="http://xml.evernote.com/pub/enml2.dtd">http://xml.evernote.com/pub/enml2.dtd</a>). evernote-mode offers the two edit mode, XHTML mode and TEXT mode for saving and reading the Evenote notes.
+3 Evernote note edit mode
+~~~~~~~~~~~~~~~~~~~~~~~~~
+</p>
+<p>
+Evernote notes are XML complying with ENML DTD([http://xml.evernote.com/pub/enml2.dtd]). evernote-mode offers the two edit mode, XHTML mode and TEXT mode for saving and reading the Evenote notes.
 </p>
 
-
-<div class="outline-3">
-<h3 id="sec-4">3.1 XHTML mode</h3>
-
-
+<p>
+3.1 XHTML mode
+==============
+</p>
 <p>
 When you save the Evernote note in XHTML mode, the content of the buffer will be saved as the content of the note. Therefore if the contents of the buffer is not valid ENML, you cannot save the contents because of the error.
 </p>
 <p>
-And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See <a href="#Install--and--Settings">Install and Settings</a> for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
+And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See [Install and Settings] for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
 </p>
 
+<p>
+3.1.1 QUOTE An example of XHTML mode editing:
 
-<div class="outline-4">
-<h4 id="sec-5">3.1.1  An example of XHTML mode editing:</h4>
-
-<p><pre>
+<hr/>
+</p>
+<p>
    Emacs Buffer
    -----------------------------------
-   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-   &lt;!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"&gt;
-   &lt;en-note&gt;Evernote notes are XML complying with ENML DTD&lt;br clear="none"/&gt;
-   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for&lt;br clear="none"/&gt;
-   saving and reading the Evenote notes.&lt;br clear="none"/&gt;
-   &lt;/en-note&gt;
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+   <en-note>Evernote notes are XML complying with ENML DTD<br clear="none"/>
+   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for<br clear="none"/>
+   saving and reading the Evenote notes.<br clear="none"/>
+   </en-note>
    -----------------------------------
    |
    | save on XHTML mode
    V
    The content of the note (same as the emacs buffer)
    -----------------------------------
-   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-   &lt;!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"&gt;
-   &lt;en-note&gt;Evernote notes are XML complying with ENML DTD&lt;br clear="none"/&gt;
-   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for&lt;br clear="none"/&gt;
-   saving and reading the Evenote notes.&lt;br clear="none"/&gt;
-   &lt;/en-note&gt;
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+   <en-note>Evernote notes are XML complying with ENML DTD<br clear="none"/>
+   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for<br clear="none"/>
+   saving and reading the Evenote notes.<br clear="none"/>
+   </en-note>
    -----------------------------------
    |
    | read on XHTML mode
@@ -294,23 +297,19 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    V
    Emacs Buffer (unformatted)
    -----------------------------------
-   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-   &lt;!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"&gt;
-   &lt;en-note&gt;Evernote notes are XML complying with ENML DTD&lt;br clear="none"/&gt;
-   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for&lt;br clear="none"/&gt;
-   saving and reading the Evenote notes.&lt;br clear="none"/&gt;
-   &lt;/en-note&gt;
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+   <en-note>Evernote notes are XML complying with ENML DTD<br clear="none"/>
+   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for<br clear="none"/>
+   saving and reading the Evenote notes.<br clear="none"/>
+   </en-note>
    -----------------------------------
+</p>
 
-
-</pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-6">3.2 TEXT mode</h3>
-
-
+<p>
+3.2 TEXT mode
+=============
+</p>
 <p>
 In XHTML mode, you have to edit a XHTML as a text but it is a complicated work. evernote-mode offers TEXT mode to make editing text notes easy and effective.
 </p>
@@ -318,11 +317,12 @@ In XHTML mode, you have to edit a XHTML as a text but it is a complicated work. 
 The text mode is specialized in editing Evernote notes that only contain text content. When you save an Evernote note, special characters(&amp;keyword; space, newline) in the buffer are escaped and the root element is added to transform it into a XML document. Therefore text contents in the Emacs buffer is same as the appearance of the note. (is not same as the actual XML content of the note.) And when you read a Evernote note by using TEXT mode, evernote-mode reads the contents under the root element of the XML as a text and all the special characters are unescaped then evernote-mode insert it to the buffer.
 </p>
 
+<p>
+3.2.1 QUOTE An example of TEXT mode editing:
 
-<div class="outline-4">
-<h4 id="sec-7">3.2.1  An example of TEXT mode editing:</h4>
-
-<p><pre>
+<hr/>
+</p>
+<p>
 Emacs Buffer
    -----------------------------------
    Evernote notes are XML complying with ENML DTD
@@ -334,12 +334,12 @@ Emacs Buffer
    V
    The content of the note (escaped and transformed into a XML)
    -----------------------------------
-   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-   &lt;!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"&gt;
-   &lt;en-note&gt;Evernote notes are XML complying with ENML DTD&lt;br clear="none"/&gt;
-   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for&lt;br clear="none"/&gt;
-   saving and reading the Evenote notes.&lt;br clear="none"/&gt;
-   &lt;/en-note&gt;
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+   <en-note>Evernote notes are XML complying with ENML DTD<br clear="none"/>
+   evernote-mode offers the two edit mode, XHTML mode and TEXT mode for<br clear="none"/>
+   saving and reading the Evenote notes.<br clear="none"/>
+   </en-note>
    -----------------------------------
    |
    | read on TEXT mode
@@ -350,85 +350,72 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-
-</pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-8">3.3 Select edit mode</h3>
-
-
+</p>
+<p>
+3.3 Select edit mode
+====================
+</p>
 <p>
 You can select the edit mode when you create a note. The edit mode is recorded in the note when you save it, and the recorded edit mode is applied to the note when you reopen it.
 </p>
 
-</div>
-
-<div class="outline-3">
-<h3 id="sec-9">3.4 Change edit mode</h3>
-
-
+<p>
+3.4 Change edit mode
+====================
+</p>
 <p>
 Use the command evernote-change-edit-mode to change the edit mode of the existing note. If you change the edit mode from XHTML mode to TEXT mode and the buffer is read-only, then the content of the TEXT mode is the formatted text. Note that the change will remove all format information(xml tags). If the buffer is read-write, the content of the TEXT mode is the original unformatted text.
 </p>
 
 <p>
-<a name="Search&ndash;Query&ndash;Examples">&nbsp;</a>
-</p></div>
-</div>
-
-<div class="outline-2">
-<h2 id="sec-10">4 Search Query Examples</h2>
-
-
+(INVISIBLE)
+</p>
+<p>
+4 Search Query Examples
+~~~~~~~~~~~~~~~~~~~~~~~
+</p>
 <p>
 Here are examples of queries used for searching notes.
 </p>
 <p>
-The following examples are referred from (<a href="http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479">http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479</a>).
+The following examples are referred from ([http://www.evernote.com/about/developer/api/evernote-api.htm#<sub>Toc277181479]</sub>).
 </p>
 <ul>
 <li>
 Find notes containing the word "chicken", tagged with "cooking", and created this year:
 
 </li>
-</ul>
-<p>chicken tag:cooking created:year
-</p>
+</ul>chicken tag:cooking created:year
+
 <ul>
 <li>
 Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
 
 </li>
-</ul>
-<p>tag:cooking -tag:mexican beef -carrots
-</p>
+</ul>tag:cooking -tag:mexican beef -carrots
+
 <ul>
 <li>
 Find notes in my "Travel" notebook with San Francisco in the title:
 
 </li>
-</ul>
-<p>notebook:Travel intitle:"San Francisco"
-</p>
+</ul>notebook:Travel intitle:"San Francisco"
+
 <ul>
 <li>
 Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
 
 </li>
-</ul>
-<p>any: "San Francisco" tag:SFO
-</p>
+</ul>any: "San Francisco" tag:SFO
+
 
 <p>
-<a name="Evernote&ndash;Browser">&nbsp;</a>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-11">5 Evernote Browser</h2>
-
-
+(INVISIBLE)
+</p>
+<p>
+5 Evernote Browser
+~~~~~~~~~~~~~~~~~~
+</p>
 <p>
 Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list, and the note list of the past search result. These lists are different from the completion lists of evernote-open-note command or the evernote-search-notes command. These lists of Evernote Browser are always kept in Emacs buffers until they are deleted by the user after they were created, and they make the procedure to open notes easy by using these list repeatedly.
 </p>
@@ -447,11 +434,13 @@ saved search list page
 </li>
 <li>
 note list page
+</li>
+<li>
+notebook list page
 
 </li>
-</ul>
-<p>A tag list page shows the hierarchical tag list created on Evernote service. Pressing Enter(\C-m) on the tag name opens a note list page of the tag.
-</p>
+</ul>A tag list page shows the hierarchical tag list created on Evernote service. Pressing Enter(\C-m) on the tag name opens a note list page of the tag.
+
 <p>
 A saved search list shows the search list created on Evernote service. Pressing Enter(\C-m) on the search name opens a note list page from the search result.
 </p>
@@ -459,9 +448,12 @@ A saved search list shows the search list created on Evernote service. Pressing 
 A note list shows the note list from a note search result. The note list page is newly created by the evenote-open-note command, the evernote-search-notes command and by searches on Evernote Browser. Pressing Enter(\C-m) on the note name opens a note.
 </p>
 <p>
+A notebook list page shows the notebook list created on Evernote service. Pressing Enter(\C-m) on the notebook name opens a note list page associated with the notebook.
+</p>
+<p>
 The followings are other key assignments on Evernote Browser pages
 </p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col>
+<COL align="left"><COL align="left">
 <thead>
 <tr><th>Key</th><th>Action</th></tr>
 </thead>
@@ -471,7 +463,10 @@ The followings are other key assignments on Evernote Browser pages
 <tr><td>t</td><td>create a tag list page and show it. If a tag list page already exists, move the cursor to the page</td></tr>
 <tr><td>S</td><td>create a search list page and show it. If a tag list page already exists, move the cursor to the page</td></tr>
 <tr><td>s</td><td>create a note list from the search query input and show it</td></tr>
+<tr><td>N</td><td>create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page</td></tr>
 <tr><td>o</td><td>same as Enter(\C-m), but it does not move the cursor to the opened note</td></tr>
+<tr><td>n</td><td>move to the next line and open the note on the cursor if in the note list,</td></tr>
+<tr><td>n</td><td>move to the previous line and open the note on the cursor if in the note list,</td></tr>
 <tr><td>d</td><td>delete the current from Evernote Browser</td></tr>
 </tbody>
 </table>
@@ -479,13 +474,12 @@ The followings are other key assignments on Evernote Browser pages
 
 
 <p>
-<a name="Install&ndash;and&ndash;Settings">&nbsp;</a>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-12">6 Install and Settings</h2>
-
-
+(INVISIBLE)
+</p>
+<p>
+6 Install and Settings
+~~~~~~~~~~~~~~~~~~~~~~
+</p>
 <ol>
 <li>
 Install ruby scripts for using Evernote service.
@@ -507,10 +501,10 @@ Get w3m for evernote-enml-formatter-command (Optional)
 
 <ul>
 <li>
-If you use Linux/Unix, get w3m from <a href="http://w3m.sourceforge.net/index.en.html">here</a> and install it or install w3m from the package of your distribution.
+If you use Linux/Unix, get w3m from [here] and install it or install w3m from the package of your distribution.
 </li>
 <li>
-If you use Win, get cygwin from <a href="http://www.cygwin.com/">here</a>, execute setup.exe and select w3m from the "Select Packages"
+If you use Win, get cygwin from [here], execute setup.exe and select w3m from the "Select Packages"
 </li>
 <li>
 Add the path of w3m to the environment variable "PATH".
@@ -520,8 +514,8 @@ Add the path of w3m to the environment variable "PATH".
 <li>
 Add the evernote-mode configuration to .emacs.
 
+
 <p>
-<pre>
 (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
 (add-to-list 'load-path "&lt;your load path&gt;")
 (require 'evernote-mode)
@@ -532,8 +526,8 @@ Add the evernote-mode configuration to .emacs.
 (global-set-key "\C-cew" 'evernote-write-note)
 (global-set-key "\C-cep" 'evernote-post-region)
 (global-set-key "\C-ceb" 'evernote-browser)
-</pre>
 </p>
+
 <p>
 If you don't set evernote-enml-formatter-command, the unformatted XHTML is displayed when reading the note of XHTML mode.
 </p>
@@ -543,11 +537,47 @@ Proxy settings
 
 <p>
 If you want to use the proxy, set the value to the environment variable 'EN_PROXY' written as 'host:port' format. (ex. export EN_PROXY=proxy.hoge.com:8080)
-</p></li>
-</ol>
-</div>
-<div id="postamble"><p class="author"> Author: Yusuke Kawakami
 </p>
-<p class="date"> Date: 2010/12/09 </p>
-</div></body>
+
+</li>
+</ol>
+7 Troubleshooting
+~~~~~~~~~~~~~~~~~
+
+<p>
+7.1 `require': no such file to load -- gdbm
+===========================================
+</p>
+<p>
+Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby for using GDBM.
+</p>
+<ul>
+<li>
+ex. for apt,
+
+
+</li>
+</ul>apt-get install libgdbm-ruby
+@/&lt;pre&gt;
+
+<p>
+7.2 `require': no such file to load -- net/https
+================================================
+</p>
+<p>
+Some distributions do not have the openssl library for ruby. Install libopenssl-ruby for using https.
+</p>
+<ul>
+<li>
+ex. for apt,
+
+
+</li>
+</ul>apt-get install libopenssl-ruby
+@/&lt;pre&gt;
+<p class="author"> Author:
+<a href="mailto:kawakamiy@KYDESK">&lt;kawakamiy@KYDESK&gt;</a>
+</p>
+<p class="date"> Date: 2011/02/22 21:52:12</p>
+</body>
 </html>

@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>Emacs evernote mode</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2010/12/09 21:15:44"/>
+<meta name="generated" content="2011/02/22 21:51:54"/>
 <meta name="author" content="Yusuke Kawakami"/>
 <style type="text/css">
   html {
@@ -34,7 +34,6 @@ lang="en" xml:lang="en">
 </style>
 </head><body>
 <h1 class="title">Emacs evernote mode</h1>
-<div id="table-of-contents">
 <h2>Table of Contents</h2>
 <ul>
 <li><a href="#sec-1">1  License</a></li>
@@ -58,14 +57,18 @@ lang="en" xml:lang="en">
 <li><a href="#sec-10">4 Search Query Examples</a></li>
 <li><a href="#sec-11">5 Evernote Browser</a></li>
 <li><a href="#sec-12">6 Install and Settings</a></li>
+<li><a href="#sec-13">7 Troubleshooting</a>
+<ul>
+<li><a href="#sec-14">7.1 `require': no such file to load -- gdbm と表示される</a></li>
+<li><a href="#sec-15">7.2 `require': no such file to load -- net/https と表示される</a></li>
 </ul>
-</div>
+</li>
+</ul>
 
-<div class="outline-2">
-<h2 id="sec-1">1  License</h2>
+<h2><a name="sec-1">1  License</a></h2>
 
 <p><pre>
-Copyright 2010 Yusuke Kawakami
+Copyright 2011 Yusuke Kawakami
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -81,10 +84,8 @@ Copyright 2010 Yusuke Kawakami
 
 &lt;&lt;Introduction&gt;&gt;(INVISIBLE)
 </pre>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-2">2 Introduction</h2>
+</p>
+<h2><a name="sec-2">2 Introduction</a></h2>
 
 
 <p>
@@ -204,10 +205,9 @@ Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れ�
 </p>
 
 </li>
-</ul>
-<p>evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
+</ul>evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。
-</p>
+
 <p>
 ノートを開いているバッファには evernote-modeマイナーモードが適用されます。以下のコマンドはevernote-modeマイナーモードでのみ有効です。
 </p>
@@ -228,20 +228,16 @@ evernote-rename-note
 evernote-delete-note
 
 </li>
-</ul>
-<p><a name="Evernote&ndash;note&ndash;edit&ndash;mode">&nbsp;</a>
-</p></div>
+</ul><a name="Evernote--note--edit--mode">&nbsp;</a>
 
-<div class="outline-2">
-<h2 id="sec-3">3 Evernote note edit mode</h2>
+<h2><a name="sec-3">3 Evernote note edit mode</a></h2>
 
 
 <p>
 EvernoteのノートはENML DTD(<a href="http://xml.evernote.com/pub/enml2.dtd">http://xml.evernote.com/pub/enml2.dtd</a>)に準拠するXML文書です。evernote-modeではこのXMLをemacsで保存、読み込みを行う為ににXHTMLモードとTEXTモード2種類の編集モードを用意しています。
 </p>
 
-<div class="outline-3">
-<h3 id="sec-4">3.1 XHTML モード</h3>
+<h3><a name="sec-4">3.1 XHTML モード</a></h3>
 
 
 <p>
@@ -252,8 +248,7 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
 </p>
 
 
-<div class="outline-4">
-<h4 id="sec-5">3.1.1  XHTMLモードでの編集の例:</h4>
+<h4><a name="sec-5">3.1.1  XHTMLモードでの編集の例:</a></h4>
 
 <p><pre>
    Emacs バッファ
@@ -302,11 +297,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    -----------------------------------
 
 </pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-6">3.2 TEXTモード</h3>
+</p>
+<h3><a name="sec-6">3.2 TEXTモード</a></h3>
 
 
 <p>
@@ -317,8 +309,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 </p>
 
 
-<div class="outline-4">
-<h4 id="sec-7">3.2.1  TEXTモードでの編集の例:</h4>
+<h4><a name="sec-7">3.2.1  TEXTモードでの編集の例:</a></h4>
 
 <p><pre>
    Emacs バッファ
@@ -352,20 +343,15 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    -----------------------------------
 
 </pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-8">3.3 モードの選択</h3>
+</p>
+<h3><a name="sec-8">3.3 モードの選択</a></h3>
 
 
 <p>
 上記XHTML, TEXTモードはノートの作成時に選択できます。ノート保存時には編集モード情報も保存され、次に読み込まれる際には保存時の編集モードで読み込まれます。また、他のEvernoteアプリケーションで作成されたノートはXHTMLモードとして読み込まれます。
 </p>
-</div>
 
-<div class="outline-3">
-<h3 id="sec-9">3.4 モードの切り替え</h3>
+<h3><a name="sec-9">3.4 モードの切り替え</a></h3>
 
 
 <p>
@@ -373,12 +359,9 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 </p>
 
 <p>
-<a name="Search&ndash;Query&ndash;Examples">&nbsp;</a>
-</p></div>
-</div>
-
-<div class="outline-2">
-<h2 id="sec-10">4 Search Query Examples</h2>
+<a name="Search--Query--Examples">&nbsp;</a>
+</p>
+<h2><a name="sec-10">4 Search Query Examples</a></h2>
 
 
 <p>
@@ -416,12 +399,9 @@ notebook:Travel intitle:"San Francisco"
 any: "San Francisco" tag:SFO
 </p>
 </li>
-</ul>
-<p><a name="Evernote&ndash;Browser">&nbsp;</a>
-</p></div>
+</ul><a name="Evernote--Browser">&nbsp;</a>
 
-<div class="outline-2">
-<h2 id="sec-11">5 Evernote Browser</h2>
+<h2><a name="sec-11">5 Evernote Browser</a></h2>
 
 
 <p>
@@ -439,7 +419,7 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 タグ一覧ページ
 
 <p>
-タグ一覧ページにはユーザがEvernoteサービス上で作成したタグ一覧が階層的に表示されます。タグ名上で Enter(\C-m) を押すことで、そのタグが付加されたノートの一覧ページが開きます。
+タグ一覧ページにはユーザがEvernoteサービス上で作成したタグ一覧が階層的に表示されます。タグ名の上で Enter(\C-m) を押すことで、そのタグが付加されたノートの一覧ページが開きます。
 </p>
 </li>
 <li>
@@ -455,13 +435,19 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 <p>
 ノート一覧ページは検索により取得したノートの一覧を表示します。ノート一覧ページは evernote-open-note コマンド、 evernote-search-notes コマンドや、Evernote Browser での検索が行われる度に新たに作成されます。ノート名上でEnter(\C-m)を押すことでノートを開きます。
 </p>
+</li>
+<li>
+ノートブック一覧ページ
+
+<p>
+ノートブック一覧ページにはユーザがEvernoteサービス上で作成したノートブックの一覧が表示されます。ノートブック名の上でEnter(\C-m)を押すことで、そのノートブックに属するノートの一覧ページが開きます。
+</p>
 
 </li>
-</ul>
-<p>Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
-</p>
+</ul>Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
+
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col>
+<COL align="left"><COL align="left">
 <thead>
 <tr><th>キー</th><th>動作</th></tr>
 </thead>
@@ -471,7 +457,10 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 <tr><td>t</td><td>タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合はそのページに移動します</td></tr>
 <tr><td>S</td><td>保存された検索一覧ページを作成し、表示します。既に保存された検索一覧ページがある場合はそのページに移動します</td></tr>
 <tr><td>s</td><td>入力された検索クエリから結果を新規ノート一覧ページとして作成し、そのページを表示します</td></tr>
+<tr><td>N</td><td>ノートブック一覧ページを作成し、表示します。既にノートブック一覧ページがある場合はそのページに移動します</td></tr>
 <tr><td>o</td><td>Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートにカーソルを移動しません</td></tr>
+<tr><td>n</td><td>次の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます</td></tr>
+<tr><td>p</td><td>前の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます</td></tr>
 <tr><td>d</td><td>現在のページを Evernote Browser から削除します</td></tr>
 </tbody>
 </table>
@@ -479,11 +468,9 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 
 
 <p>
-<a name="Install&ndash;and&ndash;Settings">&nbsp;</a>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-12">6 Install and Settings</h2>
+<a name="Install--and--Settings">&nbsp;</a>
+</p>
+<h2><a name="sec-12">6 Install and Settings</a></h2>
 
 
 <ol>
@@ -543,11 +530,49 @@ proxy の設定
 
 <p>
 プロキシを使用する場合は環境変数EN_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN_PROXY=proxy.hoge.com:8080)
-</p></li>
-</ol>
-</div>
-<div id="postamble"><p class="author"> Author: Yusuke Kawakami
 </p>
-<p class="date"> Date: 2010/12/09 </p>
-</div></body>
+</li>
+</ol>
+
+<h2><a name="sec-13">7 Troubleshooting</a></h2>
+
+
+
+<h3><a name="sec-14">7.1 `require': no such file to load -- gdbm と表示される</a></h3>
+
+
+<p>
+ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
+上記が表示される場合は libgdbm-ruby をインストールして下さい。
+</p>
+<ul>
+<li>
+aptを使ったインストール例
+
+</li>
+</ul><pre>
+apt-get install libgdbm-ruby
+</pre>
+
+
+<h3><a name="sec-15">7.2 `require': no such file to load -- net/https と表示される</a></h3>
+
+
+<p>
+ディストリビューションの設定によっては ruby が使用できる openssl ライブラリがインストールされてない場合があります。
+上記が表示される場合は libopenssl-ruby をインストールして下さい。
+</p>
+<ul>
+<li>
+aptを使ったインストール例
+
+</li>
+</ul><pre>
+apt-get install libopenssl-ruby
+</pre>
+<p class="author"> Author: Yusuke Kawakami
+<a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
+</p>
+<p class="date"> Date: 2011/02/22 21:51:54</p>
+</body>
 </html>

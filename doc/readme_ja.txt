@@ -1,8 +1,8 @@
                               Emacs evernote mode
                               ===================
 
-Author: Yusuke Kawakami
-Date: 2010/12/09 21:12:59
+Author: Yusuke Kawakami <Yusuke Kawakami>
+Date: 2011/02/22 21:51:58
 
 
 Table of Contents
@@ -19,12 +19,14 @@ Table of Contents
 4 Search Query Examples
 5 Evernote Browser
 6 Install and Settings
-
+7 Troubleshooting
+    7.1 `require': no such file to load -- gdbm と表示される
+    7.2 `require': no such file to load -- net/https と表示される
 
 1 QUOTE License
 ~~~~~~~~~~~~~~~
 
-Copyright 2010 Yusuke Kawakami
+Copyright 2011 Yusuke Kawakami
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -38,6 +40,7 @@ Copyright 2010 Yusuke Kawakami
  See the License for the specific language governing permissions and
  limitations under the License.
 
+(INVISIBLE)
 
 2 Introduction
 ~~~~~~~~~~~~~~
@@ -120,6 +123,7 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
   - evernote-rename-note
   - evernote-delete-note
 
+(INVISIBLE)
 
 3 Evernote note edit mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,8 +150,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-
-    XHTMLモードで保存
+   |
+   |XHTMLモードで保存
    V
    Evernoteサービス上のノート(Emacsバッファの内容と同じ)
    -----------------------------------
@@ -158,8 +162,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-
-    XHTMLモードで読み込み
+   |
+   |XHTMLモードで読み込み
    V
    Emacs バッファ
    (読み込み専用となり、整形されて表示される)
@@ -168,8 +172,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-
-    書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
+   |
+   |書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs バッファ
    (整形されないXMLが表示される)
@@ -199,8 +203,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-
-    TEXTモードで保存
+   |
+   |TEXTモードで保存
    V
    Evernoteサービス上のノート
    (Emacsバッファの内容がエスケープされ, XMLに変換される)
@@ -212,8 +216,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-
-    TEXTモードで読み込み
+   |
+   |TEXTモードで読み込み
    V
    Emacs バッファ
    (ノートのルート要素以下の内容がアンエスケープされる)
@@ -233,6 +237,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
 既存のノートのXHTML,TEXTモードを切り替える場合は、evernote-change-edit-modeコマンドを使用します。XHTMLモードからTEXTモードの切り替えにおいて、バッファが読み込み専用状態の場合、整形された内容がTEXTモードでのノートの内容になります。この際元のXHTMLのフォーマット情報(XML tag)は全て失われるので注意して下さい。書き込み可能状態でモードを切り替えた場合は、整形されていない元のXHTMLがTEXTモード表示されるノートの内容になります。
 
+
+(INVISIBLE)
 
 4 Search Query Examples
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,6 +263,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
       any: "San Francisco" tag:SFO
 
+(INVISIBLE)
 
 5 Evernote Browser
 ~~~~~~~~~~~~~~~~~~
@@ -270,7 +277,7 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 
   - タグ一覧ページ
 
-    タグ一覧ページにはユーザがEvernoteサービス上で作成したタグ一覧が階層的に表示されます。タグ名上で Enter(\C-m) を押すことで、そのタグが付加されたノートの一覧ページが開きます。
+    タグ一覧ページにはユーザがEvernoteサービス上で作成したタグ一覧が階層的に表示されます。タグ名の上で Enter(\C-m) を押すことで、そのタグが付加されたノートの一覧ページが開きます。
 
   - 保存された検索一覧ページ
 
@@ -280,19 +287,30 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 
     ノート一覧ページは検索により取得したノートの一覧を表示します。ノート一覧ページは evernote-open-note コマンド、 evernote-search-notes コマンドや、Evernote Browser での検索が行われる度に新たに作成されます。ノート名上でEnter(\C-m)を押すことでノートを開きます。
 
+  - ノートブック一覧ページ
+
+    ノートブック一覧ページにはユーザがEvernoteサービス上で作成したノートブックの一覧が表示されます。ノートブック名の上でEnter(\C-m)を押すことで、そのノートブックに属するノートの一覧ページが開きます。
+
 
 Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
 
-  キー   動作
- ------+--------------------------------------------------------------------------------------------------------------
-  b      前のページに移動します
-  f      次のページに移動します
-  t      タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合はそのページに移動します
-  S      保存された検索一覧ページを作成し、表示します。既に保存された検索一覧ページがある場合はそのページに移動します
-  s      入力された検索クエリから結果を新規ノート一覧ページとして作成し、そのページを表示します
-  o      Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートにカーソルを移動しません
-  d      現在のページを Evernote Browser から削除します
+|------+--------------------------------------------------------------------------------------------------------------|
+| キー | 動作                                                                                                         |
+|------+--------------------------------------------------------------------------------------------------------------|
+| b    | 前のページに移動します                                                                                       |
+| f    | 次のページに移動します                                                                            |
+| t    | タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合はそのページに移動します                     |
+| S    | 保存された検索一覧ページを作成し、表示します。既に保存された検索一覧ページがある場合はそのページに移動します |
+| s    | 入力された検索クエリから結果を新規ノート一覧ページとして作成し、そのページを表示します                       |
+| N    | ノートブック一覧ページを作成し、表示します。既にノートブック一覧ページがある場合はそのページに移動します     |
+| o    | Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートにカーソルを移動しません                     |
+| n    | 次の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                             |
+| p    | 前の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                             |
+| d    | 現在のページを Evernote Browser から削除します                                                               |
+|------+--------------------------------------------------------------------------------------------------------------|
 
+
+(INVISIBLE)
 
 6 Install and Settings
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -332,3 +350,30 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
   5. proxy の設定
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
+
+7 Troubleshooting
+~~~~~~~~~~~~~~~~~
+
+7.1 `require': no such file to load -- gdbm と表示される
+========================================================
+
+ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
+上記が表示される場合は libgdbm-ruby をインストールして下さい。
+
+- aptを使ったインストール例
+
+
+apt-get install libgdbm-ruby
+
+
+7.2 `require': no such file to load -- net/https と表示される
+=============================================================
+
+ディストリビューションの設定によっては ruby が使用できる openssl ライブラリがインストールされてない場合があります。
+上記が表示される場合は libopenssl-ruby をインストールして下さい。
+
+- aptを使ったインストール例
+
+
+apt-get install libopenssl-ruby
+
