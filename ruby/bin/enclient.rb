@@ -870,6 +870,8 @@ module EnClient
 
 
   class ListSearchCommand < Command
+    @@issued_before = false
+
     def exec_impl
       check_auth
       if dm.during_full_sync? && !@@issued_before
@@ -1124,7 +1126,7 @@ module EnClient
       if current_time > @expiration - REFRESH_LIMIT_SEC * 1000
         LOG.info "refresh authentication"
         auth_result = @user_store.refreshAuthentication @auth_token
-        @auth_token, @shared_id, @expiration = get_session auth_result
+        @auth_token, dummy, @expiration = get_session auth_result
         @note_store = create_note_store @shared_id
       end
     end
