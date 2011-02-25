@@ -298,20 +298,22 @@ module EnClient
     def push(task)
       @mutex.synchronize{
         @queue.push task
-        @cond.signal if @queue.size == 1
+        @cond.signal
       }
     end
 
     def push_to_front(task)
       @mutex.synchronize{
         @queue.unshift task
-        @cond.signal if @queue.size == 1
+        @cond.signal
       }
     end
 
     def pop
       @mutex.synchronize{
-        @cond.wait(@mutex) if @queue.size == 0
+        while @queue.size == 0
+          @cond.wait(@mutex)
+        end
         task = @queue.shift
       }
     end
@@ -446,8 +448,8 @@ module EnClient
 
     def to_xhtml(content)
       content = CGI.escapeHTML content
-      content.gsub! %r| |, %|&nbsp;|
-        content.gsub! %r|\n|, %|<br clear="none"/>|
+      content.gsub! %r{ }, %{&nbsp;}
+        content.gsub! %r{(?:\r\n)|\n|\r}, %|<br clear="none"/>|
         content = NOTE_DEFAULT_HEADER + content + NOTE_DEFAULT_FOOTER
     end
   end
@@ -459,7 +461,7 @@ module EnClient
     include FormatNoteOperation
 
     def exec_impl
-      Formatter.to_ascii @title, *@tag_names, @content
+      Formatter.to_ascii @title, @content, *@tag_names
 
       note = Evernote::EDAM::Type::Note.new
       note.title = @title
@@ -498,7 +500,7 @@ module EnClient
     include FormatNoteOperation
 
     def exec_impl
-      Formatter.to_ascii @title, *@tag_names, @content
+      Formatter.to_ascii @title, @content, *@tag_names
 
       old_note = DBUtils.get_note dm, @guid
 
@@ -715,11 +717,12 @@ module EnClient
 
     def format_content(content, edit_mode)
       result = nil
+      content.gsub! %r{(?:\r\n)|\n|\r}, $/
       if edit_mode == "TEXT"
         content =~ %r|<en-note>(.*)</en-note>|m
         content = $1
-        content.gsub! %r|<br.*?/>|m, "\n"
-        content.gsub! %r|&nbsp;|m, " "
+        content.gsub! %r{<br.*?/>}m, $/
+        content.gsub! %r{&nbsp;}m, " "
         result = CGI.unescapeHTML content
       else
         result = content
@@ -1217,14 +1220,14 @@ module EnClient
     end
 
     def transaction
-      @lock_file.flock File::LOCK_EX
       @mutex.lock
+      @lock_file.flock File::LOCK_EX
       @in_transaction = true
       yield
     ensure
       @in_transaction = false
-      @mutex.unlock
       @lock_file.flock File::LOCK_UN
+      @mutex.unlock
     end
 
     def clear_db
@@ -1266,7 +1269,7 @@ module EnClient
     def set_note_content(guid, content)
       raise IllegalStateException.new("not in transaction") unless @in_transaction
       file_path = CONTENT_DIR + guid
-      open file_path, "w" do |file|
+      open file_path, "w+b" do |file|
         file.write content
       end
       LOG.info "update content at #{file_path}"
@@ -1276,7 +1279,7 @@ module EnClient
       raise IllegalStateException.new("not in transaction") unless @in_transaction
       file_path = CONTENT_DIR + guid
       return nil unless FileTest.readable? file_path
-      open file_path, "r" do |file|
+      open file_path, "r+b" do |file|
         return file.read
       end
     end
@@ -1751,13 +1754,14 @@ module EnClient
         #if $stdin.respond_to? :set_encoding
         #  LOG.debug "get stdin encoding #{$stdin.external_encoding}, #{$stdin.internal_encoding}"
         #  $stdin.set_encoding "UTF-8", "UTF-8"
+        #  $stdout.set_encoding "UTF-8", "UTF-8"
         #  LOG.debug "get stdin encoding #{$stdin.external_encoding}, #{$stdin.internal_encoding}"
         #end
         while true
           begin
             line = $stdin.gets "\000"
-            LOG.debug line
             hash = eval line
+            LOG.debug "<#{hash[:class]}>"
             command = Command.create_from_hash hash
             command.sm = sm
             command.dm = dm
@@ -1777,7 +1781,7 @@ module EnClient
 
     def reply(command, reply)
       reply.command_id = command.command_id
-      $stdout.puts Formatter.obj_to_sexp(reply)
+      $stdout.write Formatter.obj_to_sexp(reply)
       $stdout.flush
     end
 

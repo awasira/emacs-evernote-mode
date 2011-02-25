@@ -523,7 +523,7 @@
   (when evernote-mode
     (let* ((current-edit-mode
             (or evernote-note-modified-edit-mode
-                (enutil-aget 'editMode (enh-command-get-note-attr evernote-note-guid))))
+                (enutil-aget 'editMode (enh-get-note-attr evernote-note-guid))))
            (next-edit-mode (enh-read-edit-mode current-edit-mode))
            (need-change nil))
       (when (not (string= current-edit-mode next-edit-mode))
@@ -565,7 +565,7 @@
   (when evernote-mode
       (setq evernote-note-modified-name
             (read-string "New note name:"
-                         (enutil-aget 'title (enh-command-get-note-attr evernote-note-guid))))
+                         (enutil-aget 'title (enh-get-note-attr evernote-note-guid))))
       (rename-buffer evernote-note-modified-name t)
       (enh-base-change-major-mode-from-note-name evernote-note-modified-name)
       (set-buffer-modified-p t)))
@@ -620,7 +620,7 @@
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (when evernote-mode
     (if (string= (or evernote-note-modified-edit-mode
-                     (enutil-aget 'editMode (enh-command-get-note-attr evernote-note-guid)))
+                     (enutil-aget 'editMode (enh-get-note-attr evernote-note-guid)))
                  "XHTML")
         (if buffer-read-only
             (progn
@@ -885,7 +885,7 @@
 
 (defun enh-base-update-note-common (inbuf guid &optional name is-tag-updated tag-names edit-mode)
   "Common procedure of opening a note"
-  (let ((attr (enh-command-get-note-attr guid)))
+  (let ((attr (enh-get-note-attr guid)))
     (setq attr
           (enh-command-update-note inbuf guid name is-tag-updated tag-names edit-mode))
     (enh-update-note-and-new-tag-attrs attr)))
@@ -1017,7 +1017,7 @@
 
 (defun enh-base-update-mode-line (&optional is-set-tag-names tag-names edit-mode)
   "Update mode line"
-  (let ((note-attr (enh-command-get-note-attr evernote-note-guid)))
+  (let ((note-attr (enh-get-note-attr evernote-note-guid)))
     (setq vc-mode
           (concat "[Tag:"
                   (if is-set-tag-names
@@ -1116,7 +1116,7 @@
   (enh-clear-onmem-cache)
   (enh-command-with-auth
    (let* ((guid (widget-value widget))
-          (note-attr (enh-command-get-note-attr guid))
+          (note-attr (enh-get-note-attr guid))
           (cur-buf (current-buffer)))
      (enh-base-open-note-common note-attr)
      (let ((command-keys (this-command-keys)))
@@ -1543,7 +1543,8 @@
     (message "Waiting for the result...")
     (save-excursion
       (set-buffer buffer)
-      (delete-region (point-min) (point-max))
+      (erase-buffer)
+      ;(delete-region (point-min) (point-max))
       (setq enh-command-next-command-id
             (+ 1 enh-command-next-command-id))
       (process-send-string proc
@@ -1593,6 +1594,10 @@
   "Saved search info associated with the guid")
 
 
+(defvar enh-note-attr nil
+  "Note attr associated with most recently accessed guid")
+
+
 (defun enh-get-notebook-attrs ()
   (when (eq (hash-table-count enh-notebook-info) 0)
     (mapc
@@ -1618,6 +1623,14 @@
        (puthash (enutil-aget 'guid attr) attr enh-search-info))
      (enh-command-get-search-attrs)))
   enh-search-info)
+
+
+(defun enh-get-note-attr (guid)
+  "Get the note attr from the guid"
+  (if (and enh-note-attr
+           (string= guid (enutil-aget 'guid enh-note-attr)))
+      enh-note-attr
+    (setq enh-note-attr (enh-command-get-note-attr guid))))
 
 
 (defun enh-get-notebook-attr (guid)
@@ -1657,7 +1670,7 @@
    (if note-guid
        (enh-tag-guids-to-comma-separated-names
         (enutil-aget 'tagGuids
-                     (enh-command-get-note-attr note-guid)))
+                     (enh-get-note-attr note-guid)))
      nil)))
 
 
@@ -1687,7 +1700,8 @@
 (defun enh-clear-onmem-cache ()
   (clrhash enh-notebook-info)
   (clrhash enh-tag-info)
-  (clrhash enh-search-info))
+  (clrhash enh-search-info)
+  (setq enh-note-attr nil))
 
 
 (defun enh-read-saved-search (&optional prompt)
