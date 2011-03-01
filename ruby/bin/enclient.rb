@@ -1,4 +1,4 @@
-#! D:/Ruby191/bin/ruby.exe -sWKu
+#! /usr/bin/ruby -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -27,6 +27,7 @@ require "fileutils"
 require "gdbm"
 require "logger"
 require "digest/md5"
+#require "benchmark"
 
 require "thrift/types"
 require "thrift/struct"
@@ -180,7 +181,7 @@ module Evernote
       class Note
         include EnClient::Serializable
 
-        attr_accessor :editMode
+        attr_accessor :editMode, :contentFile
 
         def serialized_fields
           { :guid => :field_type_string,
@@ -191,7 +192,8 @@ module Evernote
             :notebookGuid => :field_type_string,
             :tagGuids => :field_type_string_array,
             :tagNames => :field_type_base64_array,
-            :editMode => :field_type_string }
+            :editMode => :field_type_string,
+            :contentFile => :field_type_base64 }
         end
       end
 
@@ -242,6 +244,7 @@ module EnClient
   ERROR_CODE_NOT_FOUND = 100
   ERROR_CODE_UNEXPECTED = 101
   ERROR_CODE_NOT_AUTHED = 102
+  ERROR_CODE_TIMEOUT    = 103
 
   LOG = Logger.new File.expand_path("~/.evernote-mode.log"), 5
   #LOG = Logger.new $stdout
@@ -365,6 +368,10 @@ module EnClient
         begin
           yield
         rescue
+          if $!.is_a? SystemCallError
+            # workaround for corruption of note_store after timed out
+            @sm.fix_note_store
+          end
           reply = ErrorReply.new
           reply.command_id = @command_id
           ErrorUtils.set_reply_error $!, reply
@@ -393,7 +400,6 @@ module EnClient
          ListSearchCommand,
          SearchNoteCommand,
          GetNoteCommand,
-         GetContentCommand,
          CreateNoteCommand,
          UpdateNoteCommand,
          DeleteNoteCommand,
@@ -473,8 +479,7 @@ module EnClient
       server_task do
         result_note = sm.note_store.createNote sm.auth_token, note
         result_note.editMode = @edit_mode
-        result_note.content = note.content
-        DBUtils.set_note_and_content dm, result_note
+        DBUtils.set_note_and_content dm, result_note, @content
 
         if result_note.tagGuids
           result_note.tagGuids.each do |guid|
@@ -523,8 +528,7 @@ module EnClient
       server_task do
         result_note = sm.note_store.updateNote sm.auth_token, note
         result_note.editMode = note.editMode
-        result_note.content = note.content
-        DBUtils.set_note_and_content dm, result_note
+        DBUtils.set_note_and_content dm, result_note, @content
         reply = UpdateNoteReply.new
 
         if result_note.tagGuids
@@ -553,7 +557,7 @@ module EnClient
         note = DBUtils.get_note dm, @guid
         note.updateSequenceNum = usn
         note.active = false
-        DBUtils.set_note_and_content dm, note
+        DBUtils.set_note_and_content dm, note, nil
         shell.reply self, DeleteNoteReply.new
       end
     end
@@ -673,7 +677,7 @@ module EnClient
     def exec_impl
       check_auth
       note = DBUtils.get_note dm, @guid
-      if note
+      if note && note.contentFile && (FileTest.readable? note.contentFile)
         reply = GetNoteReply.new
         reply.note = note
         shell.reply self, reply
@@ -681,33 +685,10 @@ module EnClient
         server_task do
           note = sm.note_store.getNote sm.auth_token, @guid, true, false, false, false
           note.editMode = Formatter.get_edit_mode note.attributes.sourceApplication
-          DBUtils.set_note_and_content dm, noote
+          content = format_content note.content, note.editMode
+          DBUtils.set_note_and_content dm, note, content
           reply = GetNoteReply.new
           reply.note = note
-          shell.reply self, reply
-        end
-      end
-    end
-  end
-
-
-  class GetContentCommand < Command
-    attr_accessor :guid, :edit_mode
-
-    def exec_impl
-      check_auth
-      content = DBUtils.get_content dm, @guid
-      if content
-        reply = GetContentReply.new
-        reply.content = format_content content, @edit_mode
-        shell.reply self, reply
-      else
-        server_task do
-          note = sm.note_store.getNote sm.auth_token, @guid, true, false, false, false # with content
-          note.editMode = Formatter.get_edit_mode note.attributes.sourceApplication
-          DBUtils.set_note_and_content dm, note
-          reply = GetContentReply.new
-          reply.content = format_content note.content, @edit_mode
           shell.reply self, reply
         end
       end
@@ -717,17 +698,16 @@ module EnClient
 
     def format_content(content, edit_mode)
       result = nil
-      content.gsub! %r{(?:\r\n)|\n|\r}, $/
+      content.gsub! %r{(?:\r\n)|\n|\r}, "\n"
       if edit_mode == "TEXT"
         content =~ %r|<en-note>(.*)</en-note>|m
         content = $1
-        content.gsub! %r{<br.*?/>}m, $/
+        content.gsub! %r{<br.*?/>}m, "\n"
         content.gsub! %r{&nbsp;}m, " "
         result = CGI.unescapeHTML content
       else
         result = content
       end
-      Formatter.sexp_string_escape result
     end
   end
 
@@ -864,8 +844,12 @@ module EnClient
         LOG.debug "return tags from server"
         tags = sm.note_store.listTags sm.auth_token
         DBUtils.sync_updated_tags dm, tags
+        tags.sort! do |a, b|
+          a.name <=> b.name
+        end
         reply = ListTagReply.new
         reply.tags = tags
+        @@issued_before = true
         shell.reply self, reply
       end
     end
@@ -902,8 +886,12 @@ module EnClient
         LOG.debug "return searches from server"
         searches = sm.note_store.listSearches sm.auth_token
         DBUtils.sync_updated_searches dm, searches
+        searches.sort! do |a, b|
+          a.name <=> b.name
+        end
         reply = ListSearchReply.new
         reply.searches = searches
+        @@issued_before = true
         shell.reply self, reply
       end
     end
@@ -951,11 +939,6 @@ module EnClient
 
   class GetNoteReply < Reply
     attr_accessor :note
-  end
-
-
-  class GetContentReply < Reply
-    attr_accessor :content
   end
 
 
@@ -1059,6 +1042,10 @@ module EnClient
       end
 
     rescue
+      if $!.is_a? SystemCallError
+        # workaround for corruption of note_store after timed out
+        @sm.fix_note_store
+      end
       message = ErrorUtils.get_message $!
       LOG.warn message
       LOG.warn $!.backtrace
@@ -1131,6 +1118,14 @@ module EnClient
         auth_result = @user_store.refreshAuthentication @auth_token
         @auth_token, dummy, @expiration = get_session auth_result
         @note_store = create_note_store @shared_id
+      end
+    end
+
+    def fix_note_store
+      if @shared_id
+        @note_store = create_note_store @shared_id
+      else
+        @note_store = nil
       end
     end
 
@@ -1269,19 +1264,11 @@ module EnClient
     def set_note_content(guid, content)
       raise IllegalStateException.new("not in transaction") unless @in_transaction
       file_path = CONTENT_DIR + guid
-      open file_path, "w+b" do |file|
+      open file_path, "w" do |file| # "w" for transform eols to the native ones
         file.write content
       end
       LOG.info "update content at #{file_path}"
-    end
-
-    def get_note_content(guid)
-      raise IllegalStateException.new("not in transaction") unless @in_transaction
-      file_path = CONTENT_DIR + guid
-      return nil unless FileTest.readable? file_path
-      open file_path, "r+b" do |file|
-        return file.read
-      end
+      file_path
     end
 
     def remove_note_content(guid)
@@ -1370,18 +1357,12 @@ module EnClient
       note
     end
 
-    def self.set_note_and_content(dm, note)
+    def self.set_note_and_content(dm, note, content)
       dm.transaction do
         dm.open_note do |db|
+          note.contentFile = dm.set_note_content note.guid, content if content
           db[note.guid] = note.serialize
         end
-        dm.set_note_content note.guid, note.content if note.content
-      end
-    end
-
-    def self.get_content(dm, guid)
-      dm.transaction do
-        content = dm.get_note_content guid
       end
     end
 
@@ -1579,7 +1560,9 @@ module EnClient
           LOG.debug "exec #{task}"
           begin
             task.exec
-          rescue
+          rescue Exception
+            message = ErrorUtils.get_message $!
+            LOG.error message
             LOG.error $!.backtrace
           end
         end
@@ -1728,6 +1711,8 @@ module EnClient
         "#{ex.class.name} (message: #{ex.message} errorCode: #{errorText})"
       when Evernote::EDAM::Error::EDAMNotFoundException
         "#{ex.class.name} (identifier: #{ex.identifier} key: #{ex.key})"
+      when Errno::ETIMEDOUT
+        "Connection timed out"
       else
         ex.message
       end

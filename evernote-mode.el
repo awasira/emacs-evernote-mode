@@ -806,18 +806,21 @@
   (let* ((note-guid (enutil-aget 'guid note-attr))
          (note-name (enutil-aget 'title note-attr))
          (note-edit-mode (enutil-aget 'editMode note-attr))
+         (note-content-file (enutil-aget 'contentFile note-attr))
          (opened-buf (enh-base-find-opened-buffer note-guid)))
+    (unless note-content-file
+      (setq note-attr (enh-get-note-attr note-guid))
+      (setq note-content-file (enutil-aget 'contentFile note-attr)))
     (if opened-buf
         (enutil-move-cursor-to-window opened-buf t)
       (let ((buf (generate-new-buffer note-name)))
         (set-buffer buf)
-        (let ((content (enh-command-get-note-content note-guid note-edit-mode)))
-          (if (string= note-edit-mode "XHTML")
-              (progn
-                (setq evernote-note-xhtml-mode-content content)
-                (enh-format-enml content (current-buffer))
-                (setq buffer-read-only t))
-            (insert content)))
+        (insert-file-contents note-content-file)
+        (when (string= note-edit-mode "XHTML")
+          (setq evernote-note-xhtml-mode-content (buffer-string))
+          (erase-buffer)
+          (enh-format-enml evernote-note-xhtml-mode-content (current-buffer))
+          (setq buffer-read-only t))
         (evernote-mode note-guid)
         ; this must be after (evernote-mode) that setup the change major mode hooks.
         (enh-base-change-major-mode-from-note-name note-name)
@@ -1567,7 +1570,8 @@
 
 
 (defun enh-command-setup-process ()
-  (let ((proc (get-process enh-command-process-name)))
+  (let ((proc (get-process enh-command-process-name))
+        (process-connection-type nil)) ; use pipe instead of pty
     (when (or (not proc)
               (not (eq (process-status proc) 'run)))
       (setq proc (start-process enh-command-process-name
