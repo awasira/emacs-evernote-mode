@@ -1,4 +1,4 @@
-#! /usr/bin/ruby -sWKu
+#! C:/Ruby192/bin/ruby.exe -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -246,9 +246,9 @@ module EnClient
   ERROR_CODE_NOT_AUTHED = 102
   ERROR_CODE_TIMEOUT    = 103
 
-  LOG = Logger.new File.expand_path("~/.evernote-mode.log"), 5
+  LOG = Logger.new File.expand_path("~/.evernote-mode.log"), 3
   #LOG = Logger.new $stdout
-  LOG.level = Logger::DEBUG
+  LOG.level = Logger::WARN
 
 
   class NotAuthedException < StandardError; end
