@@ -2,7 +2,7 @@
                               ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011/02/22 21:52:07
+Date: 2011/03/02 22:28:20
 
 
 Table of Contents
@@ -23,6 +23,7 @@ Table of Contents
     7.1 `require': no such file to load -- gdbm
     7.2 `require': no such file to load -- net/https
 
+
 1 QUOTE License
 ~~~~~~~~~~~~~~~
 
@@ -41,7 +42,6 @@ Copyright 2011 Yusuke Kawakami
  limitations under the License.
 
 
-(INVISIBLE)
 
 2 Introduction
 ~~~~~~~~~~~~~~
@@ -125,7 +125,6 @@ The minor-mode "evernote-mode" is applied to the buffers opening the evernote no
   - evernote-delete-note
 
 
-(INVISIBLE)
 
 3 Evernote note edit mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,8 +152,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   | save on XHTML mode
+
+     save on XHTML mode
    V
    The content of the note (same as the emacs buffer)
    -----------------------------------
@@ -165,8 +164,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   | read on XHTML mode
+
+     read on XHTML mode
    V
    Emacs Buffer (read-only and formatted)
    -----------------------------------
@@ -174,8 +173,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-   |
-   |toggle read-only(evernote-toggle-read-only: \C-x\C-q)
+
+    toggle read-only(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs Buffer (unformatted)
    -----------------------------------
@@ -205,8 +204,8 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-   |
-   | save on TEXT mode
+
+     save on TEXT mode
    V
    The content of the note (escaped and transformed into a XML)
    -----------------------------------
@@ -217,8 +216,8 @@ Emacs Buffer
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   | read on TEXT mode
+
+     read on TEXT mode
    V
    Emacs Buffer (unescaped and transformed int a text)
    -----------------------------------
@@ -239,7 +238,6 @@ You can select the edit mode when you create a note. The edit mode is recorded i
 Use the command evernote-change-edit-mode to change the edit mode of the existing note. If you change the edit mode from XHTML mode to TEXT mode and the buffer is read-only, then the content of the TEXT mode is the formatted text. Note that the change will remove all format information(xml tags). If the buffer is read-write, the content of the TEXT mode is the original unformatted text.
 
 
-(INVISIBLE)
 
 4 Search Query Examples
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -265,7 +263,6 @@ The following examples are referred from ([http://www.evernote.com/about/develop
     any: "San Francisco" tag:SFO
 
 
-(INVISIBLE)
 
 5 Evernote Browser
 ~~~~~~~~~~~~~~~~~~
@@ -290,23 +287,20 @@ A note list shows the note list from a note search result. The note list page is
 A notebook list page shows the notebook list created on Evernote service. Pressing Enter(\C-m) on the notebook name opens a note list page associated with the notebook.
 
 The followings are other key assignments on Evernote Browser pages
-|-----+--------------------------------------------------------------------------------------------------------------|
-| Key | Action                                                                                                       |
-|-----+--------------------------------------------------------------------------------------------------------------|
-| b   | move to the previous page                                                                                    |
-| f   | move to the next page                                                                                        |
-| t   | create a tag list page and show it. If a tag list page already exists, move the cursor to the page           |
-| S   | create a search list page and show it. If a tag list page already exists, move the cursor to the page        |
-| s   | create a note list from the search query input and show it                                                   |
-| N   | create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page |
-| o   | same as Enter(\C-m), but it does not move the cursor to the opened note                                      |
-| n   | move to the next line and open the note on the cursor if in the note list,                                   |
-| n   | move to the previous line and open the note on the cursor if in the note list,                               |
-| d   | delete the current from Evernote Browser                                                                     |
-|-----+--------------------------------------------------------------------------------------------------------------|
+  Key   Action
+ -----+--------------------------------------------------------------------------------------------------------------
+  b     move to the previous page
+  f     move to the next page
+  t     create a tag list page and show it. If a tag list page already exists, move the cursor to the page
+  S     create a search list page and show it. If a tag list page already exists, move the cursor to the page
+  s     create a note list from the search query input and show it
+  N     create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page
+  o     same as Enter(\C-m), but it does not move the cursor to the opened note
+  n     move to the next line and open the note on the cursor if in the note list,
+  n     move to the previous line and open the note on the cursor if in the note list,
+  d     delete the current from Evernote Browser
 
 
-(INVISIBLE)
 
 6 Install and Settings
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -347,7 +341,6 @@ The followings are other key assignments on Evernote Browser pages
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-
 7 Troubleshooting
 ~~~~~~~~~~~~~~~~~
 
@@ -360,7 +353,7 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 
 
 apt-get install libgdbm-ruby
-@/<pre>
+
 
 7.2 `require': no such file to load -- net/https
 ================================================
@@ -371,4 +364,4 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 
 
 apt-get install libopenssl-ruby
-@/<pre>
+

@@ -312,7 +312,6 @@ The followings are other key assignments on Evernote Browser pages
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-
 * Troubleshooting
 
 ** `require': no such file to load -- gdbm
@@ -323,7 +322,7 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 
 @<pre>
 apt-get install libgdbm-ruby
-@/<pre>
+@</pre>
 
 ** `require': no such file to load -- net/https
 
@@ -333,4 +332,4 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 
 @<pre>
 apt-get install libopenssl-ruby
-@/<pre>
+@</pre>
