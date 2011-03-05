@@ -2,7 +2,7 @@
                               ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011/03/02 22:28:20
+Date: 2011/03/06 0:46:15
 
 
 Table of Contents
@@ -42,6 +42,7 @@ Copyright 2011 Yusuke Kawakami
  limitations under the License.
 
 
+(INVISIBLE)
 
 2 Introduction
 ~~~~~~~~~~~~~~
@@ -125,6 +126,7 @@ The minor-mode "evernote-mode" is applied to the buffers opening the evernote no
   - evernote-delete-note
 
 
+(INVISIBLE)
 
 3 Evernote note edit mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -238,6 +240,7 @@ You can select the edit mode when you create a note. The edit mode is recorded i
 Use the command evernote-change-edit-mode to change the edit mode of the existing note. If you change the edit mode from XHTML mode to TEXT mode and the buffer is read-only, then the content of the TEXT mode is the formatted text. Note that the change will remove all format information(xml tags). If the buffer is read-write, the content of the TEXT mode is the original unformatted text.
 
 
+(INVISIBLE)
 
 4 Search Query Examples
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -263,6 +266,7 @@ The following examples are referred from ([http://www.evernote.com/about/develop
     any: "San Francisco" tag:SFO
 
 
+(INVISIBLE)
 
 5 Evernote Browser
 ~~~~~~~~~~~~~~~~~~
@@ -297,22 +301,27 @@ The followings are other key assignments on Evernote Browser pages
   N     create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page
   o     same as Enter(\C-m), but it does not move the cursor to the opened note
   n     move to the next line and open the note on the cursor if in the note list,
-  n     move to the previous line and open the note on the cursor if in the note list,
+  p     move to the previous line and open the note on the cursor if in the note list,
   d     delete the current from Evernote Browser
 
 
+(INVISIBLE)
 
 6 Install and Settings
 ~~~~~~~~~~~~~~~~~~~~~~
 
   1. Install ruby scripts for using Evernote service.
 
+
     cd evernote-mode/ruby
     ruby setup.rb
 
+
   2. Copy evernote-mode.el to your load path.
 
+
     cp evernote-mode.el <your load path>
+
 
   3. Get w3m for evernote-enml-formatter-command (Optional)
 

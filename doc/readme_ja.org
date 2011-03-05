@@ -282,12 +282,16 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 
   1. Evernoteサービス使用のために必要なRubyスクリプトをインストールする
 
+    @<pre>
     cd evernote-mode/ruby
     ruby setup.rb
+    @</pre>
 
   2. evernote-mode.el をロードパスにコピーする
 
+    @<pre>
     cp evernote-mode.el <your load path>
+    @</pre>
 
   3. evernote-enml-formatter-command に使用するプログラム w3m の入手、設定 (オプション)
 

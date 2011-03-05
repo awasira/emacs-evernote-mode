@@ -268,7 +268,7 @@ The followings are other key assignments on Evernote Browser pages
 | N   | create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page |
 | o   | same as Enter(\C-m), but it does not move the cursor to the opened note                                      |
 | n   | move to the next line and open the note on the cursor if in the note list,                                   |
-| n   | move to the previous line and open the note on the cursor if in the note list,                               |
+| p   | move to the previous line and open the note on the cursor if in the note list,                               |
 | d   | delete the current from Evernote Browser                                                                     |
 |-----+--------------------------------------------------------------------------------------------------------------|
 
@@ -278,12 +278,16 @@ The followings are other key assignments on Evernote Browser pages
 
   1. Install ruby scripts for using Evernote service.
 
+    @<pre>
     cd evernote-mode/ruby
     ruby setup.rb
+    @</pre>
 
   2. Copy evernote-mode.el to your load path.
 
+    @<pre>
     cp evernote-mode.el <your load path>
+    @</pre>
 
   3. Get w3m for evernote-enml-formatter-command (Optional)
 

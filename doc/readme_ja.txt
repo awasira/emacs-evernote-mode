@@ -2,7 +2,7 @@
                               ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011/03/02 22:24:00
+Date: 2011/03/06 0:46:36
 
 
 Table of Contents
@@ -41,6 +41,7 @@ Copyright 2011 Yusuke Kawakami
  See the License for the specific language governing permissions and
  limitations under the License.
 
+(INVISIBLE)
 
 2 Introduction
 ~~~~~~~~~~~~~~
@@ -123,6 +124,7 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
   - evernote-rename-note
   - evernote-delete-note
 
+(INVISIBLE)
 
 3 Evernote note edit mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,6 +239,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 既存のノートのXHTML,TEXTモードを切り替える場合は、evernote-change-edit-modeコマンドを使用します。XHTMLモードからTEXTモードの切り替えにおいて、バッファが読み込み専用状態の場合、整形された内容がTEXTモードでのノートの内容になります。この際元のXHTMLのフォーマット情報(XML tag)は全て失われるので注意して下さい。書き込み可能状態でモードを切り替えた場合は、整形されていない元のXHTMLがTEXTモード表示されるノートの内容になります。
 
 
+(INVISIBLE)
 
 4 Search Query Examples
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,6 +264,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
       any: "San Francisco" tag:SFO
 
+(INVISIBLE)
 
 5 Evernote Browser
 ~~~~~~~~~~~~~~~~~~
@@ -305,18 +309,23 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
   d      現在のページを Evernote Browser から削除します
 
 
+(INVISIBLE)
 
 6 Install and Settings
 ~~~~~~~~~~~~~~~~~~~~~~
 
   1. Evernoteサービス使用のために必要なRubyスクリプトをインストールする
 
+
     cd evernote-mode/ruby
     ruby setup.rb
 
+
   2. evernote-mode.el をロードパスにコピーする
 
+
     cp evernote-mode.el <your load path>
+
 
   3. evernote-enml-formatter-command に使用するプログラム w3m の入手、設定 (オプション)
 
