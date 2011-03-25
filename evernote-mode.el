@@ -348,8 +348,6 @@
          evernote-note-is-modified-tag-names
          evernote-note-modified-tag-names
          evernote-note-modified-edit-mode)
-        (make-local-hook 'after-save-hook)
-        (make-local-hook 'change-major-mode-hook)
         (add-hook 'after-save-hook
                   'evernote-mode-after-save-hook
                   nil t)
