@@ -1937,12 +1937,6 @@
         (concat  "'" str "'"))
     "nil"))
 
-;(insert (enutil-to-ruby-string "
-;feaf
-;  \\n \\r 'feafnfea'
-;fea
-;fea %{fea}"))
-
 
 (defun enutil-to-ruby-string-list (str-list return-empty-array)
   (if str-list
