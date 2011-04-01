@@ -316,6 +316,13 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 
      evernote-enml-formatter-commandが設定されていない場合はXHTMLモードでの読み込み時に整形されてない状態のXMLが表示されます。
 
+		 上記に加え、 ruby の cygwin を使用している場合は、cygwin-mount.el (http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el) が必要になります。cygwin-mount.el を取得し、以下を .emacs に追加して下さい。
+
+     @<pre>
+		 (require 'cygwin-mount)
+		 (cygwin-mount-activate)
+     @</pre>
+
   5. proxy の設定
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)

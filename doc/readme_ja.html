@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>Emacs evernote mode</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011/03/06 0:44:35"/>
+<meta name="generated" content="2011/04/01"/>
 <meta name="author" content="Yusuke Kawakami"/>
 <style type="text/css">
   html {
@@ -34,7 +34,6 @@ lang="en" xml:lang="en">
 </style>
 </head><body>
 <h1 class="title">Emacs evernote mode</h1>
-<div id="table-of-contents">
 <h2>Table of Contents</h2>
 <ul>
 <li><a href="#sec-1">1  License</a></li>
@@ -60,15 +59,13 @@ lang="en" xml:lang="en">
 <li><a href="#sec-12">6 Install and Settings</a></li>
 <li><a href="#sec-13">7 Troubleshooting</a>
 <ul>
-<li><a href="#sec-14">7.1 `require': no such file to load &ndash; gdbm と表示される</a></li>
-<li><a href="#sec-15">7.2 `require': no such file to load &ndash; net/https と表示される</a></li>
+<li><a href="#sec-14">7.1 `require': no such file to load -- gdbm と表示される</a></li>
+<li><a href="#sec-15">7.2 `require': no such file to load -- net/https と表示される</a></li>
 </ul>
 </li>
 </ul>
-</div>
 
-<div class="outline-2">
-<h2 id="sec-1">1  License</h2>
+<h2><a name="sec-1">1  License</a></h2>
 
 <p><pre>
 Copyright 2011 Yusuke Kawakami
@@ -87,10 +84,8 @@ Copyright 2011 Yusuke Kawakami
 
 &lt;&lt;Introduction&gt;&gt;(INVISIBLE)
 </pre>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-2">2 Introduction</h2>
+</p>
+<h2><a name="sec-2">2 Introduction</a></h2>
 
 
 <p>
@@ -210,10 +205,9 @@ Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れ�
 </p>
 
 </li>
-</ul>
-<p>evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
+</ul>evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。
-</p>
+
 <p>
 ノートを開いているバッファには evernote-modeマイナーモードが適用されます。以下のコマンドはevernote-modeマイナーモードでのみ有効です。
 </p>
@@ -234,20 +228,16 @@ evernote-rename-note
 evernote-delete-note
 
 </li>
-</ul>
-<p><a name="Evernote&ndash;note&ndash;edit&ndash;mode">&nbsp;</a>
-</p></div>
+</ul><a name="Evernote--note--edit--mode">&nbsp;</a>
 
-<div class="outline-2">
-<h2 id="sec-3">3 Evernote note edit mode</h2>
+<h2><a name="sec-3">3 Evernote note edit mode</a></h2>
 
 
 <p>
 EvernoteのノートはENML DTD(<a href="http://xml.evernote.com/pub/enml2.dtd">http://xml.evernote.com/pub/enml2.dtd</a>)に準拠するXML文書です。evernote-modeではこのXMLをemacsで保存、読み込みを行う為ににXHTMLモードとTEXTモード2種類の編集モードを用意しています。
 </p>
 
-<div class="outline-3">
-<h3 id="sec-4">3.1 XHTML モード</h3>
+<h3><a name="sec-4">3.1 XHTML モード</a></h3>
 
 
 <p>
@@ -258,8 +248,7 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
 </p>
 
 
-<div class="outline-4">
-<h4 id="sec-5">3.1.1  XHTMLモードでの編集の例:</h4>
+<h4><a name="sec-5">3.1.1  XHTMLモードでの編集の例:</a></h4>
 
 <p><pre>
    Emacs バッファ
@@ -308,11 +297,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    -----------------------------------
 
 </pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-6">3.2 TEXTモード</h3>
+</p>
+<h3><a name="sec-6">3.2 TEXTモード</a></h3>
 
 
 <p>
@@ -323,8 +309,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 </p>
 
 
-<div class="outline-4">
-<h4 id="sec-7">3.2.1  TEXTモードでの編集の例:</h4>
+<h4><a name="sec-7">3.2.1  TEXTモードでの編集の例:</a></h4>
 
 <p><pre>
    Emacs バッファ
@@ -358,20 +343,15 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    -----------------------------------
 
 </pre>
-</p></div>
-</div>
-
-<div class="outline-3">
-<h3 id="sec-8">3.3 モードの選択</h3>
+</p>
+<h3><a name="sec-8">3.3 モードの選択</a></h3>
 
 
 <p>
 上記XHTML, TEXTモードはノートの作成時に選択できます。ノート保存時には編集モード情報も保存され、次に読み込まれる際には保存時の編集モードで読み込まれます。また、他のEvernoteアプリケーションで作成されたノートはXHTMLモードとして読み込まれます。
 </p>
-</div>
 
-<div class="outline-3">
-<h3 id="sec-9">3.4 モードの切り替え</h3>
+<h3><a name="sec-9">3.4 モードの切り替え</a></h3>
 
 
 <p>
@@ -379,12 +359,9 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 </p>
 
 <p>
-<a name="Search&ndash;Query&ndash;Examples">&nbsp;</a>
-</p></div>
-</div>
-
-<div class="outline-2">
-<h2 id="sec-10">4 Search Query Examples</h2>
+<a name="Search--Query--Examples">&nbsp;</a>
+</p>
+<h2><a name="sec-10">4 Search Query Examples</a></h2>
 
 
 <p>
@@ -422,12 +399,9 @@ notebook:Travel intitle:"San Francisco"
 any: "San Francisco" tag:SFO
 </p>
 </li>
-</ul>
-<p><a name="Evernote&ndash;Browser">&nbsp;</a>
-</p></div>
+</ul><a name="Evernote--Browser">&nbsp;</a>
 
-<div class="outline-2">
-<h2 id="sec-11">5 Evernote Browser</h2>
+<h2><a name="sec-11">5 Evernote Browser</a></h2>
 
 
 <p>
@@ -470,11 +444,10 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 </p>
 
 </li>
-</ul>
-<p>Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
-</p>
+</ul>Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
+
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col>
+<COL align="left"><COL align="left">
 <thead>
 <tr><th>キー</th><th>動作</th></tr>
 </thead>
@@ -495,11 +468,9 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 
 
 <p>
-<a name="Install&ndash;and&ndash;Settings">&nbsp;</a>
-</p></div>
-
-<div class="outline-2">
-<h2 id="sec-12">6 Install and Settings</h2>
+<a name="Install--and--Settings">&nbsp;</a>
+</p>
+<h2><a name="sec-12">6 Install and Settings</a></h2>
 
 
 <ol>
@@ -557,6 +528,15 @@ evernote-mode設定を.emacs に追記
 <p>
 evernote-enml-formatter-commandが設定されていない場合はXHTMLモードでの読み込み時に整形されてない状態のXMLが表示されます。
 </p>
+<p>
+上記に加え、 ruby の cygwin を使用している場合は、cygwin-mount.el (<a href="http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el">http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el</a>) が必要になります。cygwin-mount.el を取得し、以下を .emacs に追加して下さい。
+</p>
+<p>
+<pre>
+(require 'cygwin-mount)
+(cygwin-mount-activate)
+</pre>
+</p>
 </li>
 <li>
 proxy の設定
@@ -566,15 +546,12 @@ proxy の設定
 </p>
 </li>
 </ol>
-</div>
 
-<div class="outline-2">
-<h2 id="sec-13">7 Troubleshooting</h2>
+<h2><a name="sec-13">7 Troubleshooting</a></h2>
 
 
 
-<div class="outline-3">
-<h3 id="sec-14">7.1 `require': no such file to load &ndash; gdbm と表示される</h3>
+<h3><a name="sec-14">7.1 `require': no such file to load -- gdbm と表示される</a></h3>
 
 
 <p>
@@ -586,15 +563,12 @@ proxy の設定
 aptを使ったインストール例
 
 </li>
-</ul>
-<p><pre>
+</ul><pre>
 apt-get install libgdbm-ruby
 </pre>
-</p>
-</div>
 
-<div class="outline-3">
-<h3 id="sec-15">7.2 `require': no such file to load &ndash; net/https と表示される</h3>
+
+<h3><a name="sec-15">7.2 `require': no such file to load -- net/https と表示される</a></h3>
 
 
 <p>
@@ -606,15 +580,11 @@ apt-get install libgdbm-ruby
 aptを使ったインストール例
 
 </li>
-</ul>
-<p><pre>
+</ul><pre>
 apt-get install libopenssl-ruby
 </pre>
-</p></div>
-</div>
-<div id="postamble"><p class="author"> Author: Yusuke Kawakami
+<p class="author"> Author: Yusuke Kawakami
 <a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
 </p>
-<p class="date"> Date: 2011/03/06 0:44:35</p>
-</div></body>
+</body>
 </html>

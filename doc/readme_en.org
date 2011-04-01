@@ -312,6 +312,13 @@ The followings are other key assignments on Evernote Browser pages
 
      If you don't set evernote-enml-formatter-command, the unformatted XHTML is displayed when reading the note of XHTML mode.
 
+		 If you use cygwin for ruby, cygwin-mount.el (http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el) is also needed.  Get cygwin-mount.el and put it in your load path, and add the followings lines to your .emacs.
+
+     @<pre>
+		 (require 'cygwin-mount)
+		 (cygwin-mount-activate)
+     @</pre>
+
   5. Proxy settings
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)

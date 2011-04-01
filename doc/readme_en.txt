@@ -2,7 +2,7 @@
                               ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011/03/06 0:46:15
+Date: 2011/04/01
 
 
 Table of Contents
@@ -22,7 +22,6 @@ Table of Contents
 7 Troubleshooting
     7.1 `require': no such file to load -- gdbm
     7.2 `require': no such file to load -- net/https
-
 
 1 QUOTE License
 ~~~~~~~~~~~~~~~
@@ -154,8 +153,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-
-     save on XHTML mode
+   |
+   | save on XHTML mode
    V
    The content of the note (same as the emacs buffer)
    -----------------------------------
@@ -166,8 +165,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-
-     read on XHTML mode
+   |
+   | read on XHTML mode
    V
    Emacs Buffer (read-only and formatted)
    -----------------------------------
@@ -175,8 +174,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-
-    toggle read-only(evernote-toggle-read-only: \C-x\C-q)
+   |
+   |toggle read-only(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs Buffer (unformatted)
    -----------------------------------
@@ -206,8 +205,8 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-
-     save on TEXT mode
+   |
+   | save on TEXT mode
    V
    The content of the note (escaped and transformed into a XML)
    -----------------------------------
@@ -218,8 +217,8 @@ Emacs Buffer
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-
-     read on TEXT mode
+   |
+   | read on TEXT mode
    V
    Emacs Buffer (unescaped and transformed int a text)
    -----------------------------------
@@ -291,18 +290,20 @@ A note list shows the note list from a note search result. The note list page is
 A notebook list page shows the notebook list created on Evernote service. Pressing Enter(\C-m) on the notebook name opens a note list page associated with the notebook.
 
 The followings are other key assignments on Evernote Browser pages
-  Key   Action
- -----+--------------------------------------------------------------------------------------------------------------
-  b     move to the previous page
-  f     move to the next page
-  t     create a tag list page and show it. If a tag list page already exists, move the cursor to the page
-  S     create a search list page and show it. If a tag list page already exists, move the cursor to the page
-  s     create a note list from the search query input and show it
-  N     create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page
-  o     same as Enter(\C-m), but it does not move the cursor to the opened note
-  n     move to the next line and open the note on the cursor if in the note list,
-  p     move to the previous line and open the note on the cursor if in the note list,
-  d     delete the current from Evernote Browser
+|-----+--------------------------------------------------------------------------------------------------------------|
+| Key | Action                                                                                                       |
+|-----+--------------------------------------------------------------------------------------------------------------|
+| b   | move to the previous page                                                                                    |
+| f   | move to the next page                                                                                        |
+| t   | create a tag list page and show it. If a tag list page already exists, move the cursor to the page           |
+| S   | create a search list page and show it. If a tag list page already exists, move the cursor to the page        |
+| s   | create a note list from the search query input and show it                                                   |
+| N   | create a notebook list page and show it. If a notebook list page already exists, move the cursor to the page |
+| o   | same as Enter(\C-m), but it does not move the cursor to the opened note                                      |
+| n   | move to the next line and open the note on the cursor if in the note list,                                   |
+| p   | move to the previous line and open the note on the cursor if in the note list,                               |
+| d   | delete the current from Evernote Browser                                                                     |
+|-----+--------------------------------------------------------------------------------------------------------------|
 
 
 (INVISIBLE)
@@ -345,6 +346,13 @@ The followings are other key assignments on Evernote Browser pages
 
 
      If you don't set evernote-enml-formatter-command, the unformatted XHTML is displayed when reading the note of XHTML mode.
+
+     If you use cygwin for ruby, cygwin-mount.el ([http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el]) is also needed.  Get cygwin-mount.el and put it in your load path, and add the followings lines to your .emacs.
+
+
+     (require 'cygwin-mount)
+     (cygwin-mount-activate)
+
 
   5. Proxy settings
 
