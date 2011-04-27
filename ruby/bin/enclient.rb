@@ -17,6 +17,11 @@
 #   limitations under the License.
 #
 
+begin # use rubygems if possible
+  require "rubygems"
+rescue LoadError
+end
+
 require "cgi"
 require "singleton"
 require "base64"
