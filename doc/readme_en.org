@@ -344,3 +344,12 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 @<pre>
 apt-get install libopenssl-ruby
 @</pre>
+** condition-case: Wrong type argument: listp, /usr/bin/ruby
+
+The emacs variable "exec-path" may not contain the path of ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
+This may happen when multiple version of ruby are installed in the OS.
+Prepend the correct ruby path to the exec-path.
+
+e.g.
+(setq exec-path (cons '/your/ruby/path' exec-path))
+

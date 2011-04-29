@@ -1,30 +1,32 @@
-                              Emacs evernote mode
-                              ===================
+                         Emacs evernote mode
+                         ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011/04/01
+Date: 2011-04-30 02:58:04 JST
 
 
 Table of Contents
 =================
-1  License
-2 Introduction
-3 Evernote note edit mode
-    3.1 XHTML モード
-        3.1.1  XHTMLモードでの編集の例:
-    3.2 TEXTモード
-        3.2.1  TEXTモードでの編集の例:
-    3.3 モードの選択
-    3.4 モードの切り替え
-4 Search Query Examples
-5 Evernote Browser
-6 Install and Settings
-7 Troubleshooting
-    7.1 `require': no such file to load -- gdbm と表示される
-    7.2 `require': no such file to load -- net/https と表示される
+1  License 
+2 Introduction 
+3 Evernote note edit mode 
+    3.1 XHTML モード 
+        3.1.1  XHTMLモードでの編集の例: 
+    3.2 TEXTモード 
+        3.2.1  TEXTモードでの編集の例: 
+    3.3 モードの選択 
+    3.4 モードの切り替え 
+4 Search Query Examples 
+5 Evernote Browser 
+6 Install and Settings 
+7 Troubleshooting 
+    7.1 `require': no such file to load -- gdbm と表示される 
+    7.2 `require': no such file to load -- net/https と表示される 
+    7.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
 
-1 QUOTE License
-~~~~~~~~~~~~~~~
+
+1 QUOTE License 
+~~~~~~~~~~~~~~~~
 
 Copyright 2011 Yusuke Kawakami
 
@@ -40,10 +42,8 @@ Copyright 2011 Yusuke Kawakami
  See the License for the specific language governing permissions and
  limitations under the License.
 
-(INVISIBLE)
-
-2 Introduction
-~~~~~~~~~~~~~~
+2 Introduction 
+~~~~~~~~~~~~~~~
 
 Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集するための機能を提供します。現在このパッケージでは以下のインターフェースを提供しています。
 
@@ -101,11 +101,11 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-toggle-read-only (default bound to \C-x\C-q)*
 
-    バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [Evernote note edit mode] を参照して下さい
+                バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [Evernote note edit mode] を参照して下さい
 
-  - *Variable: evernote-enml-formatter-command*
+        - *Variable: evernote-enml-formatter-command*
 
-    XHTMLモードのノートを読み込んだ際、もしくは書き込み可能から読み込み専用に状態を切り替えた場合に、XHTMLを整形して表示するためのコマンドを指定します。現在整形コマンドとしてw3mを使用することができます。
+          XHTMLモードのノートを読み込んだ際、もしくは書き込み可能から読み込み専用に状態を切り替えた場合に、XHTMLを整形して表示するためのコマンドを指定します。現在整形コマンドとしてw3mを使用することができます。
 
   - *Command: evernote-browser*
 
@@ -123,23 +123,21 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
   - evernote-rename-note
   - evernote-delete-note
 
-(INVISIBLE)
-
-3 Evernote note edit mode
-~~~~~~~~~~~~~~~~~~~~~~~~~
+3 Evernote note edit mode 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 EvernoteのノートはENML DTD([http://xml.evernote.com/pub/enml2.dtd])に準拠するXML文書です。evernote-modeではこのXMLをemacsで保存、読み込みを行う為ににXHTMLモードとTEXTモード2種類の編集モードを用意しています。
 
-3.1 XHTML モード
-================
+3.1 XHTML モード 
+=================
 
 XHTMLモードでノートを保存した場合、バッファの内容がそのままノートの内容として保存されます。バッファ内容がENML DTDに沿ったフォーマットでない場合はエラーになります。
 
 XHTMLモードでノートを読み込んだ場合、初期状態としてバッファは読み込み専用になります。この際、変数evernote-enml-formatter-commandが設定されている場合は、バッファには整形された内容が表示されます。(evernote-enml-formatter-comandの設定については [Install and Settings] を参照して下さい) evernote-toggle-read-onlyコマンドを実行して編集の為に書き込み可能にした場合は、整形されない状態のXMLが表示されます。書き込み可能から読み込み専用に再度変更すると、再びバッファには整形された内容が表示されます。
 
 
-3.1.1 QUOTE XHTMLモードでの編集の例:
-------------------------------------
+3.1.1 QUOTE XHTMLモードでの編集の例: 
+-------------------------------------
 
    Emacs バッファ
    -----------------------------------
@@ -150,8 +148,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   |XHTMLモードで保存
+   | 
+   | XHTMLモードで保存
    V
    Evernoteサービス上のノート(Emacsバッファの内容と同じ)
    -----------------------------------
@@ -162,8 +160,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   |XHTMLモードで読み込み
+   | 
+   | XHTMLモードで読み込み
    V
    Emacs バッファ
    (読み込み専用となり、整形されて表示される)
@@ -172,8 +170,8 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-   |
-   |書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
+   | 
+   | 書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs バッファ
    (整形されないXMLが表示される)
@@ -186,16 +184,16 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    </en-note>
    -----------------------------------
 
-3.2 TEXTモード
-==============
+3.2 TEXTモード 
+===============
 
 XHTMLモードでは、ノートを編集する際にXHTMLをテキストとして編集する必要があり、作業が煩雑になります。そこでevernote-modeではテキストのみ含むEvernoteノートを効率よく作成、編集するための TEXTモードを提供しています。
 
 TEXTモードはテキストのみ含むEvernoteノートの編集に特化したモードです。TEXTモードでノートを保存した場合、バッファ中のXMLの特殊文字(&キーワード\;, スペース、改行)はエスケープされ、ルート要素を付加した上でENMLに変換されます。このため、emacsバッファで表示されている内容がノートの見た目上の内容として保存されます。また、TEXTモードでノートを読み込んだ場合は、XMLのルート要素直下をテキストとして解釈し、XMLの特殊文字はアンエスケープされた上でバッファに読み込まれます。
 
 
-3.2.1 QUOTE TEXTモードでの編集の例:
------------------------------------
+3.2.1 QUOTE TEXTモードでの編集の例: 
+------------------------------------
 
    Emacs バッファ
    -----------------------------------
@@ -203,8 +201,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-   |
-   |TEXTモードで保存
+   | 
+   | TEXTモードで保存
    V
    Evernoteサービス上のノート
    (Emacsバッファの内容がエスケープされ, XMLに変換される)
@@ -216,8 +214,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   |
-   |TEXTモードで読み込み
+   | 
+   | TEXTモードで読み込み
    V
    Emacs バッファ
    (ノートのルート要素以下の内容がアンエスケープされる)
@@ -227,21 +225,19 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
 
-3.3 モードの選択
-================
+3.3 モードの選択 
+=================
 
 上記XHTML, TEXTモードはノートの作成時に選択できます。ノート保存時には編集モード情報も保存され、次に読み込まれる際には保存時の編集モードで読み込まれます。また、他のEvernoteアプリケーションで作成されたノートはXHTMLモードとして読み込まれます。
 
-3.4 モードの切り替え
-====================
+3.4 モードの切り替え 
+=====================
 
 既存のノートのXHTML,TEXTモードを切り替える場合は、evernote-change-edit-modeコマンドを使用します。XHTMLモードからTEXTモードの切り替えにおいて、バッファが読み込み専用状態の場合、整形された内容がTEXTモードでのノートの内容になります。この際元のXHTMLのフォーマット情報(XML tag)は全て失われるので注意して下さい。書き込み可能状態でモードを切り替えた場合は、整形されていない元のXHTMLがTEXTモード表示されるノートの内容になります。
 
 
-(INVISIBLE)
-
-4 Search Query Examples
-~~~~~~~~~~~~~~~~~~~~~~~
+4 Search Query Examples 
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ノートの検索に使用できるクエリの例を示します。
 
@@ -263,10 +259,8 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
       any: "San Francisco" tag:SFO
 
-(INVISIBLE)
-
-5 Evernote Browser
-~~~~~~~~~~~~~~~~~~
+5 Evernote Browser 
+~~~~~~~~~~~~~~~~~~~
 
 Evernote Browser はタグ一覧や、保存された検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。これらの一覧はevernote-open-noteコマンドやevernote-search-notesコマンドで補完に使われるノート一覧と異なり、ユーザにより削除されるまでバッファ上に保持されます。この一覧は繰り返し使用することができるため、ノートを開く手順を簡略化することができます。
 
@@ -294,39 +288,35 @@ Evernote Browserは複数のEvernote Browserページ(バッファ)から構成�
 
 Evernote Browser ページ上でのその他のキーアサインは以下の通りです。
 
-|------+--------------------------------------------------------------------------------------------------------------|
-| キー | 動作                                                                                                         |
-|------+--------------------------------------------------------------------------------------------------------------|
-| b    | 前のページに移動します                                                                                       |
-| f    | 次のページに移動します                                                                            |
-| t    | タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合はそのページに移動します                     |
-| S    | 保存された検索一覧ページを作成し、表示します。既に保存された検索一覧ページがある場合はそのページに移動します |
-| s    | 入力された検索クエリから結果を新規ノート一覧ページとして作成し、そのページを表示します                       |
-| N    | ノートブック一覧ページを作成し、表示します。既にノートブック一覧ページがある場合はそのページに移動します     |
-| o    | Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートにカーソルを移動しません                     |
-| n    | 次の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                             |
-| p    | 前の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                             |
-| d    | 現在のページを Evernote Browser から削除します                                                               |
-|------+--------------------------------------------------------------------------------------------------------------|
+  キー   動作                                                                                                          
+ ------+--------------------------------------------------------------------------------------------------------------
+  b      前のページに移動します                                                                                        
+  f      次のページに移動します                                                                             
+  t      タグ一覧ページを作成し、表示します。既にタグ一覧ページがある場合はそのページに移動します                      
+  S      保存された検索一覧ページを作成し、表示します。既に保存された検索一覧ページがある場合はそのページに移動します  
+  s      入力された検索クエリから結果を新規ノート一覧ページとして作成し、そのページを表示します                        
+  N      ノートブック一覧ページを作成し、表示します。既にノートブック一覧ページがある場合はそのページに移動します      
+  o      Enter(\C-m) と同じですが、ノート一覧ページの場合は、開いたノートにカーソルを移動しません                      
+  n      次の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                              
+  p      前の行に移動します。ノート一覧ページの場合は移動したカーソル上のノートを開きます                              
+  d      現在のページを Evernote Browser から削除します                                                                
 
 
-(INVISIBLE)
-
-6 Install and Settings
-~~~~~~~~~~~~~~~~~~~~~~
+6 Install and Settings 
+~~~~~~~~~~~~~~~~~~~~~~~
 
   1. Evernoteサービス使用のために必要なRubyスクリプトをインストールする
 
-
+    
     cd evernote-mode/ruby
     ruby setup.rb
-
+    
 
   2. evernote-mode.el をロードパスにコピーする
 
-
+    
     cp evernote-mode.el <your load path>
-
+    
 
   3. evernote-enml-formatter-command に使用するプログラム w3m の入手、設定 (オプション)
 
@@ -336,7 +326,7 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 
   4. evernote-mode設定を.emacs に追記
 
-
+     
      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; optional
      (add-to-list 'load-path "<your load path>")
      (require 'evernote-mode)
@@ -347,26 +337,26 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
      (global-set-key "\C-cew" 'evernote-write-note)
      (global-set-key "\C-cep" 'evernote-post-region)
      (global-set-key "\C-ceb" 'evernote-browser)
-
+     
 
      evernote-enml-formatter-commandが設定されていない場合はXHTMLモードでの読み込み時に整形されてない状態のXMLが表示されます。
 
-     上記に加え、 ruby の cygwin を使用している場合は、cygwin-mount.el ([http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el]) が必要になります。cygwin-mount.el を取得し、以下を .emacs に追加して下さい。
+                 上記に加え、 ruby の cygwin を使用している場合は、cygwin-mount.el ([http://www.emacswiki.org/cgi-bin/wiki/cygwin-mount.el]) が必要になります。cygwin-mount.el を取得し、以下を .emacs に追加して下さい。
 
-
-     (require 'cygwin-mount)
-     (cygwin-mount-activate)
-
+     
+                 (require 'cygwin-mount)
+                 (cygwin-mount-activate)
+     
 
   5. proxy の設定
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-7 Troubleshooting
-~~~~~~~~~~~~~~~~~
+7 Troubleshooting 
+~~~~~~~~~~~~~~~~~~
 
-7.1 `require': no such file to load -- gdbm と表示される
-========================================================
+7.1 `require': no such file to load -- gdbm と表示される 
+=========================================================
 
 ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
 上記が表示される場合は libgdbm-ruby をインストールして下さい。
@@ -377,8 +367,8 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 apt-get install libgdbm-ruby
 
 
-7.2 `require': no such file to load -- net/https と表示される
-=============================================================
+7.2 `require': no such file to load -- net/https と表示される 
+==============================================================
 
 ディストリビューションの設定によっては ruby が使用できる openssl ライブラリがインストールされてない場合があります。
 上記が表示される場合は libopenssl-ruby をインストールして下さい。
@@ -388,3 +378,12 @@ apt-get install libgdbm-ruby
 
 apt-get install libopenssl-ruby
 
+7.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
+===========================================================================================
+
+emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
+OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
+exec-path の先頭に正しい ruby のパスを設定して下さい。
+
+e.g.
+(setq exec-path (cons '/your/ruby/path' exec-path))
