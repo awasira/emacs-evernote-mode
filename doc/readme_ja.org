@@ -278,6 +278,15 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 
 
 # <<Install and Settings>>
+* Bookmarks
+
+Emacs 23.1 以降を使用している場合、emacs のブックマークを evernote のノートに対して設定することができます。
+この機能により頻繁に参照する evernote ノートをより容易に開くことができます。
+
+ブックマークの使用方法は通常のファイルを扱う場合と同じです。
+bookmark-set (C-x r m RET) をノートを開いているバッファで実行することでブックマークを登録します。
+また、登録されたブックマークは bookmark-jump (C-x r b bookmark RET) や list-bookmark (C-x r l) で参照できます。
+
 * Install and Settings
 
   1. Evernoteサービス使用のために必要なRubyスクリプトをインストールする

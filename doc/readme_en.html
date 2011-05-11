@@ -4,110 +4,72 @@
 lang="en" xml:lang="en">
 <head>
 <title>Emacs evernote mode</title>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-04-30 03:02:43 JST"/>
+<meta name="generated" content="2011/05/12 7:32:39"/>
 <meta name="author" content="Yusuke Kawakami"/>
 <style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
-  html { font-family: Times, serif; font-size: 12pt; }
-  .title  { text-align: center; }
-  .todo   { color: red; }
-  .done   { color: green; }
-  .tag    { background-color:lightblue; font-weight:normal }
-  .target { }
+  html {
+	font-family: Times, serif;
+	font-size: 12pt;
+  }
+  .title { text-align: center; }
+  .todo  { color: red; }
+  .done { color: green; }
   .timestamp { color: grey }
   .timestamp-kwd { color: CadetBlue }
-  p.verse { margin-left: 3% }
+  .tag { background-color:lightblue; font-weight:normal }
+  .target { background-color: lavender; }
   pre {
 	border: 1pt solid #AEBDCC;
 	background-color: #F3F5F7;
 	padding: 5pt;
 	font-family: courier, monospace;
-        font-size: 90%;
-        overflow:auto;
   }
   table { border-collapse: collapse; }
-  td, th { vertical-align: top; }
-  dt { font-weight: bold; }
-  div.figure { padding: 0.5em; }
-  div.figure p { text-align: center; }
-  .linenr { font-size:smaller }
-  .code-highlighted {background-color:#ffff00;}
-  .org-info-js_info-navigation { border-style:none; }
-  #org-info-js_console-label { font-size:10px; font-weight:bold;
-                               white-space:nowrap; }
-  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
-                                 font-weight:bold; }
-  /*]]>*/-->
+  td, th {
+	vertical-align: top;
+	<!--border: 1pt solid #ADB9CC;-->
+  }
 </style>
-<script type="text/javascript">
-<!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*/-->
-</script>
 </head><body>
 <h1 class="title">Emacs evernote mode</h1>
-
-
-<div id="table-of-contents">
 <h2>Table of Contents</h2>
-<div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1  License </a></li>
-<li><a href="#sec-2">2 Introduction </a></li>
-<li><a href="#sec-3">3 Evernote note edit mode </a>
+<li><a href="#sec-1">1  License</a></li>
+<li><a href="#sec-2">2 Introduction</a></li>
+<li><a href="#sec-3">3 Evernote note edit mode</a>
 <ul>
-<li><a href="#sec-3.1">3.1 XHTML mode </a>
+<li><a href="#sec-4">3.1 XHTML mode</a>
 <ul>
-<li><a href="#sec-3.1.1">3.1.1  An example of XHTML mode editing: </a></li>
+<li><a href="#sec-5">3.1.1  An example of XHTML mode editing:</a></li>
 </ul>
 </li>
-<li><a href="#sec-3.2">3.2 TEXT mode </a>
+<li><a href="#sec-6">3.2 TEXT mode</a>
 <ul>
-<li><a href="#sec-3.2.1">3.2.1  An example of TEXT mode editing: </a></li>
+<li><a href="#sec-7">3.2.1  An example of TEXT mode editing:</a></li>
 </ul>
 </li>
-<li><a href="#sec-3.3">3.3 Select edit mode </a></li>
-<li><a href="#sec-3.4">3.4 Change edit mode </a></li>
+<li><a href="#sec-8">3.3 Select edit mode</a></li>
+<li><a href="#sec-9">3.4 Change edit mode</a></li>
 </ul>
 </li>
-<li><a href="#sec-4">4 Search Query Examples </a></li>
-<li><a href="#sec-5">5 Evernote Browser </a></li>
-<li><a href="#sec-6">6 Install and Settings </a></li>
-<li><a href="#sec-7">7 Troubleshooting </a>
+<li><a href="#sec-10">4 Search Query Examples</a></li>
+<li><a href="#sec-11">5 Evernote Browser</a></li>
+<li><a href="#sec-12">6 Bookmarks</a></li>
+<li><a href="#sec-13">7 Install and Settings</a></li>
+<li><a href="#sec-14">8 Troubleshooting</a>
 <ul>
-<li><a href="#sec-7.1">7.1 `require': no such file to load &ndash; gdbm </a></li>
-<li><a href="#sec-7.2">7.2 `require': no such file to load &ndash; net/https </a></li>
-<li><a href="#sec-7.3">7.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </a></li>
+<li><a href="#sec-15">8.1 `require': no such file to load -- gdbm</a></li>
+<li><a href="#sec-16">8.2 `require': no such file to load -- net/https</a></li>
+<li><a href="#sec-17">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby</a></li>
 </ul>
 </li>
 </ul>
-</div>
-</div>
 
-<div id="outline-container-1" class="outline-2">
-<h2 id="sec-1"><a name="License" id="License"></a>1  License </h2>
-<div id="text-1">
+<h2><a name="sec-1">1  License</a></h2>
 
-<pre>
+<p><pre>
 Copyright 2011 Yusuke Kawakami
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -123,14 +85,10 @@ Copyright 2011 Yusuke Kawakami
  limitations under the License.
 
 
+&lt;&lt;Introduction&gt;&gt;(INVISIBLE)
 </pre>
-</div>
-
-</div>
-
-<div id="outline-container-2" class="outline-2">
-<h2 id="sec-2"><a name="Introduction" id="Introduction"></a>2 Introduction </h2>
-<div id="text-2">
+</p>
+<h2><a name="sec-2">2 Introduction</a></h2>
 
 
 <p>
@@ -183,7 +141,7 @@ Change tags attached to the note. The change on Evernote service will be made af
 <b>Command: evernote-change-edit-mode (default bound to \C-cee)</b>
 
 <p>
-Change the edit mode of the note. (See <a href="#sec-3">Evernote note edit mode</a> for details) The change on Evernote service will be made after exec of evernote-save-note.
+Change the edit mode of the note. (See <a href="#Evernote--note--edit--mode">Evernote note edit mode</a> for details) The change on Evernote service will be made after exec of evernote-save-note.
 </p>
 </li>
 <li>
@@ -204,7 +162,7 @@ Delete the note.
 <b>Command: evernote-search-notes</b>
 
 <p>
-Search notes by query in the minibuffer. (See <a href="#sec-4">Search Query Examples</a> for details)
+Search notes by query in the minibuffer. (See <a href="#Search--Query--Examples">Search Query Examples</a> for details)
 </p>
 </li>
 <li>
@@ -232,9 +190,9 @@ Change the name and the query of an existing Saved Search.
 <b>Command: evernote-toggle-read-only (default bound to \C-x\C-q)</b>
 
 <p>
-Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See <a href="#sec-3">Evernote note edit mode</a> for details.
+Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See <a href="#Evernote--note--edit--mode">Evernote note edit mode</a> for details.
 </p>
-<ul>
+</li>
 <li>
 <b>Variable: evernote-enml-formatter-command</b>
 
@@ -242,20 +200,16 @@ Toggle read-only status of the note. When a note of XHTML mode is changed to the
 The command to format XHTML. When a note of XHTML mode is read-only, the command formats the XHTML and displays it. Currently evernote-mode supports w3m as the formatter.
 </p>
 </li>
-</ul>
-</li>
 <li>
 <b>Command: evernote-browser</b>
 
 <p>
-Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See <a href="#sec-5">Evernote Browser</a> for details.
+Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See <a href="#Evernote--Browser">Evernote Browser</a> for details.
 </p>
 </li>
-</ul>
-
-<p>When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
+</ul>When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.
-</p>
+
 
 <p>
 The minor-mode "evernote-mode" is applied to the buffers opening the evernote note. The following commands are available only when "evernote-mode" is valid.
@@ -278,14 +232,9 @@ evernote-delete-note
 
 
 </li>
-</ul>
-</div>
+</ul><a name="Evernote--note--edit--mode">&nbsp;</a>
 
-</div>
-
-<div id="outline-container-3" class="outline-2">
-<h2 id="sec-3"><a name="Evernote==note==edit==mode" id="Evernote==note==edit==mode"></a>3 Evernote note edit mode </h2>
-<div id="text-3">
+<h2><a name="sec-3">3 Evernote note edit mode</a></h2>
 
 
 <p>
@@ -293,28 +242,20 @@ Evernote notes are XML complying with ENML DTD(<a href="http://xml.evernote.com/
 </p>
 
 
-</div>
-
-<div id="outline-container-3.1" class="outline-3">
-<h3 id="sec-3.1">3.1 XHTML mode </h3>
-<div id="text-3.1">
+<h3><a name="sec-4">3.1 XHTML mode</a></h3>
 
 
 <p>
 When you save the Evernote note in XHTML mode, the content of the buffer will be saved as the content of the note. Therefore if the contents of the buffer is not valid ENML, you cannot save the contents because of the error.
 </p>
 <p>
-And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See <a href="#sec-6">Install and Settings</a> for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
+And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See <a href="#Install--and--Settings">Install and Settings</a> for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
 </p>
 
 
-</div>
+<h4><a name="sec-5">3.1.1  An example of XHTML mode editing:</a></h4>
 
-<div id="outline-container-3.1.1" class="outline-4">
-<h4 id="sec-3.1.1">3.1.1  An example of XHTML mode editing: </h4>
-<div id="text-3.1.1">
-
-<pre>
+<p><pre>
    Emacs Buffer
    -----------------------------------
    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -360,14 +301,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
 
 
 </pre>
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-3.2" class="outline-3">
-<h3 id="sec-3.2">3.2 TEXT mode </h3>
-<div id="text-3.2">
+</p>
+<h3><a name="sec-6">3.2 TEXT mode</a></h3>
 
 
 <p>
@@ -378,13 +313,9 @@ The text mode is specialized in editing Evernote notes that only contain text co
 </p>
 
 
-</div>
+<h4><a name="sec-7">3.2.1  An example of TEXT mode editing:</a></h4>
 
-<div id="outline-container-3.2.1" class="outline-4">
-<h4 id="sec-3.2.1">3.2.1  An example of TEXT mode editing: </h4>
-<div id="text-3.2.1">
-
-<pre>
+<p><pre>
 Emacs Buffer
    -----------------------------------
    Evernote notes are XML complying with ENML DTD
@@ -414,41 +345,26 @@ Emacs Buffer
    -----------------------------------
 
 </pre>
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-3.3" class="outline-3">
-<h3 id="sec-3.3">3.3 Select edit mode </h3>
-<div id="text-3.3">
+</p>
+<h3><a name="sec-8">3.3 Select edit mode</a></h3>
 
 
 <p>
 You can select the edit mode when you create a note. The edit mode is recorded in the note when you save it, and the recorded edit mode is applied to the note when you reopen it.
 </p>
 
-</div>
 
-</div>
-
-<div id="outline-container-3.4" class="outline-3">
-<h3 id="sec-3.4">3.4 Change edit mode </h3>
-<div id="text-3.4">
+<h3><a name="sec-9">3.4 Change edit mode</a></h3>
 
 
 <p>
 Use the command evernote-change-edit-mode to change the edit mode of the existing note. If you change the edit mode from XHTML mode to TEXT mode and the buffer is read-only, then the content of the TEXT mode is the formatted text. Note that the change will remove all format information(xml tags). If the buffer is read-write, the content of the TEXT mode is the original unformatted text.
 </p>
 
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-4" class="outline-2">
-<h2 id="sec-4"><a name="Search==Query==Examples" id="Search==Query==Examples"></a>4 Search Query Examples </h2>
-<div id="text-4">
+<p>
+<a name="Search--Query--Examples">&nbsp;</a>
+</p>
+<h2><a name="sec-10">4 Search Query Examples</a></h2>
 
 
 <p>
@@ -462,45 +378,34 @@ The following examples are referred from (<a href="http://www.evernote.com/about
 Find notes containing the word "chicken", tagged with "cooking", and created this year:
 
 </li>
-</ul>
+</ul>chicken tag:cooking created:year
 
-<p>chicken tag:cooking created:year
-</p>
 <ul>
 <li>
 Find notes tagged with "cooking" but not "mexican" that include the word "beef" but not the word "carrots"
 
 </li>
-</ul>
+</ul>tag:cooking -tag:mexican beef -carrots
 
-<p>tag:cooking -tag:mexican beef -carrots
-</p>
 <ul>
 <li>
 Find notes in my "Travel" notebook with San Francisco in the title:
 
 </li>
-</ul>
+</ul>notebook:Travel intitle:"San Francisco"
 
-<p>notebook:Travel intitle:"San Francisco"
-</p>
 <ul>
 <li>
 Find notes that either include the text "San Francisco" or are tagged with the "SFO" tag:
 
 </li>
-</ul>
+</ul>any: "San Francisco" tag:SFO
 
-<p>any: "San Francisco" tag:SFO
+
+<p>
+<a name="Evernote--Browser">&nbsp;</a>
 </p>
-
-</div>
-
-</div>
-
-<div id="outline-container-5" class="outline-2">
-<h2 id="sec-5"><a name="Evernote==Browser" id="Evernote==Browser"></a>5 Evernote Browser </h2>
-<div id="text-5">
+<h2><a name="sec-11">5 Evernote Browser</a></h2>
 
 
 <p>
@@ -526,10 +431,8 @@ note list page
 notebook list page
 
 </li>
-</ul>
+</ul>A tag list page shows the hierarchical tag list created on Evernote service. Pressing Enter(\C-m) on the tag name opens a note list page of the tag.
 
-<p>A tag list page shows the hierarchical tag list created on Evernote service. Pressing Enter(\C-m) on the tag name opens a note list page of the tag.
-</p>
 <p>
 A saved search list shows the search list created on Evernote service. Pressing Enter(\C-m) on the search name opens a note list page from the search result.
 </p>
@@ -542,7 +445,7 @@ A notebook list page shows the notebook list created on Evernote service. Pressi
 <p>
 The followings are other key assignments on Evernote Browser pages
 </p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col>
+<COL align="left"><COL align="left">
 <thead>
 <tr><th>Key</th><th>Action</th></tr>
 </thead>
@@ -562,13 +465,23 @@ The followings are other key assignments on Evernote Browser pages
 
 
 
-</div>
+<p>
+<a name="Install--and--Settings">&nbsp;</a>
+</p>
+<h2><a name="sec-12">6 Bookmarks</a></h2>
 
-</div>
 
-<div id="outline-container-6" class="outline-2">
-<h2 id="sec-6"><a name="Install==and==Settings" id="Install==and==Settings"></a>6 Install and Settings </h2>
-<div id="text-6">
+<p>
+On Emacs 23.1 or later, you can set emacs bookmarks to the evernote notes.
+You can open immediately the note that you can refer frequently by using this feature.
+</p>
+<p>
+You can use the bookmarks in the same way as when using bookmarks to regular files.
+You can set a bookmark to a evernote note by executing 'bookmark-set' (C-x r m RET) in the buffer opening the evernote note.
+Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'list-bookmark' (C-x r l).
+</p>
+
+<h2><a name="sec-13">7 Install and Settings</a></h2>
 
 
 <ol>
@@ -605,8 +518,7 @@ If you use Win, get cygwin from <a href="http://www.cygwin.com/">here</a>, execu
 Add the path of w3m to the environment variable "PATH".
 
 </li>
-</ul>
-</li>
+</ul></li>
 <li>
 Add the evernote-mode configuration to .emacs.
 
@@ -645,21 +557,12 @@ If you want to use the proxy, set the value to the environment variable 'EN_PROX
 </p>
 </li>
 </ol>
-</div>
 
-</div>
-
-<div id="outline-container-7" class="outline-2">
-<h2 id="sec-7">7 Troubleshooting </h2>
-<div id="text-7">
+<h2><a name="sec-14">8 Troubleshooting</a></h2>
 
 
 
-</div>
-
-<div id="outline-container-7.1" class="outline-3">
-<h3 id="sec-7.1">7.1 `require': no such file to load &ndash; gdbm </h3>
-<div id="text-7.1">
+<h3><a name="sec-15">8.1 `require': no such file to load -- gdbm</a></h3>
 
 
 <p>
@@ -670,19 +573,12 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 ex. for apt,
 
 </li>
-</ul>
-
-<p><pre>
+</ul><pre>
 apt-get install libgdbm-ruby
 </pre>
-</p>
-</div>
 
-</div>
 
-<div id="outline-container-7.2" class="outline-3">
-<h3 id="sec-7.2">7.2 `require': no such file to load &ndash; net/https </h3>
-<div id="text-7.2">
+<h3><a name="sec-16">8.2 `require': no such file to load -- net/https</a></h3>
 
 
 <p>
@@ -693,18 +589,11 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 ex. for apt,
 
 </li>
-</ul>
-
-<p><pre>
+</ul><pre>
 apt-get install libopenssl-ruby
 </pre>
-</p></div>
 
-</div>
-
-<div id="outline-container-7.3" class="outline-3">
-<h3 id="sec-7.3">7.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </h3>
-<div id="text-7.3">
+<h3><a name="sec-17">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby</a></h3>
 
 
 <p>
@@ -716,13 +605,9 @@ Prepend the correct ruby path to the exec-path.
 e.g.
 (setq exec-path (cons '/your/ruby/path' exec-path))
 </p>
-</div>
-</div>
-</div>
-<div id="postamble"><p class="author"> Author: Yusuke Kawakami
+<p class="author"> Author: Yusuke Kawakami
 <a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
 </p>
-<p class="date"> Date: 2011-04-30 03:02:43 JST</p>
-<p>HTML generated by org-mode 6.21b in emacs 23</p>
-</div></body>
+<p class="date"> Date: 2011/05/12 7:32:39</p>
+</body>
 </html>

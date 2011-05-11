@@ -274,6 +274,15 @@ The followings are other key assignments on Evernote Browser pages
 
 
 # <<Install and Settings>>
+* Bookmarks
+
+On Emacs 23.1 or later, you can set emacs bookmarks to the evernote notes.
+You can open immediately the note that you can refer frequently by using this feature.
+
+You can use the bookmarks in the same way as when using bookmarks to regular files.
+You can set a bookmark to a evernote note by executing 'bookmark-set' (C-x r m RET) in the buffer opening the evernote note.
+Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'list-bookmark' (C-x r l).
+
 * Install and Settings
 
   1. Install ruby scripts for using Evernote service.

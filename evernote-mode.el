@@ -1,5 +1,5 @@
 ;;
-;;  Copyright 2011 Yusuke Kawakami
+;;  Copyright 2011 Yusuke KAWAKAMI, Akihiro ARISAWA
 ;;
 ;;   Licensed under the Apache License, Version 2.0 (the "License");
 ;;   you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
-;; Author: Yusuke Kawakami
-;; Version: 0.31
-;; Keywords: tools
+;; Author: Yusuke KAWAKAMI
+;; Version: 0.32
+;; Keywords: tools, emacs, evernote, bookmark
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
 ;; The minor mode Evernote-mode is applied to the buffer editing a note of Evernote.
@@ -47,6 +47,18 @@
 
 (require 'tree-widget)
 
+(defun enh-bookmark-supported ()
+  (or (> emacs-major-version 23)
+      (and (= emacs-major-version 23)
+           (>= emacs-minor-version 1))))
+
+(when (enh-bookmark-supported)
+  (declare-function bookmark-default-handler "bookmark" (bmk-record))
+  (declare-function bookmark-get-bookmark-record "bookmark" (bookmark))
+  (declare-function bookmark-make-record-default
+                    "bookmark" (&optional no-file no-context posn))
+  (declare-function bookmark-name-from-full-record
+                    "bookmark" (full-record)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Macros
@@ -354,6 +366,8 @@
         (add-hook 'change-major-mode-hook
                   'evernote-mode-change-major-mode-hook
                   nil t)
+        (when (enh-bookmark-supported)
+          (enh-bookmark-prepare))
         (run-hooks 'evernote-mode-hook))
     (progn
       (setq evernote-note-guid nil)
@@ -1806,6 +1820,38 @@
     (if (and edit-mode (not (string= edit-mode "")))
         edit-mode
       default)))
+
+
+(defun enh-bookmark-make-record ()
+  "Make a emacs bookmark entry for a evernote buffer."
+  `(,(buffer-name)
+    ,@(bookmark-make-record-default 'no-file)
+    ;; if bookmark-bmenu-toggle-filenames is t and a bookmark record doesn't
+    ;; have filename field, , Emacs23.2 raises an error.
+    ;; Here is the workaround suggested by ARISAWA Akihiro.
+    (filename . ,(format "%s (evernote:%s)" (buffer-name) evernote-note-guid))
+    (handler . enh-bookmark-jump)))
+
+
+(defun enh-bookmark-jump (bookmark) ;; Note: don't rename this function for the bookmark file compatibility
+  "Default bookmark handler for evernote buffers."
+  (enh-command-with-auth
+   (let ((filename (bookmark-get-filename bookmark)))
+     (if (and filename (string-match "(evernote:\\(.*\\))$" filename))
+         (progn
+           (let* ((guid (substring filename (match-beginning 1) (match-end 1)))
+                  (attr (enh-command-get-note-attr guid)))
+             (enh-base-open-note-common attr)
+             (let ((buf (current-buffer)))
+               (bookmark-default-handler
+                `("" (buffer . ,buf) . ,(bookmark-get-bookmark-record bookmark))))))
+       (message (format "Invalid bookmark %s" (bookmark-name-from-full-record bookmark)))))))
+
+
+(defun enh-bookmark-prepare ()
+  (interactive)
+  (set (make-local-variable 'bookmark-make-record-function)
+       'enh-bookmark-make-record))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

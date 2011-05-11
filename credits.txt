@@ -6,3 +6,5 @@ feedback, bug reports, and testing:
 
 Akihiro ARISAWA
 Youhei SASAKI
+Ryo Onodera
+Felix Geller
