@@ -5,6 +5,6 @@ I would like to acknowledge those who have provided valuable
 feedback, bug reports, and testing:
 
 Akihiro ARISAWA
-Youhei SASAKI
-Ryo Onodera
 Felix Geller
+Ryo Onodera
+Youhei SASAKI
