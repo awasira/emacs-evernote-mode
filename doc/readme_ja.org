@@ -276,8 +276,7 @@ Evernote Browser ページ上でのその他のキーアサインは以下の通
 | d    | 現在のページを Evernote Browser から削除します                                                               |
 |------+--------------------------------------------------------------------------------------------------------------|
 
-
-# <<Install and Settings>>
+# <<Bookmarks>>
 * Bookmarks
 
 Emacs 23.1 以降を使用している場合、emacs のブックマークを evernote のノートに対して設定することができます。
@@ -287,6 +286,7 @@ Emacs 23.1 以降を使用している場合、emacs のブックマークを ev
 bookmark-set (C-x r m RET) をノートを開いているバッファで実行することでブックマークを登録します。
 また、登録されたブックマークは bookmark-jump (C-x r b bookmark RET) や list-bookmark (C-x r l) で参照できます。
 
+# <<Install and Settings>>
 * Install and Settings
 
   1. Evernoteサービス使用のために必要なRubyスクリプトをインストールする
@@ -336,6 +336,7 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
 
+# <<Troubleshooting>>
 * Troubleshooting
 
 ** `require': no such file to load -- gdbm と表示される
