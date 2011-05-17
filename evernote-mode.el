@@ -159,6 +159,7 @@
   "Major mode for browsing notes."
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
+  (setq evernote-browsing-mode t)
   (use-local-map evernote-browsing-mode-map)
   (setq truncate-lines t
         major-mode 'evernote-browsing-mode
@@ -328,7 +329,12 @@
   "Note contents as a string of XHTML")
 (make-variable-buffer-local 'evernote-note-xhtml-mode-content)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Menu Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar evernote-mode-display-menu t
+  "display the evernote menu on the menubar if this variable is not nil")
 
 (defvar evernote-mode-map (make-sparse-keymap)
   "Keymap used in evernote mode.")
@@ -338,6 +344,94 @@
 (define-key evernote-mode-map "\C-cer"   'evernote-rename-note)
 (define-key evernote-mode-map "\C-ced"   'evernote-delete-note)
 (define-key evernote-mode-map "\C-x\C-q" 'evernote-toggle-read-only)
+
+
+(defun enh-menu-is-visible-on-ordinary-mode ()
+	(not evernote-browsing-mode))
+
+(defun enh-menu-is-visible-on-evernote-mode ()
+	(and evernote-mode (not evernote-browsing-mode)))
+
+(defun enh-menu-is-visible-on-evernote-browsing-mode ()
+	evernote-browsing-mode)
+
+(let ((menu-bar-map (make-sparse-keymap "Evernote")))
+	(define-key-after global-map [menu-bar evernote]
+		`(menu-item "Evernote" ,menu-bar-map
+								:visible evernote-mode-display-menu)
+		'tools)
+	(define-key menu-bar-map [browser]
+		'(menu-item "Evernote Browser" evernote-browser
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [seperator-0]
+		'(menu-item "--" nil
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [toggle-read-only]
+		'(menu-item "Toggle Read Only" evernote-toggle-read-only
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [delete-note]
+		'(menu-item "Delete Note" evernote-delete-note
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [rename-note]
+		'(menu-item "Rename Note" evernote-rename-note
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [change-edit-mode]
+		'(menu-item "Change Edit Mode" evernote-change-edit-mode
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [edit-tag]
+		'(menu-item "Edit Tag" evernote-edit-tags
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [save-note]
+		'(menu-item "Save Note" evernote-save-note
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [seperator-1]
+		'(menu-item "--" nil
+								:visible (enh-menu-is-visible-on-evernote-mode)))
+	(define-key menu-bar-map [edit-search]
+		'(menu-item "Edit Saved Search" evernote-edit-search
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [create-search]
+		'(menu-item "Create Saved Search" evernote-create-search
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [do-saved-search]
+		'(menu-item "Do Saved Search" evernote-do-saved-search
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [search-note]
+		'(menu-item "Search Note" evernote-search-notes
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [seperator-2]
+		'(menu-item "--" nil
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [post-region]
+		'(menu-item "Post Region" evernote-write-note
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [write-note]
+		'(menu-item "Write Note" evernote-write-note
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [create-note]
+		'(menu-item "Create Note" evernote-create-note
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [open-note]
+		'(menu-item "Open Note" evernote-open-note
+								:visible (enh-menu-is-visible-on-ordinary-mode)))
+	(define-key menu-bar-map [browsing-prev-page]
+		'(menu-item "Prev Page" evernote-browsing-prev-page
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+	(define-key menu-bar-map [browsing-next-page]
+		'(menu-item "Next Page" evernote-browsing-next-page
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+	(define-key menu-bar-map [browsing-search-notes]
+		'(menu-item "Searche Notes" evernote-browsing-search-notes
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+	(define-key menu-bar-map [browsing-list-searches]
+		'(menu-item "List Saved Searches" evernote-browsing-list-searches
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+	(define-key menu-bar-map [browsing-list-tags]
+		'(menu-item "List Tags" evernote-browsing-list-tags
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+	(define-key menu-bar-map [browsing-list-notebooks]
+		'(menu-item "List Notebooks" evernote-browsing-list-notebooks
+								:visible (enh-menu-is-visible-on-evernote-browsing-mode))))
 
 
 (defun evernote-mode (&optional guid)
@@ -800,6 +894,40 @@
                 (exit-minibuffer)))))
     (kill-buffer (current-buffer))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; For Anything (Not tested yet)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(defun anything-c-evernote-title-set-candidates (title)
+;  (enh-command-with-auth
+;   (let ((note-attrs
+;          (enh-command-get-note-attrs-from-query
+;           (format "intitle:\"%s\"" title))))
+;       (enh-base-open-note-common (enh-base-read-note-attr note-attrs))
+;       (enh-browsing-update-page-list)
+;       (enh-browsing-push-page
+;        (enh-browsing-create-page 'note-list
+;                                  (format "Query Result of: %s" query)
+;                                  note-attrs)
+;        t))))
+;
+;
+;(defun anything-c-evernote-title-candidate-transformer (candidate)
+;  (cons (enutil-aget 'title candidate) candidate))
+;
+;
+;(defun anything-c-evernote-title-action (candidate)
+;  (enh-base-open-note-common candidate))
+;
+;
+;(defvar anything-c-source-evernote-title
+;  '((name . "Evernote Title")
+;    (candidates . anything-c-evernote-title-set-candidates)
+;    (candidate-transformer . anything-c-evernote-title-candidate-transformer)
+;    (action . (("Open" . anything-c-evernote-title-action)))
+;    (volatile)
+;    (requires-pattern . 3)
+;    (delayed)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helper functions for evernote-mode (enh-base-xxx)
@@ -1051,6 +1179,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helper functions for evernote-browsing-mode (enh-browsing-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar evernote-browsing-mode nil
+  "Non-nil if Evernote Browsing mode is enabled.")
+(make-variable-buffer-local 'evernote-browsing-mode)
 
 (defvar enh-browsing-page-type nil)
 (make-variable-buffer-local 'enh-browsing-page-type)
