@@ -1,4 +1,4 @@
-#! D:/Ruby191/bin/ruby.exe -sWKu
+#! /usr/bin/ruby1.8 -sWKu
 # -*- coding: utf-8 -*-
 
 #
@@ -236,8 +236,8 @@ end
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.32, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.32, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.33, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.33, :editmode => "XHTML"}|
 
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"

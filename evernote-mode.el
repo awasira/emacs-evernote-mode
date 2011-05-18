@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
 ;; Author: Yusuke KAWAKAMI
-;; Version: 0.32
+;; Version: 0.33
 ;; Keywords: tools, emacs, evernote, bookmark
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -895,39 +895,48 @@
     (kill-buffer (current-buffer))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; For Anything (Not tested yet)
+;; For Anything
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(defun anything-c-evernote-title-set-candidates (title)
-;  (enh-command-with-auth
-;   (let ((note-attrs
-;          (enh-command-get-note-attrs-from-query
-;           (format "intitle:\"%s\"" title))))
-;       (enh-base-open-note-common (enh-base-read-note-attr note-attrs))
-;       (enh-browsing-update-page-list)
-;       (enh-browsing-push-page
-;        (enh-browsing-create-page 'note-list
-;                                  (format "Query Result of: %s" query)
-;                                  note-attrs)
-;        t))))
-;
-;
-;(defun anything-c-evernote-title-candidate-transformer (candidate)
-;  (cons (enutil-aget 'title candidate) candidate))
-;
-;
-;(defun anything-c-evernote-title-action (candidate)
-;  (enh-base-open-note-common candidate))
-;
-;
-;(defvar anything-c-source-evernote-title
-;  '((name . "Evernote Title")
-;    (candidates . anything-c-evernote-title-set-candidates)
-;    (candidate-transformer . anything-c-evernote-title-candidate-transformer)
-;    (action . (("Open" . anything-c-evernote-title-action)))
-;    (volatile)
-;    (requires-pattern . 3)
-;    (delayed)))
+(defun anything-c-evernote-title-set-candidates ()
+  (let ((buffer (get-buffer enh-command-output-buffer-name))
+        candidates)
+    (when buffer ; create candidates only when logined.
+      (enh-command-with-auth
+       (setq candidates
+             (enh-command-get-note-attrs-from-query
+               ; Put '*' to match the start of a word.
+               ; Note: A wildcard is only permitted at the end of the term,
+               ;       not at the beginning or middle for scalability reasons on the service
+              (format "intitle:\"%s\"*" anything-input))))
+      candidates)))
+
+
+(defun anything-c-evernote-title-candidate-transformer (candidates)
+  (mapcar (lambda (cand)
+            (cons (enutil-aget 'title cand) cand))
+          candidates))
+
+
+(defun anything-c-evernote-title-action (candidate)
+  (enh-base-open-note-common candidate))
+
+
+(defvar anything-c-source-evernote-title
+  '((name . "Evernote Title")
+    (candidates . anything-c-evernote-title-set-candidates)
+    (candidate-transformer . anything-c-evernote-title-candidate-transformer)
+    (action . (("Open" . anything-c-evernote-title-action)))
+    (volatile)
+    (requires-pattern . 3)
+    (delayed)))
+
+
+(defun anything-evernote-title ()
+  "Preconfigured `anything' for searching notes with the note names."
+  (interactive)
+  (anything-other-buffer 'anything-c-source-evernote-title "*anything evernote title*"))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helper functions for evernote-mode (enh-base-xxx)
