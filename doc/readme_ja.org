@@ -364,7 +364,10 @@ apt-get install libopenssl-ruby
 
 emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
 OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path の先頭に正しい ruby のパスを設定して下さい。
+exec-path と PATH の先頭に正しい ruby のパスを設定して下さい。
 
 e.g.
-(setq exec-path (cons '/your/ruby/path' exec-path))
+    @<pre>
+    (add-to-list 'exec-path "/your/ruby/path")
+    (setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+    @</pre>
