@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-12 18:28:57 JST
+Date: 2011-05-19 00:11:20 JST
 
 
 Table of Contents
@@ -20,10 +20,11 @@ Table of Contents
 5 Evernote Browser 
 6 Bookmarks 
 7 Install and Settings 
-8 Troubleshooting 
-    8.1 `require': no such file to load -- gdbm と表示される 
-    8.2 `require': no such file to load -- net/https と表示される 
-    8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
+8 Collaboration with Anything 
+9 Troubleshooting 
+    9.1 `require': no such file to load -- gdbm と表示される 
+    9.2 `require': no such file to load -- net/https と表示される 
+    9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
 
 
 1 License 
@@ -47,6 +48,11 @@ Copyright 2011 Yusuke Kawakami
 ~~~~~~~~~~~~~~~
 
 Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集するための機能を提供します。現在このパッケージでは以下のインターフェースを提供しています。
+
+  - *Command: evernote-login*
+
+    evernote サービスにログインします。以下のコマンドはログイン時にのみ使用可能です。
+    ログインしていない状態で以下コマンドを実行した場合はログインプロンプトが表示されます。
 
   - *Command: evernote-open-note*
 
@@ -112,6 +118,18 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
     Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れされた検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。詳細は[Evernote Browser] を参照して下さい。
 
+  - *Variable: anything-c-source-evernote-title*
+
+    Anything([http://www.emacswiki.org/emacs/Anything]) からタイトルからノートの選択候補を表示する機能を提供する変数です。
+    詳細は [Collaboration with Anything] を参照して下さい。
+
+  - *Command: anything-evernote-title*
+
+    Anything を使ってタイトルからノートを開きます。
+
+  - *Variable: evernote-mode-display-menu*
+
+    非 nil の場合に evernote-mode 用のメニューをメニューバー上に表示します。(デフォルト: t)
 
 evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。
@@ -362,10 +380,25 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-8 Troubleshooting 
+8 Collaboration with Anything 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+evernote-mode は Anything([http://www.emacswiki.org/emacs/Anything]) で evernote のノート名から選択候補を表示する機能 (anything-c-source) を提供します。
+.emacs に以下の設定を追記することで、anything の選択候補に evernote のノート名を加えます。
+
+
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+
+
+また、Anything を使って Evernote のノート名のみから選択を行いたい場合は、 anything-evernote-title を使用できます。
+
+上記 Anything との協調機能は evernote にログインした状態でのみ (evernote-login, もしくは evernote-xxx コマンドを最初に実行した後)
+使用することができます。
+
+9 Troubleshooting 
 ~~~~~~~~~~~~~~~~~~
 
-8.1 `require': no such file to load -- gdbm と表示される 
+9.1 `require': no such file to load -- gdbm と表示される 
 =========================================================
 
 ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
@@ -377,7 +410,7 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
 apt-get install libgdbm-ruby
 
 
-8.2 `require': no such file to load -- net/https と表示される 
+9.2 `require': no such file to load -- net/https と表示される 
 ==============================================================
 
 ディストリビューションの設定によっては ruby が使用できる openssl ライブラリがインストールされてない場合があります。
@@ -388,12 +421,15 @@ apt-get install libgdbm-ruby
 
 apt-get install libopenssl-ruby
 
-8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
+9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される 
 ===========================================================================================
 
 emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
 OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path の先頭に正しい ruby のパスを設定して下さい。
+exec-path と PATH の先頭に正しい ruby のパスを設定して下さい。
 
 e.g.
-(setq exec-path (cons '/your/ruby/path' exec-path))
+    
+    (add-to-list 'exec-path "/your/ruby/path")
+    (setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+    

@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>Emacs evernote mode</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-05-12 18:28:52 JST"/>
+<meta name="generated" content="2011-05-19 00:12:27 JST"/>
 <meta name="author" content="Yusuke Kawakami"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -93,11 +93,12 @@ lang="en" xml:lang="en">
 <li><a href="#sec-5">5 Evernote Browser </a></li>
 <li><a href="#sec-6">6 Bookmarks </a></li>
 <li><a href="#sec-7">7 Install and Settings </a></li>
-<li><a href="#sec-8">8 Troubleshooting </a>
+<li><a href="#sec-8">8 Collaboration with Anything </a></li>
+<li><a href="#sec-9">9 Troubleshooting </a>
 <ul>
-<li><a href="#sec-8.1">8.1 `require': no such file to load &ndash; gdbm と表示される </a></li>
-<li><a href="#sec-8.2">8.2 `require': no such file to load &ndash; net/https と表示される </a></li>
-<li><a href="#sec-8.3">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される </a></li>
+<li><a href="#sec-9.1">9.1 `require': no such file to load &ndash; gdbm と表示される </a></li>
+<li><a href="#sec-9.2">9.2 `require': no such file to load &ndash; net/https と表示される </a></li>
+<li><a href="#sec-9.3">9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される </a></li>
 </ul>
 </li>
 </ul>
@@ -137,6 +138,14 @@ Copyright 2011 Yusuke Kawakami
 Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集するための機能を提供します。現在このパッケージでは以下のインターフェースを提供しています。
 </p>
 <ul>
+<li>
+<b>Command: evernote-login</b>
+
+<p>
+evernote サービスにログインします。以下のコマンドはログイン時にのみ使用可能です。
+ログインしていない状態で以下コマンドを実行した場合はログインプロンプトが表示されます。
+</p>
+</li>
 <li>
 <b>Command: evernote-open-note</b>
 
@@ -250,7 +259,28 @@ XHTMLモードのノートを読み込んだ際、もしくは書き込み可能
 <p>
 Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れされた検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。詳細は<a href="#sec-5">Evernote Browser</a> を参照して下さい。
 </p>
+</li>
+<li>
+<b>Variable: anything-c-source-evernote-title</b>
 
+<p>
+Anything(<a href="http://www.emacswiki.org/emacs/Anything">http://www.emacswiki.org/emacs/Anything</a>) からタイトルからノートの選択候補を表示する機能を提供する変数です。
+詳細は <a href="#sec-8">Collaboration with Anything</a> を参照して下さい。
+</p>
+</li>
+<li>
+<b>Command: anything-evernote-title</b>
+
+<p>
+Anything を使ってタイトルからノートを開きます。
+</p>
+</li>
+<li>
+<b>Variable: evernote-mode-display-menu</b>
+
+<p>
+非 nil の場合に evernote-mode 用のメニューをメニューバー上に表示します。(デフォルト: t)
+</p>
 </li>
 </ul>
 
@@ -666,16 +696,41 @@ proxy の設定
 </div>
 
 <div id="outline-container-8" class="outline-2">
-<h2 id="sec-8"><a name="Troubleshooting" id="Troubleshooting"></a>8 Troubleshooting </h2>
+<h2 id="sec-8"><a name="Collaboration==with==Anything" id="Collaboration==with==Anything"></a>8 Collaboration with Anything </h2>
 <div id="text-8">
+
+
+<p>
+evernote-mode は Anything(<a href="http://www.emacswiki.org/emacs/Anything">http://www.emacswiki.org/emacs/Anything</a>) で evernote のノート名から選択候補を表示する機能 (anything-c-source) を提供します。
+.emacs に以下の設定を追記することで、anything の選択候補に evernote のノート名を加えます。
+</p>
+<p>
+<pre>
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+</pre>
+</p>
+<p>
+また、Anything を使って Evernote のノート名のみから選択を行いたい場合は、 anything-evernote-title を使用できます。
+</p>
+<p>
+上記 Anything との協調機能は evernote にログインした状態でのみ (evernote-login, もしくは evernote-xxx コマンドを最初に実行した後)
+使用することができます。
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9"><a name="Troubleshooting" id="Troubleshooting"></a>9 Troubleshooting </h2>
+<div id="text-9">
 
 
 
 </div>
 
-<div id="outline-container-8.1" class="outline-3">
-<h3 id="sec-8.1">8.1 `require': no such file to load &ndash; gdbm と表示される </h3>
-<div id="text-8.1">
+<div id="outline-container-9.1" class="outline-3">
+<h3 id="sec-9.1">9.1 `require': no such file to load &ndash; gdbm と表示される </h3>
+<div id="text-9.1">
 
 
 <p>
@@ -697,9 +752,9 @@ apt-get install libgdbm-ruby
 
 </div>
 
-<div id="outline-container-8.2" class="outline-3">
-<h3 id="sec-8.2">8.2 `require': no such file to load &ndash; net/https と表示される </h3>
-<div id="text-8.2">
+<div id="outline-container-9.2" class="outline-3">
+<h3 id="sec-9.2">9.2 `require': no such file to load &ndash; net/https と表示される </h3>
+<div id="text-9.2">
 
 
 <p>
@@ -720,26 +775,29 @@ apt-get install libopenssl-ruby
 
 </div>
 
-<div id="outline-container-8.3" class="outline-3">
-<h3 id="sec-8.3">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される </h3>
-<div id="text-8.3">
+<div id="outline-container-9.3" class="outline-3">
+<h3 id="sec-9.3">9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される </h3>
+<div id="text-9.3">
 
 
 <p>
 emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
 OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path の先頭に正しい ruby のパスを設定して下さい。
+exec-path と PATH の先頭に正しい ruby のパスを設定して下さい。
 </p>
 <p>
 e.g.
-(setq exec-path (cons '/your/ruby/path' exec-path))
+<pre>
+(add-to-list 'exec-path "/your/ruby/path")
+(setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+</pre>
 </p></div>
 </div>
 </div>
 <div id="postamble"><p class="author"> Author: Yusuke Kawakami
 <a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
 </p>
-<p class="date"> Date: 2011-05-12 18:28:52 JST</p>
+<p class="date"> Date: 2011-05-19 00:12:27 JST</p>
 <p>HTML generated by org-mode 6.21b in emacs 23</p>
 </div></body>
 </html>

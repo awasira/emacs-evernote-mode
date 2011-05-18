@@ -26,6 +26,11 @@ Copyright 2011 Yusuke Kawakami
 
 Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集するための機能を提供します。現在このパッケージでは以下のインターフェースを提供しています。
 
+  - *Command: evernote-login*
+
+    evernote サービスにログインします。以下のコマンドはログイン時にのみ使用可能です。
+    ログインしていない状態で以下コマンドを実行した場合はログインプロンプトが表示されます。
+
   - *Command: evernote-open-note*
 
     既存のノートをemacsバッファに読み込みます。ミニバッファでタグを入力後、続いてノートの名前を入力します。
@@ -90,6 +95,18 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
     Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れされた検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。詳細は[[Evernote Browser]] を参照して下さい。
 
+  - *Variable: anything-c-source-evernote-title*
+
+    Anything(http://www.emacswiki.org/emacs/Anything) からタイトルからノートの選択候補を表示する機能を提供する変数です。
+    詳細は [[Collaboration with Anything]] を参照して下さい。
+
+  - *Command: anything-evernote-title*
+
+    Anything を使ってタイトルからノートを開きます。
+
+  - *Variable: evernote-mode-display-menu*
+
+    非 nil の場合に evernote-mode 用のメニューをメニューバー上に表示します。(デフォルト: t)
 
 evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。
@@ -335,6 +352,21 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
   5. proxy の設定
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
+
+# <<Collaboration with Anything>>
+* Collaboration with Anything
+
+evernote-mode は Anything(http://www.emacswiki.org/emacs/Anything) で evernote のノート名から選択候補を表示する機能 (anything-c-source) を提供します。
+.emacs に以下の設定を追記することで、anything の選択候補に evernote のノート名を加えます。
+
+@<pre>
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+@</pre>
+
+また、Anything を使って Evernote のノート名のみから選択を行いたい場合は、 anything-evernote-title を使用できます。
+
+上記 Anything との協調機能は evernote にログインした状態でのみ (evernote-login, もしくは evernote-xxx コマンドを最初に実行した後)
+使用することができます。
 
 # <<Troubleshooting>>
 * Troubleshooting

@@ -27,6 +27,11 @@ Copyright 2011 Yusuke Kawakami
 
 Emacs evernote mode offers functions to refer and edit Evernote notes directly from Emacs. Currently this package offers the following interfaces.
 
+  - *Command: evernote-login*
+
+    Login to Evernote. The following commands are available only when you login.
+    If you execute the following commands without the login, the login prompt will be shown.
+
   - *Command: evernote-open-note*
 
     Read an existing note to an Emacs buffer. At first, input tags attached to the notes, then input the name of the note on the minibuffer.
@@ -90,6 +95,19 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
   - *Command: evernote-browser*
 
     Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See [[Evernote Browser]] for details.
+
+  - *Variable: anything-c-source-evernote-title*
+
+    The variable that offers the function for Anything(http://www.emacswiki.org/emacs/Anything) to display the note candidates from the title.
+    See [[Collaboration with Anything]] for details.
+
+  - *Command: anything-evernote-title*
+
+    Open a note by using Anything. See [[Collaboration with Anything]] for details.
+
+  - *Variable: evernote-mode-display-menu*
+
+    Display the menu on the menubar for evernote-mode (default: t)
 
 When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.
@@ -333,6 +351,22 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
+
+# <<Collaboration with Anything>>
+* Collaboration with Anything
+
+evernote-mode offers the function for Anything(http://www.emacswiki.org/emacs/Anything) to display the note candidates from the title.
+You can add the evernote note titles to the source of candidates of Anything by adding the following configuration to your .emacs.
+
+@<pre>
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+@</pre>
+
+You can also use 'anything-evernote-title' to choose the candidates only from the evernote notes.
+The above features for Anything are available only when you login the evernote service
+(after executing evernote-login or the first time you use the command evernote-xxx).
+
+# <<Troubleshooting>>
 * Troubleshooting
 
 ** `require': no such file to load -- gdbm

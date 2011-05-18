@@ -2,12 +2,12 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-12 18:27:41 JST
+Date: 2011-05-19 00:12:49 JST
 
 
 Table of Contents
 =================
-1 License 
+1  License 
 2 Introduction 
 3 Evernote note edit mode 
     3.1 XHTML mode 
@@ -20,10 +20,11 @@ Table of Contents
 5 Evernote Browser 
 6 Bookmarks 
 7 Install and Settings 
-8 Troubleshooting 
-    8.1 `require': no such file to load -- gdbm 
-    8.2 `require': no such file to load -- net/https 
-    8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby 
+8 Collaboration with Anything 
+9 Troubleshooting 
+    9.1 `require': no such file to load -- gdbm 
+    9.2 `require': no such file to load -- net/https 
+    9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby 
 
 
 1 License 
@@ -48,6 +49,11 @@ Copyright 2011 Yusuke Kawakami
 ~~~~~~~~~~~~~~~
 
 Emacs evernote mode offers functions to refer and edit Evernote notes directly from Emacs. Currently this package offers the following interfaces.
+
+  - *Command: evernote-login*
+
+    Login to Evernote. The following commands are available only when you login.
+    If you execute the following commands without the login, the login prompt will be shown.
 
   - *Command: evernote-open-note*
 
@@ -112,6 +118,19 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
   - *Command: evernote-browser*
 
     Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See [Evernote Browser] for details.
+
+  - *Variable: anything-c-source-evernote-title*
+
+    The variable that offers the function for Anything([http://www.emacswiki.org/emacs/Anything]) to display the note candidates from the title.
+    See [Collaboration with Anything] for details.
+
+  - *Command: anything-evernote-title*
+
+    Open a note by using Anything. See [Collaboration with Anything] for details.
+
+  - *Variable: evernote-mode-display-menu*
+
+    Display the menu on the menubar for evernote-mode (default: t)
 
 When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.
@@ -359,10 +378,25 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-8 Troubleshooting 
+
+8 Collaboration with Anything 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+evernote-mode offers the function for Anything([http://www.emacswiki.org/emacs/Anything]) to display the note candidates from the title.
+You can add the evernote note titles to the source of candidates of Anything by adding the following configuration to your .emacs.
+
+
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+
+
+You can also use 'anything-evernote-title' to choose the candidates only from the evernote notes.
+The above features for Anything are available only when you login the evernote service
+(after executing evernote-login or the first time you use the command evernote-xxx).
+
+9 Troubleshooting 
 ~~~~~~~~~~~~~~~~~~
 
-8.1 `require': no such file to load -- gdbm 
+9.1 `require': no such file to load -- gdbm 
 ============================================
 
 Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby for using GDBM.
@@ -373,7 +407,7 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 apt-get install libgdbm-ruby
 
 
-8.2 `require': no such file to load -- net/https 
+9.2 `require': no such file to load -- net/https 
 =================================================
 
 Some distributions do not have the openssl library for ruby. Install libopenssl-ruby for using https.
@@ -383,13 +417,15 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 
 apt-get install libopenssl-ruby
 
-8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby 
+9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby 
 ==============================================================
 
 The emacs variable "exec-path" may not contain the path of ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
 This may happen when multiple version of ruby are installed in the OS.
-Prepend the correct ruby path to the exec-path.
+Prepend the correct ruby path to the exec-path and PATH.
 
 e.g.
-(setq exec-path (cons '/your/ruby/path' exec-path))
-
+    
+    (add-to-list 'exec-path "/your/ruby/path")
+    (setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+    

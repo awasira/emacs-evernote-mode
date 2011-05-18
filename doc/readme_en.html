@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>Emacs evernote mode</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-05-12 18:27:34 JST"/>
+<meta name="generated" content="2011-05-19 00:12:41 JST"/>
 <meta name="author" content="Yusuke Kawakami"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -93,11 +93,12 @@ lang="en" xml:lang="en">
 <li><a href="#sec-5">5 Evernote Browser </a></li>
 <li><a href="#sec-6">6 Bookmarks </a></li>
 <li><a href="#sec-7">7 Install and Settings </a></li>
-<li><a href="#sec-8">8 Troubleshooting </a>
+<li><a href="#sec-8">8 Collaboration with Anything </a></li>
+<li><a href="#sec-9">9 Troubleshooting </a>
 <ul>
-<li><a href="#sec-8.1">8.1 `require': no such file to load &ndash; gdbm </a></li>
-<li><a href="#sec-8.2">8.2 `require': no such file to load &ndash; net/https </a></li>
-<li><a href="#sec-8.3">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </a></li>
+<li><a href="#sec-9.1">9.1 `require': no such file to load &ndash; gdbm </a></li>
+<li><a href="#sec-9.2">9.2 `require': no such file to load &ndash; net/https </a></li>
+<li><a href="#sec-9.3">9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </a></li>
 </ul>
 </li>
 </ul>
@@ -138,6 +139,14 @@ Copyright 2011 Yusuke Kawakami
 Emacs evernote mode offers functions to refer and edit Evernote notes directly from Emacs. Currently this package offers the following interfaces.
 </p>
 <ul>
+<li>
+<b>Command: evernote-login</b>
+
+<p>
+Login to Evernote. The following commands are available only when you login.
+If you execute the following commands without the login, the login prompt will be shown.
+</p>
+</li>
 <li>
 <b>Command: evernote-open-note</b>
 
@@ -250,6 +259,28 @@ The command to format XHTML. When a note of XHTML mode is read-only, the command
 
 <p>
 Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See <a href="#sec-5">Evernote Browser</a> for details.
+</p>
+</li>
+<li>
+<b>Variable: anything-c-source-evernote-title</b>
+
+<p>
+The variable that offers the function for Anything(<a href="http://www.emacswiki.org/emacs/Anything">http://www.emacswiki.org/emacs/Anything</a>) to display the note candidates from the title.
+See <a href="#sec-8">Collaboration with Anything</a> for details.
+</p>
+</li>
+<li>
+<b>Command: anything-evernote-title</b>
+
+<p>
+Open a note by using Anything. See <a href="#sec-8">Collaboration with Anything</a> for details.
+</p>
+</li>
+<li>
+<b>Variable: evernote-mode-display-menu</b>
+
+<p>
+Display the menu on the menubar for evernote-mode (default: t)
 </p>
 </li>
 </ul>
@@ -662,6 +693,7 @@ Proxy settings
 <p>
 If you want to use the proxy, set the value to the environment variable 'EN_PROXY' written as 'host:port' format. (ex. export EN_PROXY=proxy.hoge.com:8080)
 </p>
+
 </li>
 </ol>
 </div>
@@ -669,16 +701,39 @@ If you want to use the proxy, set the value to the environment variable 'EN_PROX
 </div>
 
 <div id="outline-container-8" class="outline-2">
-<h2 id="sec-8">8 Troubleshooting </h2>
+<h2 id="sec-8"><a name="Collaboration==with==Anything" id="Collaboration==with==Anything"></a>8 Collaboration with Anything </h2>
 <div id="text-8">
+
+
+<p>
+evernote-mode offers the function for Anything(<a href="http://www.emacswiki.org/emacs/Anything">http://www.emacswiki.org/emacs/Anything</a>) to display the note candidates from the title.
+You can add the evernote note titles to the source of candidates of Anything by adding the following configuration to your .emacs.
+</p>
+<p>
+<pre>
+(add-to-list 'anything-sources anything-c-source-evernote-title)
+</pre>
+</p>
+<p>
+You can also use 'anything-evernote-title' to choose the candidates only from the evernote notes.
+The above features for Anything are available only when you login the evernote service
+(after executing evernote-login or the first time you use the command evernote-xxx).
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9"><a name="Troubleshooting" id="Troubleshooting"></a>9 Troubleshooting </h2>
+<div id="text-9">
 
 
 
 </div>
 
-<div id="outline-container-8.1" class="outline-3">
-<h3 id="sec-8.1">8.1 `require': no such file to load &ndash; gdbm </h3>
-<div id="text-8.1">
+<div id="outline-container-9.1" class="outline-3">
+<h3 id="sec-9.1">9.1 `require': no such file to load &ndash; gdbm </h3>
+<div id="text-9.1">
 
 
 <p>
@@ -699,9 +754,9 @@ apt-get install libgdbm-ruby
 
 </div>
 
-<div id="outline-container-8.2" class="outline-3">
-<h3 id="sec-8.2">8.2 `require': no such file to load &ndash; net/https </h3>
-<div id="text-8.2">
+<div id="outline-container-9.2" class="outline-3">
+<h3 id="sec-9.2">9.2 `require': no such file to load &ndash; net/https </h3>
+<div id="text-9.2">
 
 
 <p>
@@ -721,27 +776,29 @@ apt-get install libopenssl-ruby
 
 </div>
 
-<div id="outline-container-8.3" class="outline-3">
-<h3 id="sec-8.3">8.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </h3>
-<div id="text-8.3">
+<div id="outline-container-9.3" class="outline-3">
+<h3 id="sec-9.3">9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </h3>
+<div id="text-9.3">
 
 
 <p>
 The emacs variable "exec-path" may not contain the path of ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
 This may happen when multiple version of ruby are installed in the OS.
-Prepend the correct ruby path to the exec-path.
+Prepend the correct ruby path to the exec-path and PATH.
 </p>
 <p>
 e.g.
-(setq exec-path (cons '/your/ruby/path' exec-path))
-</p>
-</div>
+<pre>
+(add-to-list 'exec-path "/your/ruby/path")
+(setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+</pre>
+</p></div>
 </div>
 </div>
 <div id="postamble"><p class="author"> Author: Yusuke Kawakami
 <a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
 </p>
-<p class="date"> Date: 2011-05-12 18:27:34 JST</p>
+<p class="date"> Date: 2011-05-19 00:12:41 JST</p>
 <p>HTML generated by org-mode 6.21b in emacs 23</p>
 </div></body>
 </html>
