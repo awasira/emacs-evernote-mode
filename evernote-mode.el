@@ -403,7 +403,7 @@
 		'(menu-item "--" nil
 								:visible (enh-menu-is-visible-on-ordinary-mode)))
 	(define-key menu-bar-map [post-region]
-		'(menu-item "Post Region" evernote-write-note
+		'(menu-item "Post Region" evernote-post-region
 								:visible (enh-menu-is-visible-on-ordinary-mode)))
 	(define-key menu-bar-map [write-note]
 		'(menu-item "Write Note" evernote-write-note
