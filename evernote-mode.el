@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
 ;; Author: Yusuke KAWAKAMI
-;; Version: 0.33
+;; Version: 0.34
 ;; Keywords: tools, emacs, evernote, bookmark
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -329,6 +329,9 @@
   "Note contents as a string of XHTML")
 (make-variable-buffer-local 'evernote-note-xhtml-mode-content)
 
+(defvar evernote-username nil
+  "*An username of your evernote")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -476,9 +479,24 @@
   "Login"
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
-  (let* ((user (read-string "Evernote user name:"))
-         (passwd (read-passwd "Passwd:")))
-    (enh-command-login user passwd)))
+  (unwind-protect
+      (let* ((cache (enh-password-cache-load))
+	     (usernames (mapcar #'car cache))
+	     (username (or evernote-username
+			   (read-string "Evernote user name:"
+					(car usernames) 'usernames)))
+	     (cache-passwd (enutil-aget username cache)))
+	(unless (and cache-passwd
+		     (eq (catch 'error 
+			   (progn 
+			     (enh-command-login username cache-passwd)
+			     t))
+			 t))
+	  (let* ((passwd (read-passwd "Passwd:")))
+	    (enh-command-login username passwd)
+	    (setq evernote-username username)
+	    (enh-password-cache-save (enutil-aset username cache passwd)))))
+    (enh-password-cache-close)))
 
 
 (defun evernote-open-note ()
@@ -1739,6 +1757,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+(defvar evernote-password-cache-file
+  (and (fboundp 'epa-file-handler) (executable-find "gpg")
+       "~/.evernote-mode/password.gpg")
+  "*Filename of saving password cache.
+It is recommended to encrypt the file.")
+
+
 (defvar enh-notebook-info (make-hash-table :test #'equal)
   "Notebook info associated with the guid")
 
@@ -1753,6 +1778,9 @@
 
 (defvar enh-note-attr nil
   "Note attr associated with most recently accessed guid")
+
+
+(defvar enh-password-cache-buffer " *evernote-password-cache*")
 
 
 (defun enh-get-notebook-attrs ()
@@ -1995,6 +2023,29 @@
        'enh-bookmark-make-record))
 
 
+(defun enh-password-cache-load ()
+  "Load the password cache from the file"
+  (when (and evernote-password-cache-file
+	     (file-exists-p evernote-password-cache-file))
+    (with-current-buffer (get-buffer-create enh-password-cache-buffer)
+      (insert-file-contents evernote-password-cache-file)
+      (read (current-buffer)))))
+
+
+(defun enh-password-cache-save (user-password)
+  "Save the password cache to the file"
+  (when evernote-password-cache-file
+    (with-current-buffer (get-buffer-create enh-password-cache-buffer)
+      (write-region (prin1-to-string user-password) nil
+		    evernote-password-cache-file))))
+
+
+(defun enh-password-cache-close ()
+  "Close the password cache buffer"
+  (when (get-buffer enh-password-cache-buffer)
+    (kill-buffer enh-password-cache-buffer)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General util functions (enutil-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2024,8 +2075,10 @@
 
 (defun enutil-aset (key alist value)
   (let ((result-cons (assoc key alist)))
-    (when result-cons
-      (setcdr result-cons value))))
+    (if result-cons
+	(setcdr result-cons value)
+      (setq alist (cons (cons key value) alist)))
+    alist))
 
 
 (defun enutil-get-current-line-string ()

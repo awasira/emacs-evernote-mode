@@ -32,6 +32,10 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
     Login to Evernote. The following commands are available only when you login.
     If you execute the following commands without the login, the login prompt will be shown.
 
+  - *Variable: evernote-usename*
+
+    An username of your evernote.
+
   - *Command: evernote-open-note*
 
     Read an existing note to an Emacs buffer. At first, input tags attached to the notes, then input the name of the note on the minibuffer.
@@ -108,6 +112,10 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
   - *Variable: evernote-mode-display-menu*
 
     Display the menu on the menubar for evernote-mode (default: t)
+
+  - *Variable: evernote-password-cache-file*
+
+    Filename of saving password cache. It is recommended to encrypt the file with EasyPG.
 
 When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.

@@ -31,6 +31,10 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
     evernote サービスにログインします。以下のコマンドはログイン時にのみ使用可能です。
     ログインしていない状態で以下コマンドを実行した場合はログインプロンプトが表示されます。
 
+  - *Variable: evernote-usename*
+
+    evernote サービスのユーザ名を指定します。
+
   - *Command: evernote-open-note*
 
     既存のノートをemacsバッファに読み込みます。ミニバッファでタグを入力後、続いてノートの名前を入力します。
@@ -107,6 +111,10 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
   - *Variable: evernote-mode-display-menu*
 
     非 nil の場合に evernote-mode 用のメニューをメニューバー上に表示します。(デフォルト: t)
+
+  - *Variable: evernote-password-cache-file*
+
+    パスワードをキャッシュしておくファイルです。EasyPG を利用し、暗号化することを推奨します。
 
 evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。

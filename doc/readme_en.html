@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -6,18 +7,20 @@ lang="en" xml:lang="en">
 <title>Emacs evernote mode</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-05-19 00:12:41 JST"/>
+<meta name="generated" content="2011-05-22 18:44:43 JST"/>
 <meta name="author" content="Yusuke Kawakami"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   html { font-family: Times, serif; font-size: 12pt; }
   .title  { text-align: center; }
   .todo   { color: red; }
   .done   { color: green; }
-  .tag    { background-color:lightblue; font-weight:normal }
+  .tag    { background-color: #add8e6; font-weight:normal }
   .target { }
-  .timestamp { color: grey }
-  .timestamp-kwd { color: CadetBlue }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
   p.verse { margin-left: 3% }
   pre {
 	border: 1pt solid #AEBDCC;
@@ -61,9 +64,12 @@ lang="en" xml:lang="en">
    if(elem.cacheClassTarget)
      target.className = elem.cacheClassTarget;
  }
-/*]]>*/-->
+/*]]>*///-->
 </script>
-</head><body>
+</head>
+<body>
+<div id="content">
+
 <h1 class="title">Emacs evernote mode</h1>
 
 
@@ -106,8 +112,8 @@ lang="en" xml:lang="en">
 </div>
 
 <div id="outline-container-1" class="outline-2">
-<h2 id="sec-1"><a name="License" id="License"></a>1  License </h2>
-<div id="text-1">
+<h2 id="sec-1"><a name="License" id="License"></a><span class="section-number-2">1</span>  License </h2>
+<div class="outline-text-2" id="text-1">
 
 <pre>
 Copyright 2011 Yusuke Kawakami
@@ -126,13 +132,14 @@ Copyright 2011 Yusuke Kawakami
 
 
 </pre>
+
 </div>
 
 </div>
 
 <div id="outline-container-2" class="outline-2">
-<h2 id="sec-2"><a name="Introduction" id="Introduction"></a>2 Introduction </h2>
-<div id="text-2">
+<h2 id="sec-2"><a name="Introduction" id="Introduction"></a><span class="section-number-2">2</span> Introduction </h2>
+<div class="outline-text-2" id="text-2">
 
 
 <p>
@@ -145,6 +152,13 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 <p>
 Login to Evernote. The following commands are available only when you login.
 If you execute the following commands without the login, the login prompt will be shown.
+</p>
+</li>
+<li>
+<b>Variable: evernote-usename</b>
+
+<p>
+An username of your evernote.
 </p>
 </li>
 <li>
@@ -283,6 +297,13 @@ Open a note by using Anything. See <a href="#sec-8">Collaboration with Anything<
 Display the menu on the menubar for evernote-mode (default: t)
 </p>
 </li>
+<li>
+<b>Variable: evernote-password-cache-file</b>
+
+<p>
+Filename of saving password cache. It is recommended to encrypt the file with EasyPG.
+</p>
+</li>
 </ul>
 
 <p>When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
@@ -316,8 +337,8 @@ evernote-delete-note
 </div>
 
 <div id="outline-container-3" class="outline-2">
-<h2 id="sec-3"><a name="Evernote==note==edit==mode" id="Evernote==note==edit==mode"></a>3 Evernote note edit mode </h2>
-<div id="text-3">
+<h2 id="sec-3"><a name="Evernote==note==edit==mode" id="Evernote==note==edit==mode"></a><span class="section-number-2">3</span> Evernote note edit mode </h2>
+<div class="outline-text-2" id="text-3">
 
 
 <p>
@@ -328,8 +349,8 @@ Evernote notes are XML complying with ENML DTD(<a href="http://xml.evernote.com/
 </div>
 
 <div id="outline-container-3.1" class="outline-3">
-<h3 id="sec-3.1">3.1 XHTML mode </h3>
-<div id="text-3.1">
+<h3 id="sec-3.1"><span class="section-number-3">3.1</span> XHTML mode </h3>
+<div class="outline-text-3" id="text-3.1">
 
 
 <p>
@@ -343,8 +364,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
 </div>
 
 <div id="outline-container-3.1.1" class="outline-4">
-<h4 id="sec-3.1.1">3.1.1  An example of XHTML mode editing: </h4>
-<div id="text-3.1.1">
+<h4 id="sec-3.1.1"><span class="section-number-4">3.1.1</span>  An example of XHTML mode editing: </h4>
+<div class="outline-text-4" id="text-3.1.1">
 
 <pre>
    Emacs Buffer
@@ -356,7 +377,6 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.&lt;br clear="none"/&gt;
    &lt;/en-note&gt;
    -----------------------------------
-   |
    | save on XHTML mode
    V
    The content of the note (same as the emacs buffer)
@@ -368,7 +388,6 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.&lt;br clear="none"/&gt;
    &lt;/en-note&gt;
    -----------------------------------
-   |
    | read on XHTML mode
    V
    Emacs Buffer (read-only and formatted)
@@ -377,7 +396,6 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-   |
    |toggle read-only(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs Buffer (unformatted)
@@ -392,14 +410,15 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
 
 
 </pre>
+
 </div>
 </div>
 
 </div>
 
 <div id="outline-container-3.2" class="outline-3">
-<h3 id="sec-3.2">3.2 TEXT mode </h3>
-<div id="text-3.2">
+<h3 id="sec-3.2"><span class="section-number-3">3.2</span> TEXT mode </h3>
+<div class="outline-text-3" id="text-3.2">
 
 
 <p>
@@ -413,8 +432,8 @@ The text mode is specialized in editing Evernote notes that only contain text co
 </div>
 
 <div id="outline-container-3.2.1" class="outline-4">
-<h4 id="sec-3.2.1">3.2.1  An example of TEXT mode editing: </h4>
-<div id="text-3.2.1">
+<h4 id="sec-3.2.1"><span class="section-number-4">3.2.1</span>  An example of TEXT mode editing: </h4>
+<div class="outline-text-4" id="text-3.2.1">
 
 <pre>
 Emacs Buffer
@@ -423,7 +442,6 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-   |
    | save on TEXT mode
    V
    The content of the note (escaped and transformed into a XML)
@@ -435,7 +453,6 @@ Emacs Buffer
    saving and reading the Evenote notes.&lt;br clear="none"/&gt;
    &lt;/en-note&gt;
    -----------------------------------
-   |
    | read on TEXT mode
    V
    Emacs Buffer (unescaped and transformed int a text)
@@ -446,14 +463,15 @@ Emacs Buffer
    -----------------------------------
 
 </pre>
+
 </div>
 </div>
 
 </div>
 
 <div id="outline-container-3.3" class="outline-3">
-<h3 id="sec-3.3">3.3 Select edit mode </h3>
-<div id="text-3.3">
+<h3 id="sec-3.3"><span class="section-number-3">3.3</span> Select edit mode </h3>
+<div class="outline-text-3" id="text-3.3">
 
 
 <p>
@@ -465,8 +483,8 @@ You can select the edit mode when you create a note. The edit mode is recorded i
 </div>
 
 <div id="outline-container-3.4" class="outline-3">
-<h3 id="sec-3.4">3.4 Change edit mode </h3>
-<div id="text-3.4">
+<h3 id="sec-3.4"><span class="section-number-3">3.4</span> Change edit mode </h3>
+<div class="outline-text-3" id="text-3.4">
 
 
 <p>
@@ -479,8 +497,8 @@ Use the command evernote-change-edit-mode to change the edit mode of the existin
 </div>
 
 <div id="outline-container-4" class="outline-2">
-<h2 id="sec-4"><a name="Search==Query==Examples" id="Search==Query==Examples"></a>4 Search Query Examples </h2>
-<div id="text-4">
+<h2 id="sec-4"><a name="Search==Query==Examples" id="Search==Query==Examples"></a><span class="section-number-2">4</span> Search Query Examples </h2>
+<div class="outline-text-2" id="text-4">
 
 
 <p>
@@ -531,8 +549,8 @@ Find notes that either include the text "San Francisco" or are tagged with the "
 </div>
 
 <div id="outline-container-5" class="outline-2">
-<h2 id="sec-5"><a name="Evernote==Browser" id="Evernote==Browser"></a>5 Evernote Browser </h2>
-<div id="text-5">
+<h2 id="sec-5"><a name="Evernote==Browser" id="Evernote==Browser"></a><span class="section-number-2">5</span> Evernote Browser </h2>
+<div class="outline-text-2" id="text-5">
 
 
 <p>
@@ -574,9 +592,11 @@ A notebook list page shows the notebook list created on Evernote service. Pressi
 <p>
 The followings are other key assignments on Evernote Browser pages
 </p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col>
+<caption></caption>
+<colgroup><col align="left" /><col align="left" />
+</colgroup>
 <thead>
-<tr><th>Key</th><th>Action</th></tr>
+<tr><th scope="col">Key</th><th scope="col">Action</th></tr>
 </thead>
 <tbody>
 <tr><td>b</td><td>move to the previous page</td></tr>
@@ -599,8 +619,8 @@ The followings are other key assignments on Evernote Browser pages
 </div>
 
 <div id="outline-container-6" class="outline-2">
-<h2 id="sec-6"><a name="Bookmarks" id="Bookmarks"></a>6 Bookmarks </h2>
-<div id="text-6">
+<h2 id="sec-6"><a name="Bookmarks" id="Bookmarks"></a><span class="section-number-2">6</span> Bookmarks </h2>
+<div class="outline-text-2" id="text-6">
 
 
 <p>
@@ -617,8 +637,8 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
 </div>
 
 <div id="outline-container-7" class="outline-2">
-<h2 id="sec-7"><a name="Install==and==Settings" id="Install==and==Settings"></a>7 Install and Settings </h2>
-<div id="text-7">
+<h2 id="sec-7"><a name="Install==and==Settings" id="Install==and==Settings"></a><span class="section-number-2">7</span> Install and Settings </h2>
+<div class="outline-text-2" id="text-7">
 
 
 <ol>
@@ -701,8 +721,8 @@ If you want to use the proxy, set the value to the environment variable 'EN_PROX
 </div>
 
 <div id="outline-container-8" class="outline-2">
-<h2 id="sec-8"><a name="Collaboration==with==Anything" id="Collaboration==with==Anything"></a>8 Collaboration with Anything </h2>
-<div id="text-8">
+<h2 id="sec-8"><a name="Collaboration==with==Anything" id="Collaboration==with==Anything"></a><span class="section-number-2">8</span> Collaboration with Anything </h2>
+<div class="outline-text-2" id="text-8">
 
 
 <p>
@@ -724,16 +744,16 @@ The above features for Anything are available only when you login the evernote s
 </div>
 
 <div id="outline-container-9" class="outline-2">
-<h2 id="sec-9"><a name="Troubleshooting" id="Troubleshooting"></a>9 Troubleshooting </h2>
-<div id="text-9">
+<h2 id="sec-9"><a name="Troubleshooting" id="Troubleshooting"></a><span class="section-number-2">9</span> Troubleshooting </h2>
+<div class="outline-text-2" id="text-9">
 
 
 
 </div>
 
 <div id="outline-container-9.1" class="outline-3">
-<h3 id="sec-9.1">9.1 `require': no such file to load &ndash; gdbm </h3>
-<div id="text-9.1">
+<h3 id="sec-9.1"><span class="section-number-3">9.1</span> `require': no such file to load &ndash; gdbm </h3>
+<div class="outline-text-3" id="text-9.1">
 
 
 <p>
@@ -755,8 +775,8 @@ apt-get install libgdbm-ruby
 </div>
 
 <div id="outline-container-9.2" class="outline-3">
-<h3 id="sec-9.2">9.2 `require': no such file to load &ndash; net/https </h3>
-<div id="text-9.2">
+<h3 id="sec-9.2"><span class="section-number-3">9.2</span> `require': no such file to load &ndash; net/https </h3>
+<div class="outline-text-3" id="text-9.2">
 
 
 <p>
@@ -777,8 +797,8 @@ apt-get install libopenssl-ruby
 </div>
 
 <div id="outline-container-9.3" class="outline-3">
-<h3 id="sec-9.3">9.3 condition-case: Wrong type argument: listp, /usr/bin/ruby </h3>
-<div id="text-9.3">
+<h3 id="sec-9.3"><span class="section-number-3">9.3</span> condition-case: Wrong type argument: listp, /usr/bin/ruby </h3>
+<div class="outline-text-3" id="text-9.3">
 
 
 <p>
@@ -795,10 +815,13 @@ e.g.
 </p></div>
 </div>
 </div>
-<div id="postamble"><p class="author"> Author: Yusuke Kawakami
+<div id="postamble">
+<p class="author"> Author: Yusuke Kawakami
 <a href="mailto:Yusuke Kawakami">&lt;Yusuke Kawakami&gt;</a>
 </p>
-<p class="date"> Date: 2011-05-19 00:12:41 JST</p>
-<p>HTML generated by org-mode 6.21b in emacs 23</p>
-</div></body>
+<p class="date"> Date: 2011-05-22 18:44:43 JST</p>
+<p class="creator">HTML generated by org-mode 6.33x in emacs 23</p>
+</div>
+</div>
+</body>
 </html>
