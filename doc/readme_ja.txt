@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-22 18:40:44 JST
+Date: 2011-05-23 23:04:17 JST
 
 
 Table of Contents
@@ -139,9 +139,13 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
     非 nil の場合に evernote-mode 用のメニューをメニューバー上に表示します。(デフォルト: t)
 
-  - *Variable: evernote-password-cache-file*
+  - *Variable: evernote-password-cache*
 
-    パスワードをキャッシュしておくファイルです。EasyPG を利用し、暗号化することを推奨します。
+    非 nil の場合にパスワードのキャッシュを有効にします。
+    有効にする時は、EasyPG([http://epg.sourceforge.jp/])を使って暗号化することを推奨します。EasyPG は Emacs 23 以降には含まれています。Emacs 22 では EasyPG をインストールし、.emacs に以下を記述してください。
+    
+    (require 'epa-setup)
+    
 
 evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。

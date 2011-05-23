@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-22 18:44:41 JST
+Date: 2011-05-23 23:04:09 JST
 
 
 Table of Contents
@@ -142,9 +142,13 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
     Display the menu on the menubar for evernote-mode (default: t)
 
-  - *Variable: evernote-password-cache-file*
+  - *Variable: evernote-password-cache*
 
-    Filename of saving password cache. It is recommended to encrypt the file with EasyPG.
+    Non-nil means that password cache is enabled.
+    It is recommended to encrypt the file with EasyPG([http://epg.sourceforge.jp/]). EasyPG is included in Emacs 23 or later. On Emacs 22, you install the EasyPG, then add the following line to your .emacs
+    
+    (require 'epa-setup)
+    
 
 When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.

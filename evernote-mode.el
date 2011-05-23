@@ -1757,11 +1757,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defvar evernote-password-cache-file
-  (and (fboundp 'epa-file-handler) (executable-find "gpg")
-       "~/.evernote-mode/password.gpg")
-  "*Filename of saving password cache.
-It is recommended to encrypt the file.")
+(defvar evernote-password-cache nil
+  "*Non-nil means that password cache is enabled.
+It is recommended to encrypt the file with EasyPG.")
 
 
 (defvar enh-notebook-info (make-hash-table :test #'equal)
@@ -1778,6 +1776,10 @@ It is recommended to encrypt the file.")
 
 (defvar enh-note-attr nil
   "Note attr associated with most recently accessed guid")
+
+
+(defvar enh-password-cache-file "~/.evernote-mode/password.gpg"
+  "Filename of saving password cache.")
 
 
 (defvar enh-password-cache-buffer " *evernote-password-cache*")
@@ -2025,19 +2027,19 @@ It is recommended to encrypt the file.")
 
 (defun enh-password-cache-load ()
   "Load the password cache from the file"
-  (when (and evernote-password-cache-file
-	     (file-exists-p evernote-password-cache-file))
+  (when (and evernote-password-cache
+	     (file-exists-p enh-password-cache-file))
     (with-current-buffer (get-buffer-create enh-password-cache-buffer)
-      (insert-file-contents evernote-password-cache-file)
+      (insert-file-contents enh-password-cache-file)
       (read (current-buffer)))))
 
 
 (defun enh-password-cache-save (user-password)
   "Save the password cache to the file"
-  (when evernote-password-cache-file
+  (when evernote-password-cache
     (with-current-buffer (get-buffer-create enh-password-cache-buffer)
       (write-region (prin1-to-string user-password) nil
-		    evernote-password-cache-file))))
+		    enh-password-cache-file))))
 
 
 (defun enh-password-cache-close ()
