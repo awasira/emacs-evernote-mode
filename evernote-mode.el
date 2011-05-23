@@ -350,91 +350,91 @@
 
 
 (defun enh-menu-is-visible-on-ordinary-mode ()
-	(not evernote-browsing-mode))
+  (not evernote-browsing-mode))
 
 (defun enh-menu-is-visible-on-evernote-mode ()
-	(and evernote-mode (not evernote-browsing-mode)))
+  (and evernote-mode (not evernote-browsing-mode)))
 
 (defun enh-menu-is-visible-on-evernote-browsing-mode ()
-	evernote-browsing-mode)
+  evernote-browsing-mode)
 
 (let ((menu-bar-map (make-sparse-keymap "Evernote")))
-	(define-key-after global-map [menu-bar evernote]
-		`(menu-item "Evernote" ,menu-bar-map
-								:visible evernote-mode-display-menu)
-		'tools)
-	(define-key menu-bar-map [browser]
-		'(menu-item "Evernote Browser" evernote-browser
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [seperator-0]
-		'(menu-item "--" nil
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [toggle-read-only]
-		'(menu-item "Toggle Read Only" evernote-toggle-read-only
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [delete-note]
-		'(menu-item "Delete Note" evernote-delete-note
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [rename-note]
-		'(menu-item "Rename Note" evernote-rename-note
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [change-edit-mode]
-		'(menu-item "Change Edit Mode" evernote-change-edit-mode
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [edit-tag]
-		'(menu-item "Edit Tag" evernote-edit-tags
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [save-note]
-		'(menu-item "Save Note" evernote-save-note
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [seperator-1]
-		'(menu-item "--" nil
-								:visible (enh-menu-is-visible-on-evernote-mode)))
-	(define-key menu-bar-map [edit-search]
-		'(menu-item "Edit Saved Search" evernote-edit-search
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [create-search]
-		'(menu-item "Create Saved Search" evernote-create-search
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [do-saved-search]
-		'(menu-item "Do Saved Search" evernote-do-saved-search
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [search-note]
-		'(menu-item "Search Note" evernote-search-notes
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [seperator-2]
-		'(menu-item "--" nil
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [post-region]
-		'(menu-item "Post Region" evernote-post-region
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [write-note]
-		'(menu-item "Write Note" evernote-write-note
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [create-note]
-		'(menu-item "Create Note" evernote-create-note
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [open-note]
-		'(menu-item "Open Note" evernote-open-note
-								:visible (enh-menu-is-visible-on-ordinary-mode)))
-	(define-key menu-bar-map [browsing-prev-page]
-		'(menu-item "Prev Page" evernote-browsing-prev-page
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
-	(define-key menu-bar-map [browsing-next-page]
-		'(menu-item "Next Page" evernote-browsing-next-page
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
-	(define-key menu-bar-map [browsing-search-notes]
-		'(menu-item "Searche Notes" evernote-browsing-search-notes
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
-	(define-key menu-bar-map [browsing-list-searches]
-		'(menu-item "List Saved Searches" evernote-browsing-list-searches
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
-	(define-key menu-bar-map [browsing-list-tags]
-		'(menu-item "List Tags" evernote-browsing-list-tags
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode)))
-	(define-key menu-bar-map [browsing-list-notebooks]
-		'(menu-item "List Notebooks" evernote-browsing-list-notebooks
-								:visible (enh-menu-is-visible-on-evernote-browsing-mode))))
+  (define-key-after global-map [menu-bar evernote]
+    `(menu-item "Evernote" ,menu-bar-map
+                :visible evernote-mode-display-menu)
+    'tools)
+  (define-key menu-bar-map [browser]
+    '(menu-item "Evernote Browser" evernote-browser
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [seperator-0]
+    '(menu-item "--" nil
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [toggle-read-only]
+    '(menu-item "Toggle Read Only" evernote-toggle-read-only
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [delete-note]
+    '(menu-item "Delete Note" evernote-delete-note
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [rename-note]
+    '(menu-item "Rename Note" evernote-rename-note
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [change-edit-mode]
+    '(menu-item "Change Edit Mode" evernote-change-edit-mode
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [edit-tag]
+    '(menu-item "Edit Tag" evernote-edit-tags
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [save-note]
+    '(menu-item "Save Note" evernote-save-note
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [seperator-1]
+    '(menu-item "--" nil
+                :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [edit-search]
+    '(menu-item "Edit Saved Search" evernote-edit-search
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [create-search]
+    '(menu-item "Create Saved Search" evernote-create-search
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [do-saved-search]
+    '(menu-item "Do Saved Search" evernote-do-saved-search
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [search-note]
+    '(menu-item "Search Note" evernote-search-notes
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [seperator-2]
+    '(menu-item "--" nil
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [post-region]
+    '(menu-item "Post Region" evernote-post-region
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [write-note]
+    '(menu-item "Write Note" evernote-write-note
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [create-note]
+    '(menu-item "Create Note" evernote-create-note
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [open-note]
+    '(menu-item "Open Note" evernote-open-note
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [browsing-prev-page]
+    '(menu-item "Prev Page" evernote-browsing-prev-page
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+  (define-key menu-bar-map [browsing-next-page]
+    '(menu-item "Next Page" evernote-browsing-next-page
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+  (define-key menu-bar-map [browsing-search-notes]
+    '(menu-item "Searche Notes" evernote-browsing-search-notes
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+  (define-key menu-bar-map [browsing-list-searches]
+    '(menu-item "List Saved Searches" evernote-browsing-list-searches
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+  (define-key menu-bar-map [browsing-list-tags]
+    '(menu-item "List Tags" evernote-browsing-list-tags
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode)))
+  (define-key menu-bar-map [browsing-list-notebooks]
+    '(menu-item "List Notebooks" evernote-browsing-list-notebooks
+                :visible (enh-menu-is-visible-on-evernote-browsing-mode))))
 
 
 (defun evernote-mode (&optional guid)
@@ -481,21 +481,21 @@
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (unwind-protect
       (let* ((cache (enh-password-cache-load))
-	     (usernames (mapcar #'car cache))
-	     (username (or evernote-username
-			   (read-string "Evernote user name:"
-					(car usernames) 'usernames)))
-	     (cache-passwd (enutil-aget username cache)))
-	(unless (and cache-passwd
-		     (eq (catch 'error 
-			   (progn 
-			     (enh-command-login username cache-passwd)
-			     t))
-			 t))
-	  (let* ((passwd (read-passwd "Passwd:")))
-	    (enh-command-login username passwd)
-	    (setq evernote-username username)
-	    (enh-password-cache-save (enutil-aset username cache passwd)))))
+             (usernames (mapcar #'car cache))
+             (username (or evernote-username
+                           (read-string "Evernote user name:"
+                                        (car usernames) 'usernames)))
+             (cache-passwd (enutil-aget username cache)))
+        (unless (and cache-passwd
+                     (eq (catch 'error 
+                           (progn 
+                             (enh-command-login username cache-passwd)
+                             t))
+                         t))
+          (let* ((passwd (read-passwd "Passwd:")))
+            (enh-command-login username passwd)
+            (setq evernote-username username)
+            (enh-password-cache-save (enutil-aset username cache passwd)))))
     (enh-password-cache-close)))
 
 
@@ -505,7 +505,7 @@
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (enh-command-with-auth
    (let* ((tag-guids (enh-read-tag-guids
-                     "Tags used for search (comma separated form. default search all tags):"))
+                      "Tags used for search (comma separated form. default search all tags):"))
           (note-attrs
            (enh-command-get-note-attrs-from-tag-guids tag-guids)))
      (enh-base-open-note-common (enh-base-read-note-attr note-attrs))
@@ -687,12 +687,12 @@
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (when evernote-mode
-      (setq evernote-note-modified-name
-            (read-string "New note name:"
-                         (enutil-aget 'title (enh-get-note-attr evernote-note-guid))))
-      (rename-buffer evernote-note-modified-name t)
-      (enh-base-change-major-mode-from-note-name evernote-note-modified-name)
-      (set-buffer-modified-p t)))
+    (setq evernote-note-modified-name
+          (read-string "New note name:"
+                       (enutil-aget 'title (enh-get-note-attr evernote-note-guid))))
+    (rename-buffer evernote-note-modified-name t)
+    (enh-base-change-major-mode-from-note-name evernote-note-modified-name)
+    (set-buffer-modified-p t)))
 
 
 (defun evernote-delete-note ()
@@ -712,9 +712,9 @@
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (let ((name (read-string "Saved Search Name:"))
         (query (read-string "Query:")))
-  (enh-command-with-auth
-   (enh-command-create-search name query))
-  (enh-browsing-reflesh-page 'search-list)))
+    (enh-command-with-auth
+     (enh-command-create-search name query))
+    (enh-browsing-reflesh-page 'search-list)))
 
 
 (defun evernote-edit-search ()
@@ -805,7 +805,7 @@
         (setq evernote-note-modified-edit-mode
               (enutil-aget 'modified-edit-mode evernote-mode-info-for-changing-major-mode))
         (evernote-mode ; this must be after setting evernote-note-modified-xxx
-              (enutil-aget 'guid evernote-mode-info-for-changing-major-mode))
+         (enutil-aget 'guid evernote-mode-info-for-changing-major-mode))
         (setq evernote-note-xhtml-mode-content
               (enutil-aget 'note-xhtml-mode-content evernote-mode-info-for-changing-major-mode))
         (setq evernote-mode-info-for-changing-major-mode nil))))
@@ -1094,7 +1094,7 @@
          enh-base-displayed-name-formatted-name-alist))
     (enutil-aget (read-from-minibuffer "Note:"
                                        nil evernote-read-note-map)
-                      enh-base-displayed-name-attr-alist)))
+                 enh-base-displayed-name-attr-alist)))
 
 
 (defun enh-base-get-displayed-note-name (name name-hash)
@@ -1530,7 +1530,7 @@
               (set-buffer page)
               (if (eq enh-browsing-page-type type)
                   (funcall enh-browsing-page-setup-func)))
-              evernote-browsing-page-list)))
+            evernote-browsing-page-list)))
 
 ;
 ;
@@ -1677,9 +1677,9 @@
 (defun enh-command-delete-note (guid)
   "Issue deletenote command specified by the guid, tags and the edit mode."
   (enh-command-issue
-     (format ":class => %s, :guid => %s"
-             (enutil-to-ruby-string "DeleteNoteCommand")
-             (enutil-to-ruby-string guid))))
+   (format ":class => %s, :guid => %s"
+           (enutil-to-ruby-string "DeleteNoteCommand")
+           (enutil-to-ruby-string guid))))
 
 
 (defun enh-command-get-search-attrs ()
@@ -1693,20 +1693,20 @@
 (defun enh-command-create-search (name query)
   "Issue createsearch command"
   (enh-command-issue
-     (format ":class => %s, :name => %s, :query => %s"
-             (enutil-to-ruby-string "CreateSearchCommand")
-             (enutil-to-ruby-string name)
-             (enutil-to-ruby-string query))))
+   (format ":class => %s, :name => %s, :query => %s"
+           (enutil-to-ruby-string "CreateSearchCommand")
+           (enutil-to-ruby-string name)
+           (enutil-to-ruby-string query))))
 
 
 (defun enh-command-update-search (guid name query)
   "Issue updatesearch command"
   (enh-command-issue
-     (format ":class => %s, :guid => %s, :name => %s, :query => %s"
-             (enutil-to-ruby-string "UpdateSearchCommand")
-             (enutil-to-ruby-string guid)
-             (enutil-to-ruby-string name)
-             (enutil-to-ruby-string query))))
+   (format ":class => %s, :guid => %s, :name => %s, :query => %s"
+           (enutil-to-ruby-string "UpdateSearchCommand")
+           (enutil-to-ruby-string guid)
+           (enutil-to-ruby-string name)
+           (enutil-to-ruby-string query))))
 
 
 (defun enh-command-issue (command)
@@ -2028,7 +2028,7 @@ It is recommended to encrypt the file with EasyPG.")
 (defun enh-password-cache-load ()
   "Load the password cache from the file"
   (when (and evernote-password-cache
-	     (file-exists-p enh-password-cache-file))
+             (file-exists-p enh-password-cache-file))
     (with-current-buffer (get-buffer-create enh-password-cache-buffer)
       (insert-file-contents enh-password-cache-file)
       (read (current-buffer)))))
@@ -2039,7 +2039,7 @@ It is recommended to encrypt the file with EasyPG.")
   (when evernote-password-cache
     (with-current-buffer (get-buffer-create enh-password-cache-buffer)
       (write-region (prin1-to-string user-password) nil
-		    enh-password-cache-file))))
+                    enh-password-cache-file))))
 
 
 (defun enh-password-cache-close ()
@@ -2078,7 +2078,7 @@ It is recommended to encrypt the file with EasyPG.")
 (defun enutil-aset (key alist value)
   (let ((result-cons (assoc key alist)))
     (if result-cons
-	(setcdr result-cons value)
+        (setcdr result-cons value)
       (setq alist (cons (cons key value) alist)))
     alist))
 
@@ -2200,3 +2200,7 @@ It is recommended to encrypt the file with EasyPG.")
 (provide 'evernote-mode)
 
 ;;(setq debug-on-error t)
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
