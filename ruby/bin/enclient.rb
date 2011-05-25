@@ -236,8 +236,8 @@ end
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.33, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.33, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.34, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.34, :editmode => "XHTML"}|
 
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
