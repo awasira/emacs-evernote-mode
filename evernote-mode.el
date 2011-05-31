@@ -1740,6 +1740,11 @@
       reply)))
 
 
+(defun enh-command-sentinel (process event)
+  (error "enclient.rb %s%s" event
+         (with-current-buffer enh-command-output-buffer-name
+           (buffer-string))))
+
 (defun enh-command-setup-process ()
   (let ((proc (get-process enh-command-process-name))
         (process-connection-type nil)) ; use pipe instead of pty
@@ -1748,6 +1753,7 @@
       (setq proc (start-process enh-command-process-name
                                 enh-command-output-buffer-name
                                 "ruby" "-S" "enclient.rb"))
+      (set-process-sentinel proc 'enh-command-sentinel)
       (set-process-coding-system proc 'utf-8 'utf-8)
       (set-process-query-on-exit-flag proc nil))))
 
