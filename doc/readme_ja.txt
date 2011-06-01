@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-23 23:04:17 JST
+Date: 2011-06-01 17:47:39 JST
 
 
 Table of Contents
@@ -417,13 +417,18 @@ evernote-mode は Anything([http://www.emacswiki.org/emacs/Anything]) で everno
 =========================================================
 
 ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
-上記が表示される場合は libgdbm-ruby をインストールして下さい。
+上記が表示される場合は libgdbm-ruby 等をインストールして下さい。
 
 - aptを使ったインストール例
 
 
 apt-get install libgdbm-ruby
 
+
+- ActiveScriptRuby または Ruby-mswin32 の場合
+
+[Porting Libraries to Win32] (http://jarp.does.notwork.org/win32/)
+から gdbm.dll を入手し、ruby.exe と同じフォルダに置いて下さい。
 
 9.2 `require': no such file to load -- net/https と表示される 
 ==============================================================

@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-05-23 23:04:09 JST
+Date: 2011-06-01 17:47:32 JST
 
 
 Table of Contents
@@ -422,6 +422,12 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 
 
 apt-get install libgdbm-ruby
+
+
+- In the case of ActiveScriptRuby or Ruby-mswin32
+
+Retrieve gdbm.dll from [Porting Libraries to Win32] (http://jarp.does.notwork.org/win32/), then copy
+it to the folder where ruby.exe exists.
 
 
 9.2 `require': no such file to load -- net/https 

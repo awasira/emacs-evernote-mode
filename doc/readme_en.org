@@ -391,6 +391,11 @@ Some distributions do not have the GDBM library for ruby. Install libgdbm-ruby f
 apt-get install libgdbm-ruby
 @</pre>
 
+- In the case of ActiveScriptRuby or Ruby-mswin32
+
+Retrieve gdbm.dll from [[http://jarp.does.notwork.org/win32/][Porting Libraries to Win32]], then copy it to the folder where ruby.exe exists.
+
+
 ** `require': no such file to load -- net/https
 
 Some distributions do not have the openssl library for ruby. Install libopenssl-ruby for using https.

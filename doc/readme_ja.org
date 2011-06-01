@@ -386,13 +386,17 @@ evernote-mode は Anything(http://www.emacswiki.org/emacs/Anything) で evernote
 ** `require': no such file to load -- gdbm と表示される
 
 ディストリビューションの設定によっては ruby が使用できる GDBM ライブラリがインストールされてない場合があります。
-上記が表示される場合は libgdbm-ruby をインストールして下さい。
+上記が表示される場合は libgdbm-ruby 等をインストールして下さい。
 
 - aptを使ったインストール例
 
 @<pre>
 apt-get install libgdbm-ruby
 @</pre>
+
+- ActiveScriptRuby または Ruby-mswin32 の場合
+
+[[http://jarp.does.notwork.org/win32/][Porting Libraries to Win32]] から gdbm.dll を入手し、ruby.exe と同じフォルダに置いて下さい。
 
 ** `require': no such file to load -- net/https と表示される
 
