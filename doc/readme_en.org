@@ -341,7 +341,6 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
      @<pre>
      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (add-to-list 'load-path "<your load path>")
-     (setq evernote-username "<your evernote user name>")
      (require 'evernote-mode)
      (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
      (global-set-key "\C-cec" 'evernote-create-note)

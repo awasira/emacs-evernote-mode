@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-01 21:59:59 JST
+Date: 2011-06-01 22:38:13 JST
 
 
 Table of Contents
@@ -227,7 +227,7 @@ In XHTML mode, you have to edit a XHTML as a text but it is a complicated work. 
 The text mode is specialized in editing Evernote notes that only contain text content. When you save an Evernote note, special characters(&keyword; space, newline) in the buffer are escaped and the root element is added to transform it into a XML document. Therefore text contents in the Emacs buffer is same as the appearance of the note. (is not same as the actual XML content of the note.) And when you read a Evernote note by using TEXT mode, evernote-mode reads the contents under the root element of the XML as a text and all the special characters are unescaped then evernote-mode insert it to the buffer.
 
 
-3.2.1 QUOTE An example of TEXT mode editing: 
+3.2.1 An example of TEXT mode editing: 
 ---------------------------------------------
 
 Emacs Buffer
@@ -368,7 +368,6 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
      
      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (add-to-list 'load-path "<your load path>")
-     (setq evernote-username "<your evernote user name>")
      (require 'evernote-mode)
      (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
      (global-set-key "\C-cec" 'evernote-create-note)
