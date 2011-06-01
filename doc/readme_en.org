@@ -32,7 +32,7 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
     Login to Evernote. The following commands are available only when you login.
     If you execute the following commands without the login, the login prompt will be shown.
 
-  - *Variable: evernote-usename*
+  - *Variable: evernote-username*
 
     An username of your evernote.
 
@@ -120,6 +120,7 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
     @<pre>
     (require 'epa-setup)
     @</pre>
+    You can cache the password safely by using gpg-agent.
 
 When you create a note by evernote-create-note, evernote-write-note and evernote-post-region, you can attach tags to the note.
 Also, when using the commands, you can input the name and the tag of the note with completion in the minibuffer.
@@ -340,7 +341,9 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
      @<pre>
      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (add-to-list 'load-path "<your load path>")
+     (setq evernote-username "<your evernote user name>")
      (require 'evernote-mode)
+     (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
      (global-set-key "\C-cec" 'evernote-create-note)
      (global-set-key "\C-ceo" 'evernote-open-note)
      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -405,7 +408,7 @@ Some distributions do not have the openssl library for ruby. Install libopenssl-
 @<pre>
 apt-get install libopenssl-ruby
 @</pre>
-** condition-case: Wrong type argument: listp, /usr/bin/ruby
+** No such file or directory -- enclient.rb (LoadError)
 
 The emacs variable "exec-path" may not contain the path of ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
 This may happen when multiple version of ruby are installed in the OS.

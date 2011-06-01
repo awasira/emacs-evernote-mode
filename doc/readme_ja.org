@@ -31,7 +31,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
     evernote サービスにログインします。以下のコマンドはログイン時にのみ使用可能です。
     ログインしていない状態で以下コマンドを実行した場合はログインプロンプトが表示されます。
 
-  - *Variable: evernote-usename*
+  - *Variable: evernote-username*
 
     evernote サービスのユーザ名を指定します。
 
@@ -119,6 +119,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
     @<pre>
     (require 'epa-setup)
     @</pre>
+    gpg-agent を使うことで安全にパスワードをキャッシュできます。
 
 evernote-create-note,evernote-write-note,evernote-post-regionで新規ノートを作成する際にはノートに付加するタグを指定することができます.
 また、コマンド使用時にタグ・ノート名を入力する際にはミニバッファでの補完が行われます。
@@ -343,6 +344,7 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
      (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; optional
      (add-to-list 'load-path "<your load path>")
      (require 'evernote-mode)
+     (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
      (global-set-key "\C-cec" 'evernote-create-note)
      (global-set-key "\C-ceo" 'evernote-open-note)
      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -408,7 +410,7 @@ apt-get install libgdbm-ruby
 @<pre>
 apt-get install libopenssl-ruby
 @</pre>
-** condition-case: Wrong type argument: listp, /usr/bin/ruby の様なメッセージが表示される
+** No such file or directory -- enclient.rb (LoadError) の様なメッセージが表示される
 
 emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
 OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
