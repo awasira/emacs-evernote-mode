@@ -15,8 +15,8 @@
 
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
-;; Author: Yusuke KAWAKAMI
-;; Version: 0.34
+;; Author: Yusuke KAWAKAMI, Akihiro ARISAWA
+;; Version: 0.40
 ;; Keywords: tools, emacs, evernote, bookmark
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
@@ -98,11 +98,34 @@
       (t
        (message enh-command-last-error-message)))))
 
-;;(macroexpand
-;; '(enh-command-with-auth
-;;   (setq a 0)
-;;   (setq b 0)))
 
+(defmacro enh-base-create-note-interactive (ask-notebook)
+  "Common interactive procecure of creating a note"
+  `(progn
+     (if (called-interactively-p) (enh-clear-onmem-cache))
+     (enh-command-with-auth
+      (switch-to-buffer (enh-base-create-note-common "" ,ask-notebook t t nil)))))
+
+
+(defmacro enh-base-write-note-interactive (ask-notebook)
+  "Common interactive procecure of writing a note"
+  `(progn
+     (if (called-interactively-p) (enh-clear-onmem-cache))
+     (enh-command-with-auth
+      (enh-base-create-note-common "" ,ask-notebook ,nil t t))))
+
+
+(defmacro enh-base-post-region-interactive (begin end arg ask-notebook)
+  "Common interactive procedure of posting a note"
+  `(progn
+     (if (called-interactively-p) (enh-clear-onmem-cache))
+     (enh-command-with-auth
+      (save-excursion
+        (save-restriction
+          (narrow-to-region ,begin ,end)
+          (if (and (enutil-neq ,arg nil) (enutil-neq ,arg 1))
+              (pop-to-buffer (enh-base-create-note-common (buffer-name) ,ask-notebook t t t))
+            (enh-base-create-note-common (buffer-name) ,ask-notebook nil nil t)))))))
 
 (defmacro enutil-neq (&rest exprs)
   `(not (eq ,@exprs)))
@@ -313,6 +336,10 @@
   "Modified name of the note before saving")
 (make-variable-buffer-local 'evernote-note-modified-name)
 
+(defvar evernote-note-modified-notebook-guid nil
+  "Modified noteobok guid of the note before saving")
+(make-variable-buffer-local 'evernote-note-modified-notebook-guid)
+
 (defvar evernote-note-modified-edit-mode nil
   "Modified edit-mode of the note before saving")
 (make-variable-buffer-local 'evernote-note-modified-edit-mode)
@@ -342,6 +369,7 @@
 (defvar evernote-mode-map (make-sparse-keymap)
   "Keymap used in evernote mode.")
 (define-key evernote-mode-map "\C-x\C-s" 'evernote-save-note)
+(define-key evernote-mode-map "\C-cen"   'evernote-change-notebook)
 (define-key evernote-mode-map "\C-cet"   'evernote-edit-tags)
 (define-key evernote-mode-map "\C-cee"   'evernote-change-edit-mode)
 (define-key evernote-mode-map "\C-cer"   'evernote-rename-note)
@@ -378,6 +406,9 @@
   (define-key menu-bar-map [rename-note]
     '(menu-item "Rename Note" evernote-rename-note
                 :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [change-notebook]
+    '(menu-item "Change Notebook" evernote-change-notebook
+                :visible (enh-menu-is-visible-on-evernote-mode)))
   (define-key menu-bar-map [change-edit-mode]
     '(menu-item "Change Edit Mode" evernote-change-edit-mode
                 :visible (enh-menu-is-visible-on-evernote-mode)))
@@ -390,6 +421,15 @@
   (define-key menu-bar-map [seperator-1]
     '(menu-item "--" nil
                 :visible (enh-menu-is-visible-on-evernote-mode)))
+  (define-key menu-bar-map [edit-notebook]
+    '(menu-item "Edit Notebook" evernote-edit-notebook
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [create-notebook]
+    '(menu-item "Create Notebook" evernote-create-notebook
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [seperator-2]
+    '(menu-item "--" nil
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
   (define-key menu-bar-map [edit-search]
     '(menu-item "Edit Saved Search" evernote-edit-search
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
@@ -402,17 +442,29 @@
   (define-key menu-bar-map [search-note]
     '(menu-item "Search Note" evernote-search-notes
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
-  (define-key menu-bar-map [seperator-2]
+  (define-key menu-bar-map [seperator-3]
     '(menu-item "--" nil
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [post-region-in-notebook]
+    '(menu-item "Post Region (w/ notebook param)" evernote-post-region-in-notebook
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
   (define-key menu-bar-map [post-region]
     '(menu-item "Post Region" evernote-post-region
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [write-note-in-notebook]
+    '(menu-item "Write Note (w/ notebook param)" evernote-write-note-in-notebook
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
   (define-key menu-bar-map [write-note]
     '(menu-item "Write Note" evernote-write-note
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [create-note-in-notebook]
+    '(menu-item "Create Note (w/ notebook param)" evernote-create-note-in-notebook
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
   (define-key menu-bar-map [create-note]
     '(menu-item "Create Note" evernote-create-note
+                :visible (enh-menu-is-visible-on-ordinary-mode)))
+  (define-key menu-bar-map [open-note-in-notebook]
+    '(menu-item "Open Note (w/ notebook param)" evernote-open-note-in-notebook
                 :visible (enh-menu-is-visible-on-ordinary-mode)))
   (define-key menu-bar-map [open-note]
     '(menu-item "Open Note" evernote-open-note
@@ -454,6 +506,7 @@
       (progn
         (when guid (setq evernote-note-guid guid))
         (enh-base-update-mode-line
+         evernote-note-modified-notebook-guid
          evernote-note-is-modified-tag-names
          evernote-note-modified-tag-names
          evernote-note-modified-edit-mode)
@@ -499,15 +552,17 @@
     (enh-password-cache-close)))
 
 
-(defun evernote-open-note ()
+(defun evernote-open-note (&optional ask-notebook)
   "Open a note"
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (enh-command-with-auth
-   (let* ((tag-guids (enh-read-tag-guids
+   (let* ((notebook-guid (and ask-notebook
+                              (enutil-aget 'guid (enh-read-notebook))))
+          (tag-guids (enh-read-tag-guids
                       "Tags used for search (comma separated form. default search all tags):"))
           (note-attrs
-           (enh-command-get-note-attrs-from-tag-guids tag-guids)))
+           (enh-command-get-note-attrs-from-notebook-and-tag-guids notebook-guid tag-guids)))
      (enh-base-open-note-common (enh-base-read-note-attr note-attrs))
      (enh-browsing-update-page-list)
      (enh-browsing-push-page
@@ -518,6 +573,13 @@
                                   "All notes")
                                 note-attrs)
       t))))
+
+
+(defun evernote-open-note-in-notebook ()
+  "Open a note in the specified notebook"
+  (interactive)
+  (if (called-interactively-p) (enh-clear-onmem-cache))
+  (evernote-open-note t))
 
 
 (defun evernote-search-notes ()
@@ -560,30 +622,37 @@
 (defun evernote-create-note ()
   "Create a note"
   (interactive)
-  (if (called-interactively-p) (enh-clear-onmem-cache))
-  (enh-command-with-auth
-   (switch-to-buffer (enh-base-create-note-common "" t t))))
+  (enh-base-create-note-interactive nil))
+
+
+(defun evernote-create-note-in-notebook ()
+  "Create a note in the specified notebook"
+  (interactive)
+  (enh-base-create-note-interactive t))
 
 
 (defun evernote-write-note ()
   "Write buffer to a note"
   (interactive)
-  (if (called-interactively-p) (enh-clear-onmem-cache))
-  (enh-command-with-auth
-   (enh-base-create-note-common (buffer-name) nil t t)))
+  (enh-base-write-note-interactive nil))
+
+
+(defun evernote-write-note-in-notebook ()
+  "Write buffer to a note in the specified notebook"
+  (interactive)
+  (enh-base-write-note-interactive t))
 
 
 (defun evernote-post-region (begin end arg)
   "Post the region as a note"
   (interactive "r\np")
-  (if (called-interactively-p) (enh-clear-onmem-cache))
-  (enh-command-with-auth
-   (save-excursion
-     (save-restriction
-       (narrow-to-region begin end)
-       (if (and (enutil-neq arg nil) (enutil-neq arg 1))
-           (pop-to-buffer (enh-base-create-note-common (buffer-name) t t t))
-         (enh-base-create-note-common (buffer-name) nil nil t))))))
+  (enh-base-post-region-interactive begin end arg nil))
+
+
+(defun evernote-post-region-in-notebook (begin end arg)
+  "Post the region as a note in the specified notebook"
+  (interactive "r\np")
+  (enh-base-post-region-interactive begin end arg t))
 
 
 (defun evernote-save-note ()
@@ -606,6 +675,7 @@
       (if evernote-note-modified-name ; name
           evernote-note-modified-name
         nil)
+      evernote-note-modified-notebook-guid ; notebook-guid
       evernote-note-is-modified-tag-names ; is-tag-updated
       (if evernote-note-is-modified-tag-names ; tag-names
           evernote-note-modified-tag-names
@@ -614,14 +684,38 @@
           evernote-note-modified-edit-mode
         nil))
      (if (or evernote-note-modified-name
+             evernote-note-modified-notebook-guid
              evernote-note-is-modified-tag-names
              evernote-note-modified-edit-mode)
          (enh-browsing-reflesh-page 'note-list))
      (setq evernote-note-modified-name nil
+           evernote-note-modified-notebook-guid nil
            evernote-note-is-modified-tag-names nil
            evernote-note-modified-tag-names nil
            evernote-note-modified-edit-mode nil)
      (set-buffer-modified-p nil)))))
+
+
+(defun evernote-change-notebook ()
+  "Change notebook to which this note belongs"
+  (interactive)
+  (if (called-interactively-p) (enh-clear-onmem-cache))
+  (when evernote-mode
+    (let* (current-notebook-guid current-notebook-name next-notebook-guid)
+      (setq current-notebook-guid
+            (or evernote-note-modified-notebook-guid
+                (enutil-aget 'notebookGuid (enh-get-note-attr evernote-note-guid))))
+      (setq current-notebook-name
+            (enutil-aget 'name (enh-get-notebook-attr current-notebook-guid)))
+      (setq next-notebook-guid
+            (enutil-aget 'guid (enh-read-notebook current-notebook-name)))
+      (when (not (string= current-notebook-guid next-notebook-guid))
+        (setq evernote-note-modified-notebook-guid next-notebook-guid)
+        (enh-base-update-mode-line evernote-note-modified-notebook-guid
+                                   evernote-note-is-modified-tag-names
+                                   evernote-note-modified-tag-names
+                                   evernote-note-modified-edit-mode)
+        (set-buffer-modified-p t)))))
 
 
 (defun evernote-edit-tags ()
@@ -634,7 +728,8 @@
            "Change attached Tags (comma separated form):"
            evernote-note-guid))
     (setq evernote-note-is-modified-tag-names t) ; this must be after enh-read-tag-names
-    (enh-base-update-mode-line evernote-note-is-modified-tag-names
+    (enh-base-update-mode-line evernote-note-modified-notebook-guid
+                               evernote-note-is-modified-tag-names
                                evernote-note-modified-tag-names
                                evernote-note-modified-edit-mode)
     (set-buffer-modified-p t)))
@@ -676,6 +771,7 @@
       (when need-change
         (setq evernote-note-modified-edit-mode next-edit-mode)
         (enh-base-update-mode-line
+         evernote-note-modified-notebook-guid
          evernote-note-is-modified-tag-names
          evernote-note-modified-tag-names
          evernote-note-modified-edit-mode)
@@ -704,6 +800,38 @@
       (enh-command-with-auth
        (enh-command-delete-note evernote-note-guid)
        (kill-buffer (current-buffer)))))
+
+
+(defun evernote-create-notebook ()
+  "Create a notebook"
+  (interactive)
+  (if (called-interactively-p) (enh-clear-onmem-cache))
+  (let ((name (read-string "Notebook Name:")))
+    (enh-command-with-auth
+     (enh-command-create-notebook name nil))
+    (enh-browsing-reflesh-page 'notebook-list)))
+
+
+(defun evernote-edit-notebook ()
+  "Create a notebook"
+  (interactive)
+  (if (called-interactively-p) (enh-clear-onmem-cache))
+  (enh-command-with-auth
+   (let* ((notebook-alist (enh-get-notebook-name-attr-alist))
+          (notebook-attr
+           (enutil-aget
+            (completing-read
+             "Notebook:"
+             notebook-alist
+             nil t)
+            notebook-alist)))
+     (enh-command-update-notebook
+      (enutil-aget 'guid notebook-attr)
+      (read-string "New notebook name:"
+                   (enutil-aget 'name notebook-attr))
+      (yes-or-no-p "Use as the default notebook:"))))
+  (clrhash enh-notebook-info)
+  (enh-browsing-reflesh-page 'notebook-list))
 
 
 (defun evernote-create-search ()
@@ -736,6 +864,7 @@
                    (enutil-aget 'name search-attr))
       (read-string "New Query:"
                    (enutil-aget 'query search-attr)))))
+  (clrhash enh-search-info)
   (enh-browsing-reflesh-page 'search-list))
 
 
@@ -786,6 +915,7 @@
             (list
              (cons 'guid  evernote-note-guid)
              (cons 'modified-name evernote-note-modified-name)
+             (cons 'modified-notebook-guid evernote-note-modified-notebook-guid)
              (cons 'is-modified-tag-names evernote-note-is-modified-tag-names)
              (cons 'modified-tag-names evernote-note-modified-tag-names)
              (cons 'modified-edit-mode evernote-note-modified-edit-mode)
@@ -798,6 +928,8 @@
       (progn
         (setq evernote-note-modified-name
               (enutil-aget 'modified-name evernote-mode-info-for-changing-major-mode))
+        (setq evernote-note-modified-notebook-guid
+              (enutil-aget 'modified-notebook-guid evernote-mode-info-for-changing-major-mode))
         (setq evernote-note-is-modified-tag-names
               (enutil-aget 'is-modified-tag-names evernote-mode-info-for-changing-major-mode))
         (setq evernote-note-modified-tag-names
@@ -997,12 +1129,15 @@
 
 
 (defun enh-base-create-note-common (default-note-name
+                                     ask-notebook
                                      create-new-buffer
                                      change-to-evernote-mode
                                      &optional
                                      use-current-buffer-content)
   "Common procedure of creating a note"
-  (let ((tag-names (enh-read-tag-names))
+  (let ((notebook-guid (and ask-notebook
+                            (enutil-aget 'guid (enh-read-notebook))))
+        (tag-names (enh-read-tag-names))
         (name (read-string "Note name:" default-note-name))
         (edit-mode (enh-read-edit-mode "TEXT"))
         content
@@ -1013,6 +1148,7 @@
           (setq note-attr
                 (enh-command-create-note (current-buffer)
                                          name
+                                         notebook-guid
                                          tag-names
                                          edit-mode))
           (setq content (buffer-substring (point-min) (point-max))))
@@ -1022,6 +1158,7 @@
             (setq note-attr
                   (enh-command-create-note (current-buffer)
                                            name
+                                           notebook-guid
                                            tag-names
                                            edit-mode)))
         (with-temp-buffer ;; edit-mode = XHTML
@@ -1029,6 +1166,7 @@
           (setq note-attr
                 (enh-command-create-note (current-buffer)
                                          name
+                                         notebook-guid
                                          tag-names
                                          edit-mode))
           (setq content (buffer-substring (point-min) (point-max))))))
@@ -1053,11 +1191,11 @@
       buf)))
 
 
-(defun enh-base-update-note-common (inbuf guid &optional name is-tag-updated tag-names edit-mode)
+(defun enh-base-update-note-common (inbuf guid &optional name notebook-guid is-tag-updated tag-names edit-mode)
   "Common procedure of opening a note"
   (let ((attr (enh-get-note-attr guid)))
     (setq attr
-          (enh-command-update-note inbuf guid name is-tag-updated tag-names edit-mode))
+          (enh-command-update-note inbuf guid name notebook-guid is-tag-updated tag-names edit-mode))
     (enh-update-note-and-new-tag-attrs attr)))
 
 
@@ -1077,8 +1215,10 @@
                      enh-base-displayed-name-attr-alist))
          (setq enh-base-displayed-name-formatted-name-alist
                (cons (cons displayed-name
-                           (format "%-30s   %-15s   %s"
+                           (format "%-30s   %-20s   %-15s   %s"
                                    (enutil-aget 'updated attr)
+                                   (enutil-aget 'name
+                                                (enh-get-notebook-attr (enutil-aget 'notebookGuid attr)))
                                    (enh-tag-guids-to-comma-separated-names
                                     (enutil-aget 'tagGuids attr)
                                     15)
@@ -1140,9 +1280,10 @@
   "Display formatted note names on this buffer"
   (setq buffer-read-only nil)
   (erase-buffer)
-  (insert (format "total %d\n%-30s   %-15s   %s\n\n"
+  (insert (format "total %d\n%-30s   %-20s   %-15s   %s\n\n"
                   (length formatted-name-displayed-name-alist)
                   "Last Modified"
+                  "Notebook"
                   "Tags"
                   "Title"))
   (mapc (lambda (elem)
@@ -1185,11 +1326,17 @@
     found_buf))
 
 
-(defun enh-base-update-mode-line (&optional is-set-tag-names tag-names edit-mode)
+(defun enh-base-update-mode-line (&optional notebook-guid is-set-tag-names tag-names edit-mode)
   "Update mode line"
   (let ((note-attr (enh-get-note-attr evernote-note-guid)))
     (setq vc-mode
-          (concat "[Tag:"
+          (concat "[Notebook:"
+                  (if notebook-guid
+                      (enutil-aget 'name (enh-get-notebook-attr notebook-guid))
+                    (enutil-aget 'name (enh-get-notebook-attr
+                                        (enutil-aget 'notebookGuid note-attr))))
+                  "] "
+                  "[Tag:"
                   (if is-set-tag-names
                       (mapconcat #'identity tag-names ",")
                     (enh-tag-guids-to-comma-separated-names
@@ -1236,7 +1383,7 @@
   (let* ((guid (widget-value widget)) note-attrs)
     (enh-command-with-auth
      (setq note-attrs
-           (enh-command-get-note-attrs-from-notebook-guid guid)))
+           (enh-command-get-note-attrs-from-notebook-and-tag-guids guid nil)))
     (enh-browsing-update-page-list)
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
@@ -1252,7 +1399,8 @@
   (let ((guid (widget-value widget)) note-attrs)
     (enh-command-with-auth
      (setq note-attrs
-           (enh-command-get-note-attrs-from-tag-guids
+           (enh-command-get-note-attrs-from-notebook-and-tag-guids
+            nil
             (if guid
                 (list guid)
               nil))))
@@ -1455,8 +1603,10 @@
     (mapc
      (lambda (attr)
        (enutil-push `(push-button
-                      :tag ,(format "%-30s   %-15s   %4s   %s"
+                      :tag ,(format "%-30s   %-20s   %-15s   %4s   %s"
                                     (enutil-aget 'updated attr)
+                                    (enutil-aget 'name
+                                                 (enh-get-notebook-attr (enutil-aget 'notebookGuid attr)))
                                     (enh-tag-guids-to-comma-separated-names
                                      (enutil-aget 'tagGuids attr)
                                      15)
@@ -1470,10 +1620,11 @@
     (setq enh-browsing-page-widget-root
           (apply 'widget-create
                  `(group
-                   (item ,(format "%s\n\ntotal %d\n%-30s   %-15s   %4s   %s\n"
+                   (item ,(format "%s\n\ntotal %d\n%-30s   %-20s   %-15s   %4s   %s\n"
                                   enh-browsing-page-description
                                   (length note-attrs)
                                   "Last Modified"
+                                  "Notebook"
                                   "Tags"
                                   "Mode"
                                   "Name"))
@@ -1612,20 +1763,13 @@
     (enutil-aget 'note reply)))
 
 
-(defun enh-command-get-note-attrs-from-notebook-guid (notebook-guid)
-  "Issue listnotes command from the notebook guid."
+(defun enh-command-get-note-attrs-from-notebook-and-tag-guids (notebook-guid tag-guids)
+  "Issue listnotes command from the notebook guid and the tag guids."
+  (message "notebook %s" notebook-guid)
   (let ((reply (enh-command-issue
-                (format ":class => %s, :notebook_guid => %s"
+                (format ":class => %s, :notebook_guid => %s, :tag_guids => %s"
                         (enutil-to-ruby-string "ListNoteCommand")
-                        (enutil-to-ruby-string notebook-guid)))))
-    (enutil-aget 'notes reply)))
-
-
-(defun enh-command-get-note-attrs-from-tag-guids (tag-guids)
-  "Issue listnotes command from the tag guid list."
-  (let ((reply (enh-command-issue
-                (format ":class => %s, :tag_guids => %s"
-                        (enutil-to-ruby-string "ListNoteCommand")
+                        (enutil-to-ruby-string notebook-guid)
                         (enutil-to-ruby-string-list tag-guids nil)))))
     (enutil-aget 'notes reply)))
 
@@ -1649,11 +1793,12 @@
     (enutil-aget 'content reply)))
 
 
-(defun enh-command-create-note (inbuf name tag-names edit-mode)
+(defun enh-command-create-note (inbuf name notebook-guid tag-names edit-mode)
   "Issue createnote command specified by the guid, tags and the edit-mode."
   (let ((reply (enh-command-issue
-                (format ":class => %s, :title => %s, :tag_names => %s, :edit_mode => %s, :content => %s"
+                (format ":class => %s, :notebook_guid => %s, :title => %s, :tag_names => %s, :edit_mode => %s, :content => %s"
                         (enutil-to-ruby-string "CreateNoteCommand")
+                        (enutil-to-ruby-string notebook-guid)
                         (enutil-to-ruby-string name)
                         (enutil-to-ruby-string-list tag-names nil)
                         (enutil-to-ruby-string edit-mode)
@@ -1661,12 +1806,13 @@
     (enutil-aget 'note reply)))
 
 
-(defun enh-command-update-note (inbuf guid name is-tag-updated tag-names edit-mode)
+(defun enh-command-update-note (inbuf guid name notebook-guid is-tag-updated tag-names edit-mode)
   "Issue updatenote command specified by the guid and the parameters for updating."
   (let ((reply (enh-command-issue
-                (format ":class => %s, :guid => %s, :title => %s, :tag_names => %s, :edit_mode => %s, :content => %s"
+                (format ":class => %s, :guid => %s, :notebook_guid => %s, :title => %s, :tag_names => %s, :edit_mode => %s, :content => %s"
                         (enutil-to-ruby-string "UpdateNoteCommand")
                         (enutil-to-ruby-string guid)
+                        (enutil-to-ruby-string notebook-guid)
                         (enutil-to-ruby-string name)
                         (enutil-to-ruby-string-list tag-names is-tag-updated)
                         (enutil-to-ruby-string edit-mode)
@@ -1680,6 +1826,25 @@
    (format ":class => %s, :guid => %s"
            (enutil-to-ruby-string "DeleteNoteCommand")
            (enutil-to-ruby-string guid))))
+
+
+(defun enh-command-create-notebook (name default-notebook)
+  "Issue createnotebook command"
+  (enh-command-issue
+   (format ":class => %s, :name => %s, :default_notebook => %s"
+           (enutil-to-ruby-string "CreateNotebookCommand")
+           (enutil-to-ruby-string name)
+           (if default-notebook "true" "false"))))
+
+
+(defun enh-command-update-notebook (guid name default-notebook)
+  "Issue updatenotebook command"
+  (enh-command-issue
+   (format ":class => %s, :guid => %s, :name => %s, :default_notebook => %s"
+           (enutil-to-ruby-string "UpdateNotebookCommand")
+           (enutil-to-ruby-string guid)
+           (enutil-to-ruby-string name)
+           (if default-notebook "true" "false"))))
 
 
 (defun enh-command-get-search-attrs ()
@@ -1897,6 +2062,17 @@ It is recommended to encrypt the file with EasyPG.")
   (setq enh-note-attr nil))
 
 
+(defun enh-read-notebook (&optional default)
+  (let ((notebook-name-attr-alist (enh-get-notebook-name-attr-alist)))
+    (enutil-aget (completing-read
+                  "Notebook:"
+                  notebook-name-attr-alist
+                  nil
+                  t
+                  default)
+                 notebook-name-attr-alist)))
+
+
 (defun enh-read-saved-search (&optional prompt)
   (let ((search-name-query-alist (enh-get-search-name-attr-alist)))
     (enutil-aget (completing-read
@@ -1906,6 +2082,20 @@ It is recommended to encrypt the file with EasyPG.")
                   search-name-query-alist
                   nil t)
                  search-name-query-alist)))
+
+
+(defun enh-get-notebook-name-attr-alist ()
+  "Get the notebook alist for completion from command output"
+  (let (result)
+    (maphash
+     (lambda (guid attr)
+       (setq result
+             (cons
+              (cons (enutil-aget 'name attr)
+                    attr)
+              result)))
+     (enh-get-notebook-attrs))
+    result))
 
 
 (defun enh-get-tag-name-alist ()
@@ -1971,6 +2161,17 @@ It is recommended to encrypt the file with EasyPG.")
 ;;   (lambda (tag-guid)
 ;;     (enutil-aget 'name (enh-get-tag-attr tag-guid)))
 ;;   tag-guids))
+
+
+(defun enh-notebook-name-to-guid (notebook-name)
+  (let ((notebook-attrs (enh-get-notebook-attrs)))
+    (catch 'guid
+      (maphash
+       (lambda (guid attr)
+         (let ((name (enutil-aget 'name attr)))
+           (if (equal notebook-name name)
+               (throw 'guid guid))))
+       notebook-attrs))))
 
 
 (defun enh-tag-names-to-guids (tag-names)

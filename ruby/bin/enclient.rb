@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-#  Copyright 2011 Yusuke Kawakami
+#  Copyright 2011 Yusuke KAWAKAMI, Akihiro ARISAWA
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -236,8 +236,8 @@ end
 # main module
 #
 module EnClient
-  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.34, :editmode => "TEXT"}|
-  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.34, :editmode => "XHTML"}|
+  APPLICATION_NAME_TEXT  = %|emacs-enclient {:version => 0.40, :editmode => "TEXT"}|
+  APPLICATION_NAME_XHTML = %|emacs-enclient {:version => 0.40, :editmode => "XHTML"}|
 
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
@@ -408,6 +408,8 @@ module EnClient
          CreateNoteCommand,
          UpdateNoteCommand,
          DeleteNoteCommand,
+         CreateNotebookCommand,
+         UpdateNotebookCommand,
          CreateTagCommand,
          UpdateTagCommand,
          CreateSearchCommand,
@@ -467,7 +469,7 @@ module EnClient
 
 
   class CreateNoteCommand < Command
-    attr_accessor :title, :tag_names, :edit_mode, :content
+    attr_accessor :title, :notebook_guid, :tag_names, :edit_mode, :content
 
     include FormatNoteOperation
 
@@ -476,6 +478,7 @@ module EnClient
 
       note = Evernote::EDAM::Type::Note.new
       note.title = @title
+      note.notebookGuid = @notebook_guid
       note.tagNames = @tag_names
       note.editMode = @edit_mode
       note.content = @content
@@ -505,12 +508,12 @@ module EnClient
 
 
   class UpdateNoteCommand < Command
-    attr_accessor :guid, :title, :tag_names, :content, :edit_mode
+    attr_accessor :guid, :title, :notebook_guid, :tag_names, :content, :edit_mode
 
     include FormatNoteOperation
 
     def exec_impl
-      Formatter.to_ascii @title, @content, *@tag_names
+      Formatter.to_ascii @title, @notebook_guid, @content, *@tag_names
 
       old_note = DBUtils.get_note dm, @guid
 
@@ -521,6 +524,7 @@ module EnClient
       else
         note.title = old_note.title
       end
+      note.notebookGuid = @notebook_guid
       note.tagNames = @tag_names
       if @edit_mode
         note.editMode = @edit_mode
@@ -564,6 +568,50 @@ module EnClient
         note.active = false
         DBUtils.set_note_and_content dm, note, nil
         shell.reply self, DeleteNoteReply.new
+      end
+    end
+  end
+
+
+  class CreateNotebookCommand < Command
+    attr_accessor :name, :default_notebook
+
+    def exec_impl
+      Formatter.to_ascii @name
+
+      notebook = Evernote::EDAM::Type::Notebook.new
+      notebook.name = @name
+      notebook.defaultNotebook = @default_notebook
+
+      server_task do
+        result_notebook = sm.note_store.createNotebook sm.auth_token, notebook
+        DBUtils.set_notebook dm, result_notebook
+        reply = CreateNotebookReply.new
+        reply.notebook = result_notebook
+        shell.reply self, reply
+      end
+    end
+  end
+
+
+  class UpdateNotebookCommand < Command
+    attr_accessor :guid, :name, :default_notebook
+
+    def exec_impl
+      Formatter.to_ascii @name
+
+      notebook = Evernote::EDAM::Type::Notebook.new
+      notebook.guid = @guid
+      notebook.name = @name
+      notebook.defaultNotebook = @default_notebook
+
+      server_task do
+        usn = sm.note_store.updateNotebook sm.auth_token, notebook
+        notebook.updateSequenceNum = usn
+        DBUtils.set_notebook dm, notebook
+        reply = UpdateNotebookReply.new
+        reply.notebook = notebook
+        shell.reply self, reply
       end
     end
   end
@@ -958,6 +1006,16 @@ module EnClient
 
 
   class DeleteNoteReply < Reply
+  end
+
+
+  class CreateNotebookReply < Reply
+    attr_accessor :notebook
+  end
+
+
+  class UpdateNotebookReply < Reply
+    attr_accessor :notebook
   end
 
 
@@ -1422,6 +1480,25 @@ module EnClient
       dm.transaction do
         dm.open_search do |db|
           db[search.guid] = search.serialize
+        end
+      end
+    end
+
+    def self.set_notebook(dm, notebook)
+      dm.transaction do
+        dm.open_notebook do |db|
+          if notebook.defaultNotebook
+            # unset defaultNotebook of all notebooks
+            db.each_value do |value|
+              n = Evernote::EDAM::Type::Notebook.new
+              n.deserialize value
+              if n.guid != notebook.guid
+                n.defaultNotebook = false
+                db[n.guid] = n.serialize
+              end
+            end
+          end
+          db[notebook.guid] = notebook.serialize
         end
       end
     end
