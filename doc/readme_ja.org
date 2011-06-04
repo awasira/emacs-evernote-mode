@@ -37,7 +37,11 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-open-note*
 
-    既存のノートをemacsバッファに読み込みます。ミニバッファでタグを入力後、続いてノートの名前を入力します。
+    既存のノートをemacsバッファに読み込みます。検索するタグをミニバッファで入力後、続いてノートの名前を入力します。
+
+  - *Command: evernote-open-note-in-notebook*
+
+    既存のノートをemacsバッファに読み込みます。検索するノートブックとタグをミニバッファで入力後、続いてノートの名前を入力します。
 
   - *Command: evernote-save-note (default bound to \C-x\C-s)*
 
@@ -45,15 +49,31 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-create-note*
 
-    ノートを新規作成します。
+    ノートを新規作成します。ノートはデフォルトのノートブックに作成されます。
 
-  - *Command: evernote-post-region*
+  - *Command: evernote-create-note-in-notebook*
 
-    選択されたリージョンを新規ノートとしてポストします。引数なしで実行した場合は、evernote-open-noteやevernote-create-noteと異なり、新規ノートに対応するバッファは作成しませんが、\C-u等で引数を与えた場合（デフォルト引数以外を与えた場合）は、新規ノートに対応するバッファを作成し、引き続きバッファ上での編集作業を行うことができます。
+    ノートを新規作成します。ノートは指定されたノートブックに作成されます。
 
   - *Command: evernote-write-note*
 
-    emacsバッファを新規ノートとして保存します。
+    emacsバッファを新規ノートとして保存します。ノートはデフォルトのノートブックに作成されます。
+
+  - *Command: evernote-write-note-in-notebook*
+
+    emacsバッファを新規ノートとして保存します。ノートは指定されたノートブックに作成されます。
+
+  - *Command: evernote-post-region*
+
+    選択されたリージョンを新規ノートとしてポストします。ノートはデフォルトのノートブックに作成されます。引数なしで実行した場合は、evernote-open-noteやevernote-create-noteと異なり、新規ノートに対応するバッファは作成しませんが、\C-u等で引数を与えた場合（デフォルト引数以外を与えた場合）は、新規ノートに対応するバッファを作成し、引き続きバッファ上での編集作業を行うことができます。
+
+  - *Command: evernote-post-region-in-notebook*
+
+    選択されたリージョンを新規ノートとしてポストします。ノートは指定されたノートブックに作成されます。
+
+  - *Command: evernote-change-notebook (default bound to \C-cen)*
+
+    ノートが属するノートブックを変更します。このコマンド発行後にevernote-save-noteを実行することでEvernoteサービス上で変更が反映されます.
 
   - *Command: evernote-edit-tags (default bound to \C-cet)*
 
@@ -79,6 +99,14 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
     Evernoteの「保存された検索」を使ってノートを検索します。
 
+  - *Command: evernote-create-notebook*
+
+    ノートブックを新規作成します。
+
+  - *Command: evernote-edit-notebook*
+
+    指定されたノートブックの名前とデフォルトノートブックか否かを設定します。
+
   - *Command: evernote-create-search*
 
     クエリに名前をつけて保存し、以後「保存された検索」として参照できるようにします。
@@ -89,11 +117,11 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-toggle-read-only (default bound to \C-x\C-q)*
 
-		バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [[Evernote note edit mode]] を参照して下さい
+    バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [[Evernote note edit mode]] を参照して下さい
 
-	- *Variable: evernote-enml-formatter-command*
+  - *Variable: evernote-enml-formatter-command*
 
-	  XHTMLモードのノートを読み込んだ際、もしくは書き込み可能から読み込み専用に状態を切り替えた場合に、XHTMLを整形して表示するためのコマンドを指定します。現在整形コマンドとしてw3mを使用することができます。
+    XHTMLモードのノートを読み込んだ際、もしくは書き込み可能から読み込み専用に状態を切り替えた場合に、XHTMLを整形して表示するためのコマンドを指定します。現在整形コマンドとしてw3mを使用することができます。
 
   - *Command: evernote-browser*
 
@@ -127,6 +155,7 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
 ノートを開いているバッファには evernote-modeマイナーモードが適用されます。以下のコマンドはevernote-modeマイナーモードでのみ有効です。
 
   - evernote-save-note
+  - evernote-change-notebook
   - evernote-edit-tags
   - evernote-change-edit-mode
   - evernote-rename-note

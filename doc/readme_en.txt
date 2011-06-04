@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-01 22:38:13 JST
+Date: 2011-06-04 17:25:30 JST
 
 
 Table of Contents
@@ -61,23 +61,43 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-open-note*
 
-    Read an existing note to an Emacs buffer. At first, input tags attached to the notes, then input the name of the note on the minibuffer.
+    Read an existing note to an Emacs buffer. At first, input tags of the notes, then input the name of the note on the minibuffer.
+
+  - *Command: evernote-open-note-in-notebook*
+
+    Read an existing note to an Emacs buffer. At first, input the notebook and tags of the notes, then input the name of the note on the minibuffer.
 
   - *Command: evernote-save-note (default bound to \C-x\C-s)*
 
-    Save the modified note.
+    Save the modified note..
 
   - *Command: evernote-create-note*
 
-    Create a note from scratch.
+    Create a note from scratch. The note is created in the default notebook.
+
+  - *Command: evernote-create-note-in-notebook*
+
+    Create a note from scratch. The note is created in the specified notebook.
 
   - *Command: evernote-write-note*
 
-    Create a new note from the current buffer.
+    Create a new note from the current buffer. The note is created in the default notebook.
+
+  - *Command: evernote-write-note-in-notebook*
+
+    Create a new note from the current buffer. The note is created in the specified notebook.
 
   - *Command: evernote-post-region*
 
-    Create a new note containing the selected region. If you call this command without argument, no buffer associated with the new note is generated, which is different from evernote-open-note and evernote-create-note. If you call this command with an argument by \C-u etc.(not default argument), it creates a new buffer associated with the new note and you can edit the note in the buffer.
+    Create a new note containing the selected region. The note is created in the default notebook. If you call this command without argument, no buffer associated with the new note is generated, which is different from evernote-open-note and evernote-create-note. If you call this command with an argument by \C-u etc.(not default argument), it creates a new buffer associated with the new note and you can edit the note in the buffer.
+
+  - *Command: evernote-post-region-in-notebook*
+
+    Create a new note containing the selected region. The note is created in the specified notebook.
+
+  - *Command: evernote-change-notebook (default bound to \C-cen)*
+
+    Change the notebook to which the note belongs. The change on Evernote service will be made after exec of evernote-save-note.
 
   - *Command: evernote-edit-tags (default bound to \C-cet)*
 
@@ -103,6 +123,14 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
     Search notes by using a Saved Search.
 
+  - *Command: evernote-create-notebook*
+
+    Create a new notebook.
+
+  - *Command: evernote-edit-notebook*
+
+    Change the name and whether this book is the default notebook or not.
+
   - *Command: evernote-create-search*
 
     Save a query with a name for later use.
@@ -113,11 +141,11 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-toggle-read-only (default bound to \C-x\C-q)*
 
-                Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See [Evernote note edit mode] for details.
+    Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See [Evernote note edit mode] for details.
 
-        - *Variable: evernote-enml-formatter-command*
+  - *Variable: evernote-enml-formatter-command*
 
-          The command to format XHTML. When a note of XHTML mode is read-only, the command formats the XHTML and displays it. Currently evernote-mode supports w3m as the formatter.
+    The command to format XHTML. When a note of XHTML mode is read-only, the command formats the XHTML and displays it. Currently evernote-mode supports w3m as the formatter.
 
   - *Command: evernote-browser*
 
@@ -152,6 +180,7 @@ Also, when using the commands, you can input the name and the tag of the note wi
 The minor-mode "evernote-mode" is applied to the buffers opening the evernote note. The following commands are available only when "evernote-mode" is valid.
 
   - evernote-save-note
+  - evernote-change-notebook
   - evernote-edit-tags
   - evernote-change-edit-mode
   - evernote-rename-note
@@ -236,8 +265,8 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-   | 
-   | save on TEXT mode
+    
+     save on TEXT mode
    V
    The content of the note (escaped and transformed into a XML)
    -----------------------------------
@@ -248,8 +277,8 @@ Emacs Buffer
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-   | 
-   | read on TEXT mode
+    
+     read on TEXT mode
    V
    Emacs Buffer (unescaped and transformed int a text)
    -----------------------------------
