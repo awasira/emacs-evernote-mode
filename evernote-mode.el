@@ -112,7 +112,7 @@
   `(progn
      (if (called-interactively-p) (enh-clear-onmem-cache))
      (enh-command-with-auth
-      (enh-base-create-note-common "" ,ask-notebook ,nil t t))))
+      (enh-base-create-note-common (buffer-name) ,ask-notebook ,nil t t))))
 
 
 (defmacro enh-base-post-region-interactive (begin end arg ask-notebook)
