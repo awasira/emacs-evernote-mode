@@ -1700,6 +1700,12 @@
 ;; Functions for executing the external command (enh-command-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar enh-enclient-command
+  (concat 
+   (shell-command-to-string
+    "ruby -rrbconfig -e \"print Config::CONFIG['bindir']\"")
+   "/enclient.rb")
+  "Name of the enclient.rb command.")
 (defconst enh-command-process-name "Evernote-Client")
 (defconst enh-command-output-buffer-name "*Evernote-Client-Output*")
 
@@ -1917,7 +1923,7 @@
               (not (eq (process-status proc) 'run)))
       (setq proc (start-process enh-command-process-name
                                 enh-command-output-buffer-name
-                                "ruby" "-S" "enclient.rb"))
+                                "ruby" "-S" enh-enclient-command))
       (set-process-sentinel proc 'enh-command-sentinel)
       (set-process-coding-system proc 'utf-8 'utf-8)
       (set-process-query-on-exit-flag proc nil))))
