@@ -429,6 +429,23 @@ apt-get install libgdbm-ruby
 
 [[http://jarp.does.notwork.org/win32/][Porting Libraries to Win32]] から gdbm.dll を入手し、ruby.exe と同じフォルダに置いて下さい。
 
+- Mac OS X の場合
+
+Mac OS X に付属の ruby には GDBM バインディングが含まれていません。
+[[http://www.macports.org/][MacPorts]] や [[http://mxcl.github.com/homebrew/][Homebrew]] で ruby と GDBM をインストールしてください。
+
+MacPorts の場合
+@<pre>
+$ sudo ports install ruby gdbm
+@</pre>
+
+Homebrew の場合
+@<pre>
+$ sudo brew install ruby gdbm
+@</pre>
+
+また、[[No%20such%20file%20or%20directory][exec-path を設定]] してください。
+
 ** `require': no such file to load -- net/https と表示される
 
 ディストリビューションの設定によっては ruby が使用できる openssl ライブラリがインストールされてない場合があります。
@@ -443,10 +460,9 @@ apt-get install libopenssl-ruby
 
 emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
 OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path と PATH の先頭に正しい ruby のパスを設定して下さい。
+exec-path の先頭に正しい ruby のパスを設定して下さい。
 
 e.g.
     @<pre>
-    (add-to-list 'exec-path "/your/ruby/path")
-    (setenv "PATH" (concat (getenv "PATH") ";/your/ruby/path"))
+    (setq exec-path (cons '/your/ruby/path' exec-path))
     @</pre>
