@@ -242,7 +242,7 @@ module EnClient
   #EVERNOTE_HOST       = "sandbox.evernote.com"
   EVERNOTE_HOST       = "www.evernote.com"
   USER_STORE_URL      = "https://#{EVERNOTE_HOST}/edam/user"
-  NOTE_STORE_URL_BASE = "http://#{EVERNOTE_HOST}/edam/note/"
+  NOTE_STORE_URL_BASE = "https://#{EVERNOTE_HOST}/edam/note/"
 
   # error code
   ERROR_CODE_OK = 0
