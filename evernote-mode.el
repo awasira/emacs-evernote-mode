@@ -1702,8 +1702,9 @@
 
 (defvar enh-enclient-command
   (concat 
-   (shell-command-to-string
-    "ruby -rrbconfig -e \"print Config::CONFIG['bindir']\"")
+   (with-output-to-string
+     (call-process "ruby" nil standard-output nil
+                   "-rrbconfig" "-e" "print Config::CONFIG['bindir']"))
    "/enclient.rb")
   "Name of the enclient.rb command.")
 (defconst enh-command-process-name "Evernote-Client")
