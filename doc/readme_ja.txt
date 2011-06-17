@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-11 09:30:05 JST
+Date: 2011-06-17 21:27:26 JST
 
 
 Table of Contents
@@ -104,7 +104,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-change-edit-mode (default bound to \C-cee)*
 
-    ノートの編集モードを変更します.詳細は [Evernote note edit mode] (sec-3) を参照して下さい.このコマンド発行後にevernote-save-noteを実行することでEvernoteサービス上で変更が反映されます.
+    ノートの編集モードを変更します.詳細は [Evernote note edit mode] を参照して下さい.このコマンド発行後にevernote-save-noteを実行することでEvernoteサービス上で変更が反映されます.
 
   - *Command: evernote-rename-note (default bound to \C-cer)*
 
@@ -116,8 +116,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-search-notes*
 
-    ミニバッファから入力されたクエリを使ってノートを検索します。クエリの例は [Search Query Examples] (sec-4)
-    を参照して下さい。
+    ミニバッファから入力されたクエリを使ってノートを検索します。クエリの例は [Search Query Examples] を参照して下さい。
 
   - *Command: evernote-do-saved-search*
 
@@ -141,8 +140,7 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-toggle-read-only (default bound to \C-x\C-q)*
 
-    バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [Evernote note edit mode]
-    (sec-3) を参照して下さい
+    バッファに読み込まれたノートの読み込み専用，書込み可能状態を切り替えます。XHTMLモードのノートを読み込み専用にした場合、evernote-enml-formatter-command変数に設定されたコマンドを使ってXHTMLをフォーマットして表示します。詳細は [Evernote note edit mode] を参照して下さい
 
   - *Variable: evernote-enml-formatter-command*
 
@@ -150,14 +148,12 @@ Emacs evernote modeはEvernoteのノートをemacsから直接参照、編集す
 
   - *Command: evernote-browser*
 
-    Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れされた検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。詳細は[Evernote Browser] (sec-5)
-    を参照して下さい。
+    Evernote Browser を開きます。Evernote Browser はタグ一覧や、保れされた検索の一覧、過去に検索したノートの一覧からノートを開くための機能を提供します。詳細は[Evernote Browser] を参照して下さい。
 
   - *Variable: anything-c-source-evernote-title*
 
     Anything([http://www.emacswiki.org/emacs/Anything]) からタイトルからノートの選択候補を表示する機能を提供する変数です。
-    詳細は [Collaboration with Anything] (sec-8)
-    を参照して下さい。
+    詳細は [Collaboration with Anything] を参照して下さい。
 
   - *Command: anything-evernote-title*
 
@@ -188,6 +184,13 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
   - evernote-rename-note
   - evernote-delete-note
 
+
+  [Evernote note edit mode]: sec-3
+  [Search Query Examples]: sec-4
+  [Evernote note edit mode]: sec-3
+  [Evernote Browser]: sec-5
+  [Collaboration with Anything]: sec-8
+
 3 Evernote note edit mode 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -198,9 +201,11 @@ EvernoteのノートはENML DTD([http://xml.evernote.com/pub/enml2.dtd])に準�
 
 XHTMLモードでノートを保存した場合、バッファの内容がそのままノートの内容として保存されます。バッファ内容がENML DTDに沿ったフォーマットでない場合はエラーになります。
 
-XHTMLモードでノートを読み込んだ場合、初期状態としてバッファは読み込み専用になります。この際、変数evernote-enml-formatter-commandが設定されている場合は、バッファには整形された内容が表示されます。(evernote-enml-formatter-comandの設定については [Install and Settings] (sec-7) を参照して下さい)
-evernote-toggle-read-onlyコマンドを実行して編集の為に書き込み可能にした場合は、整形されない状態のXMLが表示されます。書き込み可能から読み込み専用に再度変更すると、再びバッファには整形された内容が表示されます。
+XHTMLモードでノートを読み込んだ場合、初期状態としてバッファは読み込み専用になります。この際、変数evernote-enml-formatter-commandが設定されている場合は、バッファには整形された内容が表示されます。(evernote-enml-formatter-comandの設定については [Install and Settings] を参照して下さい) evernote-toggle-read-onlyコマンドを実行して編集の為に書き込み可能にした場合は、整形されない状態のXMLが表示されます。書き込み可能から読み込み専用に再度変更すると、再びバッファには整形された内容が表示されます。
 
+
+
+[Install and Settings]: sec-7
 
 3.1.1 QUOTE XHTMLモードでの編集の例: 
 -------------------------------------
@@ -302,8 +307,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
 ノートの検索に使用できるクエリの例を示します。
 
-以下の例は [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]
-(http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479) からの引用です。
+以下の例は [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479] からの引用です。
 
     - 今年に作られたノートで、"chicken"を含み、かつ"cooking"タグが付加されたものを検索します:
 
@@ -320,6 +324,9 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
     - "San Francisco"と含むノート、もしくは"SFO"タグを付加されたノートを検索します:
 
       any: "San Francisco" tag:SFO
+
+
+      [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]: http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 
 5 Evernote Browser 
 ~~~~~~~~~~~~~~~~~~~
@@ -391,10 +398,8 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
 
   3. evernote-enml-formatter-command に使用するプログラム w3m の入手、設定 (オプション)
 
-     - Linux/Unixの場合、w3m のパッケージを [こちら] (http://w3m.sourceforge.net/index.en.html)
-     から入手してインストールするか、各ディストリビューションのw3mパッケージをインストールして下さい。
-     - Windowsの場合、cygwin を [こちら] (http://www.cygwin.com/) から入手し、setup.exe を実行してパッケージ選択画面(Select
-     Packages)からw3mを選択してインストールして下さい。
+     - Linux/Unixの場合、w3m のパッケージを [こちら] から入手してインストールするか、各ディストリビューションのw3mパッケージをインストールして下さい。
+     - Windowsの場合、cygwin を [こちら] から入手し、setup.exe を実行してパッケージ選択画面(Select Packages)からw3mを選択してインストールして下さい。
      - w3mが存在するパスを環境変数PATHに追加して下さい
 
   4. evernote-mode設定を.emacs に追記
@@ -425,6 +430,10 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
   5. proxy の設定
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
+
+
+    [こちら]: http://w3m.sourceforge.net/index.en.html
+    [こちら]: http://www.cygwin.com/
 
 8 Collaboration with Anything 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -458,14 +467,12 @@ apt-get install libgdbm-ruby
 
 - ActiveScriptRuby または Ruby-mswin32 の場合
 
-[Porting Libraries to Win32] (http://jarp.does.notwork.org/win32/)
-から gdbm.dll を入手し、ruby.exe と同じフォルダに置いて下さい。
+[Porting Libraries to Win32] から gdbm.dll を入手し、ruby.exe と同じフォルダに置いて下さい。
 
 - Mac OS X の場合
 
 Mac OS X に付属の ruby には GDBM バインディングが含まれていません。
-[MacPorts] (http://www.macports.org/) や [Homebrew]
-(http://mxcl.github.com/homebrew/) で ruby と GDBM をインストールしてください。
+[MacPorts] や [Homebrew] で ruby と GDBM をインストールしてください。
 
 MacPorts の場合
 
@@ -477,8 +484,13 @@ Homebrew の場合
 $ sudo brew install ruby gdbm
 
 
-また、[exec-path を設定]
-(sec-9.3) してください。
+また、[enh-ruby-command を設定] してください。
+
+
+[Porting Libraries to Win32]: http://jarp.does.notwork.org/win32/
+[MacPorts]: http://www.macports.org/
+[Homebrew]: http://mxcl.github.com/homebrew/
+[enh-ruby-command を設定]: sec-9.3
 
 9.2 `require': no such file to load -- net/https と表示される 
 ==============================================================
@@ -494,12 +506,11 @@ apt-get install libopenssl-ruby
 9.3 No such file or directory -- enclient.rb (LoadError) の様なメッセージが表示される 
 ======================================================================================
 
-emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
-OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path の先頭に正しい ruby のパスを設定して下さい。
+OS に複数のバージョンの ruby がインストールされている場合に、evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) と異なる ruby が使われている可能性があります。
+evernote-mode をロードする前に、enh-ruby-command に正しい ruby をフルパスで指定してください。
 
 e.g.
     
-    (setq exec-path (cons '/your/ruby/path' exec-path))
+    (setq enh-ruby-command "/your/path/to/ruby")
+    (require 'evernote-mode)
     
-

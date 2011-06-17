@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-11 09:29:53 JST
+Date: 2011-06-17 21:28:02 JST
 
 
 Table of Contents
@@ -105,8 +105,7 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-change-edit-mode (default bound to \C-cee)*
 
-    Change the edit mode of the note. (See [Evernote note edit mode] (sec-3) for details) The change on Evernote service will be made after exec of
-    evernote-save-note.
+    Change the edit mode of the note. (See [Evernote note edit mode] for details) The change on Evernote service will be made after exec of evernote-save-note.
 
   - *Command: evernote-rename-note (default bound to \C-cer)*
 
@@ -118,8 +117,7 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-search-notes*
 
-    Search notes by query in the minibuffer. (See [Search Query Examples] (sec-4)
-    for details)
+    Search notes by query in the minibuffer. (See [Search Query Examples] for details)
 
   - *Command: evernote-do-saved-search*
 
@@ -143,8 +141,7 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-toggle-read-only (default bound to \C-x\C-q)*
 
-    Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See [Evernote note edit mode] (sec-3)
-    for details.
+    Toggle read-only status of the note. When a note of XHTML mode is changed to the read-only status, the command in the variable evernote-enml-formatter-command formats the XHTML. See [Evernote note edit mode] for details.
 
   - *Variable: evernote-enml-formatter-command*
 
@@ -152,19 +149,16 @@ Emacs evernote mode offers functions to refer and edit Evernote notes directly f
 
   - *Command: evernote-browser*
 
-    Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See [Evernote Browser] (sec-5)
-    for details.
+    Open Evernote Browser. Evernote Browser offers the features to open notes from the tag hierarchical list, the saved search list and the note list of the past search result. See [Evernote Browser] for details.
 
   - *Variable: anything-c-source-evernote-title*
 
     The variable that offers the function for Anything([http://www.emacswiki.org/emacs/Anything]) to display the note candidates from the title.
-    See [Collaboration with Anything] (sec-8)
-    for details.
+    See [Collaboration with Anything] for details.
 
   - *Command: anything-evernote-title*
 
-    Open a note by using Anything. See [Collaboration with Anything] (sec-8)
-    for details.
+    Open a note by using Anything. See [Collaboration with Anything] for details.
 
   - *Variable: evernote-mode-display-menu*
 
@@ -193,6 +187,14 @@ The minor-mode "evernote-mode" is applied to the buffers opening the evernote no
   - evernote-delete-note
 
 
+
+  [Evernote note edit mode]: sec-3
+  [Search Query Examples]: sec-4
+  [Evernote note edit mode]: sec-3
+  [Evernote Browser]: sec-5
+  [Collaboration with Anything]: sec-8
+  [Collaboration with Anything]: sec-8
+
 3 Evernote note edit mode 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -204,9 +206,11 @@ Evernote notes are XML complying with ENML DTD([http://xml.evernote.com/pub/enml
 
 When you save the Evernote note in XHTML mode, the content of the buffer will be saved as the content of the note. Therefore if the contents of the buffer is not valid ENML, you cannot save the contents because of the error.
 
-And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See [Install and Settings] (sec-7) for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to
-read-only again.
+And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See [Install and Settings] for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
 
+
+
+[Install and Settings]: sec-7
 
 3.1.1 QUOTE An example of XHTML mode editing: 
 ----------------------------------------------
@@ -306,8 +310,7 @@ Use the command evernote-change-edit-mode to change the edit mode of the existin
 
 Here are examples of queries used for searching notes.
 
-The following examples are referred from ([http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]
-(http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479)).
+The following examples are referred from ([http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]).
 
     * Find notes containing the word "chicken", tagged with "cooking", and created this year:
 
@@ -325,6 +328,9 @@ The following examples are referred from ([http://www.evernote.com/about/develop
 
     any: "San Francisco" tag:SFO
 
+
+
+    [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]: http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 
 5 Evernote Browser 
 ~~~~~~~~~~~~~~~~~~~
@@ -391,10 +397,8 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
 
   3. Get w3m for evernote-enml-formatter-command (Optional)
 
-     - If you use Linux/Unix, get w3m from [here] (http://w3m.sourceforge.net/index.en.html) and install it or
-     install w3m from the package of your distribution.
-     - If you use Win, get cygwin from [here] (http://www.cygwin.com/), execute setup.exe and select w3m
-     from the "Select Packages"
+     - If you use Linux/Unix, get w3m from [here] and install it or install w3m from the package of your distribution.
+     - If you use Win, get cygwin from [here], execute setup.exe and select w3m from the "Select Packages"
      - Add the path of w3m to the environment variable "PATH".
 
   4. Add the evernote-mode configuration to .emacs.
@@ -427,6 +431,10 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
 
+
+     [here]: http://w3m.sourceforge.net/index.en.html
+     [here]: http://www.cygwin.com/
+
 8 Collaboration with Anything 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -457,14 +465,12 @@ apt-get install libgdbm-ruby
 
 - In the case of ActiveScriptRuby or Ruby-mswin32
 
-Retrieve gdbm.dll from [Porting Libraries to Win32] (http://jarp.does.notwork.org/win32/), then copy
-it to the folder where ruby.exe exists.
+Retrieve gdbm.dll from [Porting Libraries to Win32], then copy it to the folder where ruby.exe exists.
 
 - In the case of Mac OS X
 
 The pre-installed ruby on Mac OS X does not contain GDBM bindings.
-Re-install ruby and GDBM by [MacPorts] (http://www.macports.org/) or
-[Homebrew] (http://mxcl.github.com/homebrew/).
+Re-install ruby and GDBM by [MacPorts] or [Homebrew].
 
 MacPorts:
 
@@ -476,8 +482,13 @@ Homebrew:
 $ sudo brew install ruby gdbm
 
 
-Also, [adjust your
-exec-path] (sec-9.3).
+Also, [specify enh-ruby-command].
+
+
+[Porting Libraries to Win32]: http://jarp.does.notwork.org/win32/
+[MacPorts]: http://www.macports.org/
+[Homebrew]: http://mxcl.github.com/homebrew/
+[specify enh-ruby-command]: sec-9.3
 
 9.2 `require': no such file to load -- net/https 
 =================================================
@@ -492,11 +503,10 @@ apt-get install libopenssl-ruby
 9.3 No such file or directory -- enclient.rb (LoadError) 
 =========================================================
 
-The emacs variable "exec-path" may not contain the path of ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
-This may happen when multiple version of ruby are installed in the OS.
-Prepend the correct ruby path to the exec-path.
+When multiple version of ruby are installed in the OS, the evernote-mode may use another ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
+Specify the full path of ruby to the enh-ruby-command, before load the evernote-mode.
 
 e.g.
     
-    (setq exec-path (cons '/your/ruby/path' exec-path))
+    (setq enh-ruby-command "/your/path/to/ruby")
     

@@ -444,7 +444,7 @@ Homebrew の場合
 $ sudo brew install ruby gdbm
 @</pre>
 
-また、[[No%20such%20file%20or%20directory][exec-path を設定]] してください。
+また、[[No%20such%20file%20or%20directory][enh-ruby-command を設定]] してください。
 
 ** `require': no such file to load -- net/https と表示される
 
@@ -458,11 +458,11 @@ apt-get install libopenssl-ruby
 @</pre>
 ** No such file or directory -- enclient.rb (LoadError) の様なメッセージが表示される
 
-emacs の変数 exec-path に evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) が含まれていない可能性があります。
-OS に複数のバージョンの ruby がインストールされている場合にこのような場合が起こり得ます。
-exec-path の先頭に正しい ruby のパスを設定して下さい。
+OS に複数のバージョンの ruby がインストールされている場合に、evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) と異なる ruby が使われている可能性があります。
+evernote-mode をロードする前に、enh-ruby-command に正しい ruby をフルパスで指定してください。
 
 e.g.
     @<pre>
-    (setq exec-path (cons '/your/ruby/path' exec-path))
+    (setq enh-ruby-command "/your/path/to/ruby")
+    (require 'evernote-mode)
     @</pre>
