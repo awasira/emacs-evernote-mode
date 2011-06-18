@@ -370,10 +370,10 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
   4. evernote-mode設定を.emacs に追記
 
      @<pre>
-     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; optional
      (add-to-list 'load-path "<your load path>")
      (require 'evernote-mode)
      (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
+     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; optional
      (global-set-key "\C-cec" 'evernote-create-note)
      (global-set-key "\C-ceo" 'evernote-open-note)
      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -444,7 +444,7 @@ Homebrew の場合
 $ sudo brew install ruby gdbm
 @</pre>
 
-また、[[No%20such%20file%20or%20directory][enh-ruby-command を設定]] してください。
+また、[[No%20such%20file%20or%20directory][evernote-ruby-command を設定]] してください。
 
 ** `require': no such file to load -- net/https と表示される
 
@@ -459,10 +459,10 @@ apt-get install libopenssl-ruby
 ** No such file or directory -- enclient.rb (LoadError) の様なメッセージが表示される
 
 OS に複数のバージョンの ruby がインストールされている場合に、evernote-mode をインストールした ruby (ruby setup.rb を実行した ruby) と異なる ruby が使われている可能性があります。
-evernote-mode をロードする前に、enh-ruby-command に正しい ruby をフルパスで指定してください。
+evernote-mode をロードする前に、evernote-ruby-command に正しい ruby をフルパスで指定してください。
 
 e.g.
     @<pre>
-    (setq enh-ruby-command "/your/path/to/ruby")
+    (setq evernote-ruby-command "/your/path/to/ruby")
     (require 'evernote-mode)
     @</pre>

@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-17 21:28:02 JST
+Date: 2011-06-18 09:25:24 JST
 
 
 Table of Contents
@@ -27,7 +27,7 @@ Table of Contents
     9.3 No such file or directory -- enclient.rb (LoadError) 
 
 
-1 QUOTE License 
+1 License 
 ~~~~~~~~~~~~~~~~
 
 Copyright 2011 Yusuke Kawakami
@@ -187,14 +187,6 @@ The minor-mode "evernote-mode" is applied to the buffers opening the evernote no
   - evernote-delete-note
 
 
-
-  [Evernote note edit mode]: sec-3
-  [Search Query Examples]: sec-4
-  [Evernote note edit mode]: sec-3
-  [Evernote Browser]: sec-5
-  [Collaboration with Anything]: sec-8
-  [Collaboration with Anything]: sec-8
-
 3 Evernote note edit mode 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -209,10 +201,7 @@ When you save the Evernote note in XHTML mode, the content of the buffer will be
 And when you read a Evernote note by using XHTML mode, the buffer is read-only as the initial state. If the variable evernote-enml-formatter-command is set, the content of the buffer is formatted. (See [Install and Settings] for details of setting evernote-enml-formatter-command) If you toggle the read-only status and change it to read-write, unformatted XHTML is displayed in the buffer. The buffer will display the formatted text if you change the state to read-only again.
 
 
-
-[Install and Settings]: sec-7
-
-3.1.1 QUOTE An example of XHTML mode editing: 
+3.1.1 An example of XHTML mode editing: 
 ----------------------------------------------
 
    Emacs Buffer
@@ -224,7 +213,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-     save on XHTML mode
+   | 
+   | save on XHTML mode
    V
    The content of the note (same as the emacs buffer)
    -----------------------------------
@@ -235,7 +225,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-     read on XHTML mode
+   | 
+   | read on XHTML mode
    V
    Emacs Buffer (read-only and formatted)
    -----------------------------------
@@ -243,7 +234,8 @@ And when you read a Evernote note by using XHTML mode, the buffer is read-only a
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-    toggle read-only(evernote-toggle-read-only: \C-x\C-q)
+   | 
+   | toggle read-only(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs Buffer (unformatted)
    -----------------------------------
@@ -264,7 +256,7 @@ In XHTML mode, you have to edit a XHTML as a text but it is a complicated work. 
 The text mode is specialized in editing Evernote notes that only contain text content. When you save an Evernote note, special characters(&keyword; space, newline) in the buffer are escaped and the root element is added to transform it into a XML document. Therefore text contents in the Emacs buffer is same as the appearance of the note. (is not same as the actual XML content of the note.) And when you read a Evernote note by using TEXT mode, evernote-mode reads the contents under the root element of the XML as a text and all the special characters are unescaped then evernote-mode insert it to the buffer.
 
 
-3.2.1 QUOTE An example of TEXT mode editing: 
+3.2.1 An example of TEXT mode editing: 
 ---------------------------------------------
 
 Emacs Buffer
@@ -273,7 +265,8 @@ Emacs Buffer
    evernote-mode offers the two edit mode, XHTML mode and TEXT mode for
    saving and reading the Evenote notes.
    -----------------------------------
-     save on TEXT mode
+   | 
+   | save on TEXT mode
    V
    The content of the note (escaped and transformed into a XML)
    -----------------------------------
@@ -284,7 +277,8 @@ Emacs Buffer
    saving and reading the Evenote notes.<br clear="none"/>
    </en-note>
    -----------------------------------
-     read on TEXT mode
+   | 
+   | read on TEXT mode
    V
    Emacs Buffer (unescaped and transformed int a text)
    -----------------------------------
@@ -310,7 +304,7 @@ Use the command evernote-change-edit-mode to change the edit mode of the existin
 
 Here are examples of queries used for searching notes.
 
-The following examples are referred from ([http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]).
+The following examples are referred from ([http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479]).
 
     * Find notes containing the word "chicken", tagged with "cooking", and created this year:
 
@@ -328,9 +322,6 @@ The following examples are referred from ([http://www.evernote.com/about/develop
 
     any: "San Francisco" tag:SFO
 
-
-
-    [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]: http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 
 5 Evernote Browser 
 ~~~~~~~~~~~~~~~~~~~
@@ -404,10 +395,10 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
   4. Add the evernote-mode configuration to .emacs.
 
      
-     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (add-to-list 'load-path "<your load path>")
      (require 'evernote-mode)
      (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
+     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (global-set-key "\C-cec" 'evernote-create-note)
      (global-set-key "\C-ceo" 'evernote-open-note)
      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -430,10 +421,6 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
 
      If you want to use the proxy, set the value to the environment variable 'EN\_PROXY' written as 'host:port' format. (ex. export EN\_PROXY=proxy.hoge.com:8080)
 
-
-
-     [here]: http://w3m.sourceforge.net/index.en.html
-     [here]: http://www.cygwin.com/
 
 8 Collaboration with Anything 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -482,13 +469,7 @@ Homebrew:
 $ sudo brew install ruby gdbm
 
 
-Also, [specify enh-ruby-command].
-
-
-[Porting Libraries to Win32]: http://jarp.does.notwork.org/win32/
-[MacPorts]: http://www.macports.org/
-[Homebrew]: http://mxcl.github.com/homebrew/
-[specify enh-ruby-command]: sec-9.3
+Also, [specify evernote-ruby-command].
 
 9.2 `require': no such file to load -- net/https 
 =================================================
@@ -504,9 +485,9 @@ apt-get install libopenssl-ruby
 =========================================================
 
 When multiple version of ruby are installed in the OS, the evernote-mode may use another ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
-Specify the full path of ruby to the enh-ruby-command, before load the evernote-mode.
+Specify the full path of ruby to the evernote-ruby-command, before load the evernote-mode.
 
 e.g.
     
-    (setq enh-ruby-command "/your/path/to/ruby")
+    (setq evernote-ruby-command "/your/path/to/ruby")
     

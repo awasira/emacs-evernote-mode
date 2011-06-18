@@ -368,10 +368,10 @@ Also, you can refer the bookmarks 'bookmark-jump' (C-x r b bookmark RET) or 'lis
   4. Add the evernote-mode configuration to .emacs.
 
      @<pre>
-     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (add-to-list 'load-path "<your load path>")
      (require 'evernote-mode)
      (setq evernote-username "<your evernote user name>") ; optional: you can use this username as default.
+     (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")) ; option
      (global-set-key "\C-cec" 'evernote-create-note)
      (global-set-key "\C-ceo" 'evernote-open-note)
      (global-set-key "\C-ces" 'evernote-search-notes)
@@ -441,7 +441,7 @@ Homebrew:
 $ sudo brew install ruby gdbm
 @</pre>
 
-Also, [[No%20such%20file%20or%20directory][specify enh-ruby-command]].
+Also, [[No%20such%20file%20or%20directory][specify evernote-ruby-command]].
 
 ** `require': no such file to load -- net/https
 
@@ -455,9 +455,9 @@ apt-get install libopenssl-ruby
 ** No such file or directory -- enclient.rb (LoadError)
 
 When multiple version of ruby are installed in the OS, the evernote-mode may use another ruby that has installed the evernote-mode (The ruby that has executed 'ruby setup.rb').
-Specify the full path of ruby to the enh-ruby-command, before load the evernote-mode.
+Specify the full path of ruby to the evernote-ruby-command, before load the evernote-mode.
 
 e.g.
     @<pre>
-    (setq enh-ruby-command "/your/path/to/ruby")
+    (setq evernote-ruby-command "/your/path/to/ruby")
     @</pre>

@@ -146,6 +146,23 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; User options
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar evernote-username nil
+  "*An username of your evernote")
+
+(defvar evernote-enml-formatter-command nil
+  "*Formatter for xhtml")
+
+(defvar evernote-ruby-command "ruby"
+  "*Path of the ruby command")
+
+(defvar evernote-password-cache nil
+  "*Non-nil means that password cache is enabled.
+It is recommended to encrypt the file with EasyPG.")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interface for evernote-browsing-mode.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -356,8 +373,6 @@
   "Note contents as a string of XHTML")
 (make-variable-buffer-local 'evernote-note-xhtml-mode-content)
 
-(defvar evernote-username nil
-  "*An username of your evernote")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu Settings
@@ -1700,13 +1715,10 @@
 ;; Functions for executing the external command (enh-command-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar enh-ruby-command "ruby"
-  "Name of the ruby command")
-
 (defvar enh-enclient-command
   (concat 
    (with-output-to-string
-     (call-process enh-ruby-command nil standard-output nil
+     (call-process evernote-ruby-command nil standard-output nil
                    "-rrbconfig" "-e" "print Config::CONFIG['bindir']"))
    "/enclient.rb")
   "Name of the enclient.rb command")
@@ -1927,7 +1939,7 @@
               (not (eq (process-status proc) 'run)))
       (setq proc (start-process enh-command-process-name
                                 enh-command-output-buffer-name
-                                enh-ruby-command "-S" enh-enclient-command))
+                                evernote-ruby-command "-S" enh-enclient-command))
       (set-process-sentinel proc 'enh-command-sentinel)
       (set-process-coding-system proc 'utf-8 'utf-8)
       (set-process-query-on-exit-flag proc nil))))
@@ -1936,12 +1948,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helper functions for all modes in this file (enh-xxx)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(defvar evernote-password-cache nil
-  "*Non-nil means that password cache is enabled.
-It is recommended to encrypt the file with EasyPG.")
-
 
 (defvar enh-notebook-info (make-hash-table :test #'equal)
   "Notebook info associated with the guid")
