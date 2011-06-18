@@ -2049,7 +2049,7 @@ It is recommended to encrypt the file with EasyPG.")
 
 
 (defun enh-format-enml (content outbuf)
-  (if (boundp 'evernote-enml-formatter-command)
+  (if evernote-enml-formatter-command
       (let ((infile (concat (make-temp-file "evernote-enml") ".html"))
             (command (car evernote-enml-formatter-command))
             (args (cdr evernote-enml-formatter-command)))
