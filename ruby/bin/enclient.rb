@@ -753,7 +753,7 @@ module EnClient
       result = nil
       content.gsub! %r{(?:\r\n)|\n|\r}, "\n"
       if edit_mode == "TEXT"
-        content =~ %r|<en-note>(.*)</en-note>|m
+        content =~ %r|<en-note[^>]*>(.*)</en-note>|m
         content = $1
         content.gsub! %r{<br.*?/>}m, "\n"
         content.gsub! %r{&nbsp;}m, " "
