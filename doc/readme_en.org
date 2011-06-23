@@ -460,4 +460,5 @@ Specify the full path of ruby to the evernote-ruby-command, before load the ever
 e.g.
     @<pre>
     (setq evernote-ruby-command "/your/path/to/ruby")
+    (require 'evernote-mode)
     @</pre>
