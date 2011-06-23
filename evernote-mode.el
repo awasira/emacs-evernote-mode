@@ -1308,25 +1308,8 @@ It is recommended to encrypt the file with EasyPG.")
 
 
 (defun enh-base-change-major-mode-from-note-name (note-name)
-  (catch 'mode
-    (mapc
-     (lambda (pattern-mode-pair)
-       (if (consp pattern-mode-pair)
-           (let ((pattern (car pattern-mode-pair))
-                 (mode (cdr pattern-mode-pair)))
-             (if (consp mode)
-                 (setq mode (car mode)))
-             (if (and (stringp pattern)
-                      (fboundp mode)
-                      (string-match pattern note-name))
-                 (progn
-                   (funcall mode)
-                   (throw 'mode mode))))))
-     auto-mode-alist)
-    (if (fboundp default-major-mode)
-        (progn
-          (funcall default-major-mode)
-          (throw 'mode default-major-mode)))))
+  (let ((buffer-file-name note-name))
+    (normal-mode)))
 
 
 (defun enh-base-find-opened-buffer (guid)
