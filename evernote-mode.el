@@ -16,7 +16,7 @@
 ;;
 ;; evernote-mode home page is at: http://code.google.com/p/emacs-evernote-mode/
 ;; Author: Yusuke KAWAKAMI, Akihiro ARISAWA
-;; Version: 0.40
+;; Version: 0.41
 ;; Keywords: tools, emacs, evernote, bookmark
 
 ;; This emacs lisp offers the interactive functions to open, edit, and update notes of Evernote.
