@@ -432,16 +432,19 @@ apt-get install libgdbm-ruby
 - Mac OS X の場合
 
 Mac OS X に付属の ruby には GDBM バインディングが含まれていません。
-[[http://www.macports.org/][MacPorts]] や [[http://mxcl.github.com/homebrew/][Homebrew]] で ruby と GDBM をインストールしてください。
+[[http://www.macports.org/][MacPorts]] や [[http://mxcl.github.com/homebrew/][Homebrew]] で GDBM と ruby をインストールしてください。
+GDBM をインストールせずに ruby をインストールしていた場合は、一旦 ruby を削除してください。
 
 MacPorts の場合
 @<pre>
-$ sudo ports install ruby gdbm
+$ sudo port uninstall ruby
+$ sudo port install gdbm ruby
 @</pre>
 
 Homebrew の場合
 @<pre>
-$ sudo brew install ruby gdbm
+$ sudo brew uninstall ruby
+$ sudo brew install gdbm ruby
 @</pre>
 
 また、[[No%20such%20file%20or%20directory][evernote-ruby-command を設定]] してください。

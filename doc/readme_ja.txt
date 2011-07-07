@@ -2,7 +2,7 @@
                          ===================
 
 Author: Yusuke Kawakami <Yusuke Kawakami>
-Date: 2011-06-18 09:23:25 JST
+Date: 2011-07-07 22:18:00 JST
 
 
 Table of Contents
@@ -27,7 +27,7 @@ Table of Contents
     9.3 No such file or directory -- enclient.rb (LoadError) の様なメッセージが表示される 
 
 
-1 License 
+1 QUOTE License 
 ~~~~~~~~~~~~~~~~
 
 Copyright 2011 Yusuke Kawakami
@@ -184,6 +184,13 @@ evernote-create-note,evernote-write-note,evernote-post-regionで新規ノート�
   - evernote-rename-note
   - evernote-delete-note
 
+
+  [Evernote note edit mode]: sec-3
+  [Search Query Examples]: sec-4
+  [Evernote note edit mode]: sec-3
+  [Evernote Browser]: sec-5
+  [Collaboration with Anything]: sec-8
+
 3 Evernote note edit mode 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -197,7 +204,10 @@ XHTMLモードでノートを保存した場合、バッファの内容がその
 XHTMLモードでノートを読み込んだ場合、初期状態としてバッファは読み込み専用になります。この際、変数evernote-enml-formatter-commandが設定されている場合は、バッファには整形された内容が表示されます。(evernote-enml-formatter-comandの設定については [Install and Settings] を参照して下さい) evernote-toggle-read-onlyコマンドを実行して編集の為に書き込み可能にした場合は、整形されない状態のXMLが表示されます。書き込み可能から読み込み専用に再度変更すると、再びバッファには整形された内容が表示されます。
 
 
-3.1.1 XHTMLモードでの編集の例: 
+
+[Install and Settings]: sec-7
+
+3.1.1 QUOTE XHTMLモードでの編集の例: 
 -------------------------------------
 
    Emacs バッファ
@@ -209,8 +219,7 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   | 
-   | XHTMLモードで保存
+    XHTMLモードで保存
    V
    Evernoteサービス上のノート(Emacsバッファの内容と同じ)
    -----------------------------------
@@ -221,8 +230,7 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   | 
-   | XHTMLモードで読み込み
+    XHTMLモードで読み込み
    V
    Emacs バッファ
    (読み込み専用となり、整形されて表示される)
@@ -231,8 +239,7 @@ XHTMLモードでノートを読み込んだ場合、初期状態としてバッ
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-   | 
-   | 書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
+    書き込み可能状態にする(evernote-toggle-read-only: \C-x\C-q)
    V
    Emacs バッファ
    (整形されないXMLが表示される)
@@ -253,7 +260,7 @@ XHTMLモードでは、ノートを編集する際にXHTMLをテキストとし�
 TEXTモードはテキストのみ含むEvernoteノートの編集に特化したモードです。TEXTモードでノートを保存した場合、バッファ中のXMLの特殊文字(&キーワード\;, スペース、改行)はエスケープされ、ルート要素を付加した上でENMLに変換されます。このため、emacsバッファで表示されている内容がノートの見た目上の内容として保存されます。また、TEXTモードでノートを読み込んだ場合は、XMLのルート要素直下をテキストとして解釈し、XMLの特殊文字はアンエスケープされた上でバッファに読み込まれます。
 
 
-3.2.1 TEXTモードでの編集の例: 
+3.2.1 QUOTE TEXTモードでの編集の例: 
 ------------------------------------
 
    Emacs バッファ
@@ -262,8 +269,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    拠するXML文書です。evernote-modeではこのXMLをemacsで扱うためにXHTMLモー
    ドとTEXTモード2種類の編集モードを用意しています。
    -----------------------------------
-   | 
-   | TEXTモードで保存
+    TEXTモードで保存
    V
    Evernoteサービス上のノート
    (Emacsバッファの内容がエスケープされ, XMLに変換される)
@@ -275,8 +281,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
    ドとTEXTモード2種類の編集モードを用意しています。<br clear="none"/>
    </en-note>
    -----------------------------------
-   | 
-   | TEXTモードで読み込み
+    TEXTモードで読み込み
    V
    Emacs バッファ
    (ノートのルート要素以下の内容がアンエスケープされる)
@@ -302,7 +307,7 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
 
 ノートの検索に使用できるクエリの例を示します。
 
-以下の例は [http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479] からの引用です。
+以下の例は [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479] からの引用です。
 
     - 今年に作られたノートで、"chicken"を含み、かつ"cooking"タグが付加されたものを検索します:
 
@@ -319,6 +324,9 @@ TEXTモードはテキストのみ含むEvernoteノートの編集に特化し�
     - "San Francisco"と含むノート、もしくは"SFO"タグを付加されたノートを検索します:
 
       any: "San Francisco" tag:SFO
+
+
+      [http://www.evernote.com/about/developer/api/evernote-api.htm#\_Toc277181479]: http://www.evernote.com/about/developer/api/evernote-api.htm#_Toc277181479
 
 5 Evernote Browser 
 ~~~~~~~~~~~~~~~~~~~
@@ -423,6 +431,10 @@ bookmark-set (C-x r m RET) をノートを開いているバッファで実行�
 
     プロキシを使用する場合は環境変数EN\_PROXYに 'プロキシホスト':'ポート'を指定して下さい。(ex. export EN\_PROXY=proxy.hoge.com:8080)
 
+
+    [こちら]: http://w3m.sourceforge.net/index.en.html
+    [こちら]: http://www.cygwin.com/
+
 8 Collaboration with Anything 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -460,19 +472,28 @@ apt-get install libgdbm-ruby
 - Mac OS X の場合
 
 Mac OS X に付属の ruby には GDBM バインディングが含まれていません。
-[MacPorts] や [Homebrew] で ruby と GDBM をインストールしてください。
+[MacPorts] や [Homebrew] で GDBM と ruby をインストールしてください。
+GDBM をインストールせずに ruby をインストールしていた場合は、一旦 ruby を削除してください。
 
 MacPorts の場合
 
-$ sudo ports install ruby gdbm
+$ sudo port uninstall ruby
+$ sudo port install gdbm ruby
 
 
 Homebrew の場合
 
-$ sudo brew install ruby gdbm
+$ sudo brew uninstall ruby
+$ sudo brew install gdbm ruby
 
 
 また、[evernote-ruby-command を設定] してください。
+
+
+[Porting Libraries to Win32]: http://jarp.does.notwork.org/win32/
+[MacPorts]: http://www.macports.org/
+[Homebrew]: http://mxcl.github.com/homebrew/
+[evernote-ruby-command を設定]: sec-9.3
 
 9.2 `require': no such file to load -- net/https と表示される 
 ==============================================================

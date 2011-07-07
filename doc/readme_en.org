@@ -429,16 +429,19 @@ Retrieve gdbm.dll from [[http://jarp.does.notwork.org/win32/][Porting Libraries 
 - In the case of Mac OS X
 
 The pre-installed ruby on Mac OS X does not contain GDBM bindings.
-Re-install ruby and GDBM by [[http://www.macports.org/][MacPorts]] or [[http://mxcl.github.com/homebrew/][Homebrew]].
+Re-install GDBM and ruby by [[http://www.macports.org/][MacPorts]] or [[http://mxcl.github.com/homebrew/][Homebrew]].
+If you have installed ruby before GDBM, delete ruby once.
 
 MacPorts:
 @<pre>
-$ sudo ports install ruby gdbm
+$ sudo port uninstall ruby
+$ sudo port install gdbm ruby
 @</pre>
 
 Homebrew:
 @<pre>
-$ sudo brew install ruby gdbm
+$ sudo brew uninstall ruby
+$ sudo brew install gdbm ruby
 @</pre>
 
 Also, [[No%20such%20file%20or%20directory][specify evernote-ruby-command]].
