@@ -290,8 +290,7 @@ It is recommended to encrypt the file with EasyPG.")
      (enh-browsing-create-page 'note-list
                                (format "Query Result of: %s" query)
                                note-attrs
-                               `(enh-command-get-note-attrs-from-query
-                                 ,query)))))
+                               `(lambda () (enh-command-get-note-attrs-from-query ,query))))))
 
 
 (defun evernote-browsing-prev-page ()
@@ -591,8 +590,8 @@ It is recommended to encrypt the file with EasyPG.")
                                             (enh-tag-guids-to-comma-separated-names tag-guids))
                                   "All notes")
                                 note-attrs
-                                `(enh-command-get-note-attrs-from-notebook-and-tag-guids
-                                  ,notebook-guid ,tag-guids))
+                                `(lambda () (enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                             ,notebook-guid ',tag-guids)))
       t))))
 
 
@@ -618,8 +617,7 @@ It is recommended to encrypt the file with EasyPG.")
         (enh-browsing-create-page 'note-list
                                   (format "Query Result of: %s" query)
                                   note-attrs
-                                  `(enh-command-get-note-attrs-from-query
-                                    ,query))
+                                  `(lambda () (enh-command-get-note-attrs-from-query ,query)))
         t)))))
 
 
@@ -639,8 +637,8 @@ It is recommended to encrypt the file with EasyPG.")
                                 (format "Query Result of Saved Search: %s"
                                         (enutil-aget 'name search-attr))
                                 note-attrs
-                                `(enh-command-get-note-attrs-from-query
-                                  ,(enutil-aget 'query search-attr)))
+                                `(lambda () (enh-command-get-note-attrs-from-query
+                                             ,(enutil-aget 'query search-attr))))
       t))))
 
 
@@ -1402,8 +1400,8 @@ It is recommended to encrypt the file with EasyPG.")
                                        (enutil-aget 'name
                                                     (enh-get-notebook-attr guid)))
                                note-attrs
-                               `(enh-command-get-note-attrs-from-notebook-and-tag-guids
-                                 ,guid nil)))))
+                               `(lambda () (enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                            ,guid nil))))))
 
 
 (defun enh-browsing-open-tag (widget &rest ignored)
@@ -1426,10 +1424,10 @@ It is recommended to encrypt the file with EasyPG.")
                                                         (enh-get-tag-attr guid)))
                                  "All notes")
                                note-attrs
-                               `(enh-command-get-note-attrs-from-notebook-and-tag-guids
-                                 nil ,(if guid
-                                          (list guid)
-                                        nil))))))
+                               `(lambda () (enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                            nil ',(if guid
+                                                      (list guid)
+                                                    nil)))))))
 
 
 (defun enh-browsing-open-search (widget &rest ignored)
@@ -1448,9 +1446,9 @@ It is recommended to encrypt the file with EasyPG.")
                                        (enutil-aget 'name
                                                     (enh-get-search-attr guid)))
                                note-attrs
-                               `(enh-command-get-note-attrs-from-query
-                                 ,(enutil-aget 'query
-                                               (enh-get-search-attr guid)))))))
+                               `(lambda () (enh-command-get-note-attrs-from-query
+                                            ,(enutil-aget 'query
+                                                          (enh-get-search-attr guid))))))))
 
 
 (defun enh-browsing-open-note (widget &rest ignored)
@@ -1621,11 +1619,7 @@ It is recommended to encrypt the file with EasyPG.")
     (setq enh-browsing-page-widget-root nil))
   (when (and (null enh-browsing-page-data)
              enh-browsing-page-data-refresh-closure)
-    (let (note-attrs
-          (attrs-func (car enh-browsing-page-data-refresh-closure))
-          (attrs-args (cdr enh-browsing-page-data-refresh-closure)))
-      (setq note-attrs (apply attrs-func attrs-args))
-      (setq enh-browsing-page-data note-attrs)))
+    (setq enh-browsing-page-data (funcall enh-browsing-page-data-refresh-closure)))
   (let ((note-attrs enh-browsing-page-data)
         (note-list nil))
     (mapc
