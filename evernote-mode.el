@@ -289,7 +289,9 @@ It is recommended to encrypt the file with EasyPG.")
     (enh-browsing-push-page
      (enh-browsing-create-page 'note-list
                                (format "Query Result of: %s" query)
-                               note-attrs))))
+                               note-attrs
+                               `(enh-command-get-note-attrs-from-query
+                                 ,query)))))
 
 
 (defun evernote-browsing-prev-page ()
@@ -334,6 +336,8 @@ It is recommended to encrypt the file with EasyPG.")
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
   (when (eq major-mode 'evernote-browsing-mode)
+    (when enh-browsing-page-data-refresh-closure
+      (setq enh-browsing-page-data nil))
     (funcall enh-browsing-page-setup-func)))
 
 
@@ -586,7 +590,9 @@ It is recommended to encrypt the file with EasyPG.")
                                     (format "Notes with tag: %s"
                                             (enh-tag-guids-to-comma-separated-names tag-guids))
                                   "All notes")
-                                note-attrs)
+                                note-attrs
+                                `(enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                  ,notebook-guid ,tag-guids))
       t))))
 
 
@@ -611,7 +617,9 @@ It is recommended to encrypt the file with EasyPG.")
        (enh-browsing-push-page
         (enh-browsing-create-page 'note-list
                                   (format "Query Result of: %s" query)
-                                  note-attrs)
+                                  note-attrs
+                                  `(enh-command-get-note-attrs-from-query
+                                    ,query))
         t)))))
 
 
@@ -630,7 +638,9 @@ It is recommended to encrypt the file with EasyPG.")
       (enh-browsing-create-page 'note-list
                                 (format "Query Result of Saved Search: %s"
                                         (enutil-aget 'name search-attr))
-                                note-attrs)
+                                note-attrs
+                                `(enh-command-get-note-attrs-from-query
+                                  ,(enutil-aget 'query search-attr)))
       t))))
 
 
@@ -1365,6 +1375,9 @@ It is recommended to encrypt the file with EasyPG.")
 (defvar enh-browsing-page-data nil)
 (make-variable-buffer-local 'enh-browsing-page-data)
 
+(defvar enh-browsing-page-data-refresh-closure nil)
+(make-variable-buffer-local 'enh-browsing-page-data-refresh-closure)
+
 (defvar enh-browsing-page-widget-title nil)
 (make-variable-buffer-local 'enh-browsing-page-widget-title)
 
@@ -1388,7 +1401,9 @@ It is recommended to encrypt the file with EasyPG.")
                                (format "Notes in Notebook: %s"
                                        (enutil-aget 'name
                                                     (enh-get-notebook-attr guid)))
-                               note-attrs))))
+                               note-attrs
+                               `(enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                 ,guid nil)))))
 
 
 (defun enh-browsing-open-tag (widget &rest ignored)
@@ -1410,7 +1425,11 @@ It is recommended to encrypt the file with EasyPG.")
                                            (enutil-aget 'name
                                                         (enh-get-tag-attr guid)))
                                  "All notes")
-                               note-attrs))))
+                               note-attrs
+                               `(enh-command-get-note-attrs-from-notebook-and-tag-guids
+                                 nil ,(if guid
+                                          (list guid)
+                                        nil))))))
 
 
 (defun enh-browsing-open-search (widget &rest ignored)
@@ -1428,7 +1447,10 @@ It is recommended to encrypt the file with EasyPG.")
                                (format "Query Result of Saved Search: %s"
                                        (enutil-aget 'name
                                                     (enh-get-search-attr guid)))
-                               note-attrs))))
+                               note-attrs
+                               `(enh-command-get-note-attrs-from-query
+                                 ,(enutil-aget 'query
+                                               (enh-get-search-attr guid)))))))
 
 
 (defun enh-browsing-open-note (widget &rest ignored)
@@ -1460,14 +1482,15 @@ It is recommended to encrypt the file with EasyPG.")
      (funcall enh-browsing-page-setup-func))))
 
 
-(defun enh-browsing-create-page (type description &optional note-attrs)
+(defun enh-browsing-create-page (type description &optional note-attrs refresh-closure)
   "Create a page structure of the attr-list"
   (let ((buf (generate-new-buffer (format "*ENB %s* " description))))
     (save-excursion
       (set-buffer buf)
       (setq enh-browsing-page-type type
             enh-browsing-page-description description
-            enh-browsing-page-data note-attrs)
+            enh-browsing-page-data note-attrs
+            enh-browsing-page-data-refresh-closure refresh-closure)
       (cond
        ((eq type 'notebook-list)
         (setq enh-browsing-page-setup-func
@@ -1596,6 +1619,13 @@ It is recommended to encrypt the file with EasyPG.")
   (when enh-browsing-page-widget-root
     (widget-delete enh-browsing-page-widget-root)
     (setq enh-browsing-page-widget-root nil))
+  (when (and (null enh-browsing-page-data)
+             enh-browsing-page-data-refresh-closure)
+    (let (note-attrs
+          (attrs-func (car enh-browsing-page-data-refresh-closure))
+          (attrs-args (cdr enh-browsing-page-data-refresh-closure)))
+      (setq note-attrs (apply attrs-func attrs-args))
+      (setq enh-browsing-page-data note-attrs)))
   (let ((note-attrs enh-browsing-page-data)
         (note-list nil))
     (mapc
@@ -1677,8 +1707,10 @@ It is recommended to encrypt the file with EasyPG.")
   (save-excursion
     (mapcar (lambda (page)
               (set-buffer page)
-              (if (eq enh-browsing-page-type type)
-                  (funcall enh-browsing-page-setup-func)))
+              (when (eq enh-browsing-page-type type)
+                (when enh-browsing-page-data-refresh-closure
+                  (setq enh-browsing-page-data nil))
+                (funcall enh-browsing-page-setup-func)))
             evernote-browsing-page-list)))
 
 ;
