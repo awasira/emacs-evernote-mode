@@ -289,8 +289,8 @@ module EnClient
       #http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       #http.verify_depth = 5
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      resp, data = http.post(@url.request_uri, @outbuf, @headers)
-      @inbuf = StringIO.new data
+      resp = http.post(@url.request_uri, @outbuf, @headers)
+      @inbuf = StringIO.new resp.body
       @outbuf = ""
     end
   end

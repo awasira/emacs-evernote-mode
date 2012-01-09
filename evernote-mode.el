@@ -1728,7 +1728,7 @@ It is recommended to encrypt the file with EasyPG.")
   (concat 
    (with-output-to-string
      (call-process evernote-ruby-command nil (list standard-output nil) nil
-                   "-rrbconfig" "-e" "print Config::CONFIG['bindir']"))
+                   "-rrbconfig" "-e" "print RbConfig::CONFIG['bindir']"))
    "/enclient.rb")
   "Name of the enclient.rb command")
 (defconst enh-command-process-name "Evernote-Client")
